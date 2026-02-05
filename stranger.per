@@ -1,10 +1,11 @@
 ; ========================================
-; Tower Rush AI - 修正版
+; Tower Rush AI - 修正版2
 ; ファイル名: tower_rush.per
 ; ========================================
 
 ; ===== 定数定義 =====
 (defconst gl-tower-rush-mode 40)
+(defconst gl-houses-built 41)
 (defconst min-stone-amount 125)
 
 ; ===== 初期設定 =====
@@ -25,11 +26,31 @@
     (set-strategic-number sn-gold-gatherer-percentage 10)
     (set-strategic-number sn-stone-gatherer-percentage 0)
     (set-strategic-number sn-enable-offensive-priority 1)
+    (set-goal gl-houses-built 0)
     (disable-self)
 )
 
-; ===== 家の建設 =====
+; ===== ゲーム開始：最初の家2軒を優先建設 =====
 (defrule
+    (game-time < 60)
+    (goal gl-houses-built 0)
+    (building-type-count-total house < 2)
+    (can-build house)
+=>
+    (build house)
+)
+
+(defrule
+    (building-type-count-total house >= 2)
+    (goal gl-houses-built 0)
+=>
+    (set-goal gl-houses-built 1)
+    (disable-self)
+)
+
+; ===== 通常の家建設 =====
+(defrule
+    (goal gl-houses-built 1)
     (housing-headroom < 3)
     (population-headroom < 3)
     (can-build house)
@@ -49,6 +70,7 @@
 ; ===== 暗黒の時代：伐採所 =====
 (defrule
     (current-age == dark-age)
+    (building-type-count-total house >= 2)
     (building-type-count-total lumber-camp < 2)
     (can-build lumber-camp)
 =>
@@ -58,6 +80,7 @@
 ; ===== 暗黒の時代：粉ひき所 =====
 (defrule
     (current-age == dark-age)
+    (building-type-count-total house >= 2)
     (building-type-count-total mill < 1)
     (can-build mill)
 =>
@@ -115,20 +138,12 @@
     (build barracks)
 )
 
-; ===== 見張り台技術の研究 =====
-;(defrule
-;    (current-age == feudal-age)
-;    (can-research ri-watch-tower)
-;=>
-;    (research ri-watch-tower)
-;)
-
 ; ===== 前線建築者の派遣開始 =====
 (defrule
     (current-age == feudal-age)
     (goal gl-tower-rush-mode 1)
     (stone-amount >= min-stone-amount)
-    (can-build watch-tower-line)
+    (can-build watch-tower)
 =>
     (set-strategic-number sn-number-forward-builders 4)
     ;(set-strategic-number sn-enable-offensive-tower-placement 1)
@@ -141,9 +156,9 @@
 (defrule
     (current-age == feudal-age)
     (stone-amount >= 125)
-    (building-type-count-total watch-tower-line < 6)
+    (building-type-count-total watch-tower < 6)
 =>
-    (build-forward watch-tower-line)
+    (build-forward watch-tower)
 )
 
 ; ===== 継続的な町の人訓練 =====
@@ -158,7 +173,7 @@
 ; ===== 槍兵生産 =====
 (defrule
     (current-age == feudal-age)
-    (building-type-count-total watch-tower-line >= 1)
+    (building-type-count-total watch-tower >= 1)
     (unit-type-count spearman-line < 10)
     (can-train spearman-line)
 =>
@@ -187,6 +202,7 @@
 
 ; ===== 追加の家建設 =====
 (defrule
+    (goal gl-houses-built 1)
     (housing-headroom < 5)
     (can-build house)
 =>
