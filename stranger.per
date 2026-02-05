@@ -1,5 +1,5 @@
 ; ========================================
-; Tower Rush AI - 修正版2
+; Tower Rush AI - 修正版5（家建設修正）
 ; ファイル名: tower_rush.per
 ; ========================================
 
@@ -21,18 +21,23 @@
     (set-strategic-number sn-number-explore-groups 1)
     (set-strategic-number sn-minimum-explore-group-size 1)
     (set-strategic-number sn-maximum-explore-group-size 1)
-    (set-strategic-number sn-food-gatherer-percentage 50)
-    (set-strategic-number sn-wood-gatherer-percentage 40)
+    (set-strategic-number sn-food-gatherer-percentage 55)
+    (set-strategic-number sn-wood-gatherer-percentage 35)
     (set-strategic-number sn-gold-gatherer-percentage 10)
     (set-strategic-number sn-stone-gatherer-percentage 0)
     (set-strategic-number sn-enable-offensive-priority 1)
+    
+    ; イノシシ誘導の設定
+    (set-strategic-number sn-enable-boar-hunting 1)
+    (set-strategic-number sn-minimum-number-hunters 4)
+    (set-strategic-number sn-food-dropsite-distance 4)
+    
     (set-goal gl-houses-built 0)
     (disable-self)
 )
 
 ; ===== ゲーム開始：最初の家2軒を優先建設 =====
 (defrule
-    (game-time < 60)
     (goal gl-houses-built 0)
     (building-type-count-total house < 2)
     (can-build house)
@@ -40,11 +45,13 @@
     (build house)
 )
 
+; ===== 家2軒完成後の切り替え =====
 (defrule
     (building-type-count-total house >= 2)
     (goal gl-houses-built 0)
 =>
     (set-goal gl-houses-built 1)
+    (chat-to-all "初期家建設完了")
     (disable-self)
 )
 
@@ -146,7 +153,6 @@
     (can-build watch-tower)
 =>
     (set-strategic-number sn-number-forward-builders 4)
-    ;(set-strategic-number sn-enable-offensive-tower-placement 1)
     (set-goal gl-tower-rush-mode 2)
     (chat-to-all "前線タワー建設開始")
     (disable-self)
