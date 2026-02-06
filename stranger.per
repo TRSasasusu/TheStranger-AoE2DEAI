@@ -1,5 +1,5 @@
 ; ========================================
-; Tower Rush AI - 修正版9（軍兵塔ラッシュ）
+; Tower Rush AI - 修正版11（資源管理改善・エラー修正）
 ; ファイル名: tower_rush.per
 ; ========================================
 
@@ -33,6 +33,9 @@
     (set-strategic-number sn-enable-boar-hunting 1)
     (set-strategic-number sn-minimum-number-hunters 4)
     (set-strategic-number sn-food-dropsite-distance 4)
+    
+    ; 畑の設定
+    (set-strategic-number sn-percent-building-cancellation 20)
     
     ; 軍事ユニットの攻撃設定
     (set-strategic-number sn-percent-attack-soldiers 100)
@@ -96,24 +99,58 @@
     (train villager)
 )
 
-; ===== 暗黒の時代：伐採所 =====
+; ===== 暗黒の時代：伐採所（複数） =====
 (defrule
     (current-age == dark-age)
     (building-type-count-total house >= 2)
-    (building-type-count-total lumber-camp < 2)
+    (building-type-count-total lumber-camp < 3)
     (can-build lumber-camp)
 =>
     (build lumber-camp)
 )
 
-; ===== 暗黒の時代：粉ひき所 =====
+; ===== 暗黒の時代：粉ひき所（複数） =====
 (defrule
     (current-age == dark-age)
     (building-type-count-total house >= 2)
-    (building-type-count-total mill < 1)
+    (building-type-count-total mill < 2)
     (can-build mill)
 =>
     (build mill)
+)
+
+; ===== 資源が遠い場合：追加の粉ひき所 =====
+(defrule
+    (current-age >= dark-age)
+    (food-amount < 200)
+    (building-type-count-total mill < 4)
+    (dropsite-min-distance food > 15)
+    (can-build mill)
+=>
+    (build mill)
+    (chat-to-all "遠い食料のため粉ひき所建設")
+)
+
+; ===== 畑の建設（食料が遠い、または領主以降） =====
+(defrule
+    (current-age >= feudal-age)
+    (building-type-count-total mill >= 1)
+    (wood-amount >= 60)
+    (can-build farm)
+=>
+    (build farm)
+)
+
+; ===== 食料が遠い場合：早めに畑を作る =====
+(defrule
+    (current-age == dark-age)
+    (population >= 15)
+    (dropsite-min-distance food > 20)
+    (wood-amount >= 60)
+    (can-build farm)
+=>
+    (build farm)
+    (chat-to-all "食料が遠いため畑を建設")
 )
 
 ; ===== 領主の時代へ進化 =====
@@ -141,13 +178,45 @@
     (disable-self)
 )
 
-; ===== 鉱山キャンプ建設 =====
+; ===== 鉱山キャンプ建設（石用） =====
 (defrule
     (current-age >= feudal-age)
     (building-type-count-total mining-camp < 1)
     (can-build mining-camp)
 =>
     (build mining-camp)
+)
+
+; ===== 石が遠い場合：追加の鉱山キャンプ =====
+(defrule
+    (current-age >= feudal-age)
+    (dropsite-min-distance stone > 15)
+    (building-type-count-total mining-camp < 2)
+    (can-build mining-camp)
+=>
+    (build mining-camp)
+    (chat-to-all "遠い石のため鉱山キャンプ建設")
+)
+
+; ===== 金が遠い場合：追加の鉱山キャンプ =====
+(defrule
+    (current-age >= feudal-age)
+    (dropsite-min-distance gold > 15)
+    (building-type-count-total mining-camp < 3)
+    (can-build mining-camp)
+=>
+    (build mining-camp)
+    (chat-to-all "遠い金のため鉱山キャンプ建設")
+)
+
+; ===== 領主時代：畑の大量建設 =====
+(defrule
+    (current-age >= feudal-age)
+    (building-type-count-total farm < 10)
+    (wood-amount >= 60)
+    (can-build farm)
+=>
+    (build farm)
 )
 
 ; ===== 兵舎の建設（優先） =====
