@@ -1,5 +1,5 @@
 ; ========================================
-; Tower Rush AI - 修正版7（柵建設改善）
+; Tower Rush AI - 修正版9（軍兵塔ラッシュ）
 ; ファイル名: tower_rush.per
 ; ========================================
 
@@ -7,6 +7,7 @@
 (defconst gl-tower-rush-mode 40)
 (defconst gl-houses-built 41)
 (defconst gl-loom-researched 42)
+(defconst gl-military-sent 43)
 (defconst min-stone-amount 125)
 
 ; ===== 初期設定 =====
@@ -22,8 +23,8 @@
     (set-strategic-number sn-number-explore-groups 1)
     (set-strategic-number sn-minimum-explore-group-size 1)
     (set-strategic-number sn-maximum-explore-group-size 1)
-    (set-strategic-number sn-food-gatherer-percentage 55)
-    (set-strategic-number sn-wood-gatherer-percentage 35)
+    (set-strategic-number sn-food-gatherer-percentage 50)
+    (set-strategic-number sn-wood-gatherer-percentage 40)
     (set-strategic-number sn-gold-gatherer-percentage 10)
     (set-strategic-number sn-stone-gatherer-percentage 0)
     (set-strategic-number sn-enable-offensive-priority 1)
@@ -33,12 +34,15 @@
     (set-strategic-number sn-minimum-number-hunters 4)
     (set-strategic-number sn-food-dropsite-distance 4)
     
-    ; 壁建設の設定
-    (set-strategic-number sn-wall-targeting-mode 1)
-    (set-strategic-number sn-number-build-attempts-before-skip 3)
+    ; 軍事ユニットの攻撃設定
+    (set-strategic-number sn-percent-attack-soldiers 100)
+    (set-strategic-number sn-percent-attack-boats 0)
+    (set-strategic-number sn-task-ungrouped-soldiers 1)
+    (set-strategic-number sn-group-commander-selection-method 1)
     
     (set-goal gl-houses-built 0)
     (set-goal gl-loom-researched 0)
+    (set-goal gl-military-sent 0)
     (disable-self)
 )
 
@@ -133,7 +137,7 @@
     (set-strategic-number sn-wood-gatherer-percentage 40)
     (set-strategic-number sn-food-gatherer-percentage 30)
     (set-strategic-number sn-gold-gatherer-percentage 5)
-    (chat-to-all "タワーラッシュを開始します")
+    (chat-to-all "軍兵塔ラッシュを開始します")
     (disable-self)
 )
 
@@ -146,9 +150,20 @@
     (build mining-camp)
 )
 
+; ===== 兵舎の建設（優先） =====
+(defrule
+    (current-age == feudal-age)
+    (building-type-count-total barracks < 2)
+    (can-build barracks)
+=>
+    (build barracks)
+    (chat-to-all "兵舎建設")
+)
+
 ; ===== 鍛冶場の建設 =====
 (defrule
     (current-age == feudal-age)
+    (building-type-count-total barracks >= 1)
     (building-type-count-total blacksmith < 1)
     (can-build blacksmith)
 =>
@@ -165,16 +180,17 @@
     (chat-to-all "矢羽根を研究")
 )
 
-; ===== 兵舎の建設 =====
+; ===== 民兵の研究 =====
 (defrule
     (current-age == feudal-age)
-    (building-type-count-total barracks < 1)
-    (can-build barracks)
+    (building-type-count-total barracks >= 1)
+    (can-research ri-man-at-arms)
 =>
-    (build barracks)
+    (research ri-man-at-arms)
+    (chat-to-all "民兵を研究")
 )
 
-; ===== 前線建築者の派遣開始（3人に変更） =====
+; ===== 前線建築者の派遣開始 =====
 (defrule
     (current-age == feudal-age)
     (goal gl-tower-rush-mode 1)
@@ -196,36 +212,6 @@
     (build-forward watch-tower)
 )
 
-; ===== タワー1つ目の周辺に柵を複数建設 =====
-(defrule
-    (current-age == feudal-age)
-    (building-type-count-total watch-tower >= 1)
-    (building-type-count-total palisade-wall < 10)
-    (wood-amount >= 10)
-=>
-    (build-forward palisade-wall)
-)
-
-; ===== タワー2つ目以降も柵で囲む =====
-(defrule
-    (current-age == feudal-age)
-    (building-type-count-total watch-tower >= 2)
-    (building-type-count-total palisade-wall < 20)
-    (wood-amount >= 10)
-=>
-    (build-forward palisade-wall)
-)
-
-; ===== さらに柵を追加（タワー3つ以上） =====
-(defrule
-    (current-age == feudal-age)
-    (building-type-count-total watch-tower >= 3)
-    (building-type-count-total palisade-wall < 30)
-    (wood-amount >= 10)
-=>
-    (build-forward palisade-wall)
-)
-
 ; ===== 継続的な町の人訓練 =====
 (defrule
     (current-age >= feudal-age)
@@ -235,11 +221,46 @@
     (train villager)
 )
 
-; ===== 槍兵生産 =====
+; ===== 民兵/軍兵の大量生産 =====
+(defrule
+    (current-age == feudal-age)
+    (building-type-count-total barracks >= 1)
+    (unit-type-count militia-line < 15)
+    (can-train militia-line)
+=>
+    (train militia-line)
+)
+
+; ===== タワー建設後に軍兵を前線へ派遣 =====
 (defrule
     (current-age == feudal-age)
     (building-type-count-total watch-tower >= 1)
-    (unit-type-count spearman-line < 10)
+    (unit-type-count militia-line >= 5)
+    (goal gl-military-sent 0)
+=>
+    (set-strategic-number sn-number-attack-groups 1)
+    (set-strategic-number sn-minimum-attack-group-size 5)
+    (set-strategic-number sn-maximum-attack-group-size 20)
+    (set-strategic-number sn-attack-group-gather-spacing 3)
+    (set-goal gl-military-sent 1)
+    (chat-to-all "軍兵を前線へ派遣")
+    (disable-self)
+)
+
+; ===== 攻撃グループの編成と送り込み =====
+(defrule
+    (current-age == feudal-age)
+    (unit-type-count militia-line >= 8)
+    (goal gl-military-sent 1)
+=>
+    (attack-now)
+)
+
+; ===== 槍兵も生産（対騎兵用） =====
+(defrule
+    (current-age == feudal-age)
+    (building-type-count-total watch-tower >= 1)
+    (unit-type-count spearman-line < 8)
     (can-train spearman-line)
 =>
     (train spearman-line)
@@ -259,7 +280,7 @@
 (defrule
     (current-age == feudal-age)
     (building-type-count-total archery-range >= 1)
-    (unit-type-count archer-line < 8)
+    (unit-type-count archer-line < 10)
     (can-train archer-line)
 =>
     (train archer-line)
@@ -277,16 +298,25 @@
 ; ===== 石不足時の採掘強化 =====
 (defrule
     (current-age == feudal-age)
-    (stone-amount < 200)
+    (stone-amount < 300)
     (strategic-number sn-stone-gatherer-percentage < 30)
 =>
     (set-strategic-number sn-stone-gatherer-percentage 30)
 )
 
+; ===== 金採掘の強化（軍兵生産のため） =====
+(defrule
+    (current-age == feudal-age)
+    (gold-amount < 300)
+    (unit-type-count militia-line >= 5)
+=>
+    (set-strategic-number sn-gold-gatherer-percentage 15)
+)
+
 ; ===== 城主の時代へ =====
 (defrule
     (current-age == feudal-age)
-    (population >= 30)
+    (population >= 35)
     (can-research castle-age)
 =>
     (research castle-age)
