@@ -1,11 +1,12 @@
 ; ========================================
-; Tower Rush AI - 修正版5（家建設修正）
+; Tower Rush AI - 修正版7（柵建設改善）
 ; ファイル名: tower_rush.per
 ; ========================================
 
 ; ===== 定数定義 =====
 (defconst gl-tower-rush-mode 40)
 (defconst gl-houses-built 41)
+(defconst gl-loom-researched 42)
 (defconst min-stone-amount 125)
 
 ; ===== 初期設定 =====
@@ -32,7 +33,24 @@
     (set-strategic-number sn-minimum-number-hunters 4)
     (set-strategic-number sn-food-dropsite-distance 4)
     
+    ; 壁建設の設定
+    (set-strategic-number sn-wall-targeting-mode 1)
+    (set-strategic-number sn-number-build-attempts-before-skip 3)
+    
     (set-goal gl-houses-built 0)
+    (set-goal gl-loom-researched 0)
+    (disable-self)
+)
+
+; ===== 機織りの研究（暗黒の時代早期） =====
+(defrule
+    (current-age == dark-age)
+    (goal gl-loom-researched 0)
+    (can-research ri-loom)
+=>
+    (research ri-loom)
+    (set-goal gl-loom-researched 1)
+    (chat-to-all "機織りを研究")
     (disable-self)
 )
 
@@ -98,6 +116,7 @@
 (defrule
     (current-age == dark-age)
     (population >= 21)
+    (goal gl-loom-researched 1)
     (can-research feudal-age)
 =>
     (research feudal-age)
@@ -136,6 +155,16 @@
     (build blacksmith)
 )
 
+; ===== 矢羽根の研究 =====
+(defrule
+    (current-age == feudal-age)
+    (building-type-count-total blacksmith >= 1)
+    (can-research ri-fletching)
+=>
+    (research ri-fletching)
+    (chat-to-all "矢羽根を研究")
+)
+
 ; ===== 兵舎の建設 =====
 (defrule
     (current-age == feudal-age)
@@ -145,14 +174,14 @@
     (build barracks)
 )
 
-; ===== 前線建築者の派遣開始 =====
+; ===== 前線建築者の派遣開始（3人に変更） =====
 (defrule
     (current-age == feudal-age)
     (goal gl-tower-rush-mode 1)
     (stone-amount >= min-stone-amount)
     (can-build watch-tower)
 =>
-    (set-strategic-number sn-number-forward-builders 4)
+    (set-strategic-number sn-number-forward-builders 3)
     (set-goal gl-tower-rush-mode 2)
     (chat-to-all "前線タワー建設開始")
     (disable-self)
@@ -165,6 +194,36 @@
     (building-type-count-total watch-tower < 6)
 =>
     (build-forward watch-tower)
+)
+
+; ===== タワー1つ目の周辺に柵を複数建設 =====
+(defrule
+    (current-age == feudal-age)
+    (building-type-count-total watch-tower >= 1)
+    (building-type-count-total palisade-wall < 10)
+    (wood-amount >= 10)
+=>
+    (build-forward palisade-wall)
+)
+
+; ===== タワー2つ目以降も柵で囲む =====
+(defrule
+    (current-age == feudal-age)
+    (building-type-count-total watch-tower >= 2)
+    (building-type-count-total palisade-wall < 20)
+    (wood-amount >= 10)
+=>
+    (build-forward palisade-wall)
+)
+
+; ===== さらに柵を追加（タワー3つ以上） =====
+(defrule
+    (current-age == feudal-age)
+    (building-type-count-total watch-tower >= 3)
+    (building-type-count-total palisade-wall < 30)
+    (wood-amount >= 10)
+=>
+    (build-forward palisade-wall)
 )
 
 ; ===== 継続的な町の人訓練 =====
