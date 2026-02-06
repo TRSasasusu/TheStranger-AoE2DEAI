@@ -1,5 +1,5 @@
 ; ========================================
-; Tower Rush AI - 修正版11（資源管理改善・エラー修正）
+; Tower Rush AI - 修正版26（エラー修正・魚を避けて畑建設）
 ; ファイル名: tower_rush.per
 ; ========================================
 
@@ -8,9 +8,10 @@
 (defconst gl-houses-built 41)
 (defconst gl-loom-researched 42)
 (defconst gl-military-sent 43)
+(defconst gl-far-food-check 44)
 (defconst min-stone-amount 125)
 
-; ===== 初期設定 =====
+; ===== 初期設定1：基本設定 =====
 (defrule
     (true)
 =>
@@ -23,33 +24,88 @@
     (set-strategic-number sn-number-explore-groups 1)
     (set-strategic-number sn-minimum-explore-group-size 1)
     (set-strategic-number sn-maximum-explore-group-size 1)
+    (disable-self)
+)
+
+; ===== 初期設定2：資源採集設定 =====
+(defrule
+    (true)
+=>
     (set-strategic-number sn-food-gatherer-percentage 50)
     (set-strategic-number sn-wood-gatherer-percentage 40)
     (set-strategic-number sn-gold-gatherer-percentage 10)
     (set-strategic-number sn-stone-gatherer-percentage 0)
     (set-strategic-number sn-enable-offensive-priority 1)
-    
-    ; イノシシ誘導の設定
-    (set-strategic-number sn-enable-boar-hunting 1)
-    (set-strategic-number sn-minimum-number-hunters 4)
-    (set-strategic-number sn-food-dropsite-distance 4)
-    
-    ; 畑の設定
-    (set-strategic-number sn-percent-building-cancellation 20)
-    
-    ; 軍事ユニットの攻撃設定
-    (set-strategic-number sn-percent-attack-soldiers 100)
-    (set-strategic-number sn-percent-attack-boats 0)
-    (set-strategic-number sn-task-ungrouped-soldiers 1)
-    (set-strategic-number sn-group-commander-selection-method 1)
-    
-    (set-goal gl-houses-built 0)
-    (set-goal gl-loom-researched 0)
-    (set-goal gl-military-sent 0)
     (disable-self)
 )
 
-; ===== 機織りの研究（暗黒の時代早期） =====
+; ===== 初期設定3：イノシシと資源場設定 =====
+(defrule
+    (true)
+=>
+    (set-strategic-number sn-enable-boar-hunting 1)
+    (set-strategic-number sn-minimum-number-hunters 4)
+    (set-strategic-number sn-food-dropsite-distance 5)
+    (set-strategic-number sn-camp-max-distance 15)
+    (set-strategic-number sn-mill-max-distance 15)
+    (set-strategic-number sn-percent-building-cancellation 20)
+    (disable-self)
+)
+
+; ===== 初期設定4：軍事設定 =====
+(defrule
+    (true)
+=>
+    (set-strategic-number sn-percent-attack-soldiers 70)
+    (set-strategic-number sn-percent-attack-boats 0)
+    (set-strategic-number sn-task-ungrouped-soldiers 0)
+    (set-strategic-number sn-group-commander-selection-method 0)
+    (disable-self)
+)
+
+; ===== 初期設定5：町の中心回避設定 =====
+(defrule
+    (true)
+=>
+    (set-strategic-number sn-ignore-attack-group-under-attack 1)
+    (set-strategic-number sn-blot-exploration-map 0)
+    (set-strategic-number sn-maximum-town-size 8)
+    (set-strategic-number sn-attack-winning-player 0)
+    (set-strategic-number sn-attack-winning-player-factor 0)
+    (disable-self)
+)
+
+; ===== 初期設定6：ゴール初期化 =====
+(defrule
+    (true)
+=>
+    (set-goal gl-houses-built 0)
+    (set-goal gl-loom-researched 0)
+    (set-goal gl-military-sent 0)
+    (set-goal gl-far-food-check 0)
+    (disable-self)
+)
+
+; ===== 遠い食料を避ける設定 =====
+(defrule
+    (current-age >= dark-age)
+    (dropsite-min-distance food > 12)
+=>
+    (set-goal gl-far-food-check 1)
+    (set-strategic-number sn-food-gatherer-percentage 25)
+)
+
+; ===== 食料が近くにある場合は通常モード =====
+(defrule
+    (current-age >= dark-age)
+    (dropsite-min-distance food <= 12)
+    (goal gl-far-food-check 1)
+=>
+    (set-goal gl-far-food-check 0)
+    (set-strategic-number sn-food-gatherer-percentage 50)
+)
+
+; ===== 機織りの研究 =====
 (defrule
     (current-age == dark-age)
     (goal gl-loom-researched 0)
@@ -57,34 +113,23 @@
 =>
     (research ri-loom)
     (set-goal gl-loom-researched 1)
-    (chat-to-all "機織りを研究")
     (disable-self)
 )
 
-; ===== ゲーム開始：最初の家2軒を優先建設 =====
+; ===== 家の建設（人口余裕4未満で建設） =====
 (defrule
-    (goal gl-houses-built 0)
-    (building-type-count-total house < 2)
+    (housing-headroom < 4)
+    (population-headroom > 0)
     (can-build house)
 =>
     (build house)
 )
 
-; ===== 家2軒完成後の切り替え =====
+; ===== 家の建設（予備：人口余裕10未満で木が豊富なら） =====
 (defrule
-    (building-type-count-total house >= 2)
-    (goal gl-houses-built 0)
-=>
-    (set-goal gl-houses-built 1)
-    (chat-to-all "初期家建設完了")
-    (disable-self)
-)
-
-; ===== 通常の家建設 =====
-(defrule
-    (goal gl-houses-built 1)
-    (housing-headroom < 3)
-    (population-headroom < 3)
+    (housing-headroom < 10)
+    (population-headroom > 0)
+    (wood-amount > 150)
     (can-build house)
 =>
     (build house)
@@ -99,58 +144,97 @@
     (train villager)
 )
 
-; ===== 暗黒の時代：伐採所（複数） =====
+; ===== 伐採所（距離5以上で建設） =====
 (defrule
     (current-age == dark-age)
-    (building-type-count-total house >= 2)
+    (dropsite-min-distance wood > 5)
     (building-type-count-total lumber-camp < 3)
     (can-build lumber-camp)
 =>
     (build lumber-camp)
 )
 
-; ===== 暗黒の時代：粉ひき所（複数） =====
+; ===== 領主時代：伐採所追加 =====
+(defrule
+    (current-age >= feudal-age)
+    (dropsite-min-distance wood > 5)
+    (building-type-count-total lumber-camp < 4)
+    (can-build lumber-camp)
+=>
+    (build lumber-camp)
+)
+
+; ===== 粉ひき所（距離5以上で建設） =====
 (defrule
     (current-age == dark-age)
-    (building-type-count-total house >= 2)
-    (building-type-count-total mill < 2)
+    (dropsite-min-distance food > 5)
+    (dropsite-min-distance food < 13)
+    (building-type-count-total mill < 3)
     (can-build mill)
 =>
     (build mill)
 )
 
-; ===== 資源が遠い場合：追加の粉ひき所 =====
+; ===== 領主時代：粉ひき所追加（軍事建物後のみ） =====
 (defrule
-    (current-age >= dark-age)
-    (food-amount < 200)
+    (current-age >= feudal-age)
+    (dropsite-min-distance food > 5)
+    (dropsite-min-distance food < 13)
     (building-type-count-total mill < 4)
-    (dropsite-min-distance food > 15)
+    (building-type-count-total barracks >= 2)
+    (building-type-count-total blacksmith >= 1)
     (can-build mill)
 =>
     (build mill)
-    (chat-to-all "遠い食料のため粉ひき所建設")
 )
 
-; ===== 畑の建設（食料が遠い、または領主以降） =====
+; ===== 畑（暗黒時代・食料が遠い場合）条件緩和 =====
+(defrule
+    (current-age == dark-age)
+    (population >= 12)
+    (building-type-count-total mill >= 1)
+    (goal gl-far-food-check 1)
+    (building-type-count-total farm < 8)
+    (wood-amount >= 60)
+    (can-build farm)
+=>
+    (build farm)
+    (chat-to-all "暗黒時代：畑建設")
+)
+
+; ===== 畑（暗黒時代・通常でも少し建設） =====
+(defrule
+    (current-age == dark-age)
+    (population >= 18)
+    (building-type-count-total mill >= 2)
+    (building-type-count-total farm < 3)
+    (wood-amount >= 120)
+    (can-build farm)
+=>
+    (build farm)
+)
+
+; ===== 畑（領主進化中）積極的に建設 =====
+(defrule
+    (current-age == feudal-age)
+    (research-available feudal-age)
+    (building-type-count-total mill >= 1)
+    (building-type-count-total farm < 10)
+    (wood-amount >= 60)
+    (can-build farm)
+=>
+    (build farm)
+)
+
+; ===== 畑（領主時代）積極的に建設 =====
 (defrule
     (current-age >= feudal-age)
     (building-type-count-total mill >= 1)
+    (building-type-count-total farm < 20)
     (wood-amount >= 60)
     (can-build farm)
 =>
     (build farm)
-)
-
-; ===== 食料が遠い場合：早めに畑を作る =====
-(defrule
-    (current-age == dark-age)
-    (population >= 15)
-    (dropsite-min-distance food > 20)
-    (wood-amount >= 60)
-    (can-build farm)
-=>
-    (build farm)
-    (chat-to-all "食料が遠いため畑を建設")
 )
 
 ; ===== 領主の時代へ進化 =====
@@ -171,55 +255,34 @@
 =>
     (set-goal gl-tower-rush-mode 1)
     (set-strategic-number sn-stone-gatherer-percentage 25)
-    (set-strategic-number sn-wood-gatherer-percentage 40)
-    (set-strategic-number sn-food-gatherer-percentage 30)
+    (set-strategic-number sn-wood-gatherer-percentage 45)
+    (set-strategic-number sn-food-gatherer-percentage 25)
     (set-strategic-number sn-gold-gatherer-percentage 5)
     (chat-to-all "軍兵塔ラッシュを開始します")
     (disable-self)
 )
 
-; ===== 鉱山キャンプ建設（石用） =====
+; ===== 鉱山キャンプ（距離5以上で建設） =====
 (defrule
     (current-age >= feudal-age)
-    (building-type-count-total mining-camp < 1)
-    (can-build mining-camp)
-=>
-    (build mining-camp)
-)
-
-; ===== 石が遠い場合：追加の鉱山キャンプ =====
-(defrule
-    (current-age >= feudal-age)
-    (dropsite-min-distance stone > 15)
-    (building-type-count-total mining-camp < 2)
-    (can-build mining-camp)
-=>
-    (build mining-camp)
-    (chat-to-all "遠い石のため鉱山キャンプ建設")
-)
-
-; ===== 金が遠い場合：追加の鉱山キャンプ =====
-(defrule
-    (current-age >= feudal-age)
-    (dropsite-min-distance gold > 15)
+    (dropsite-min-distance stone > 5)
     (building-type-count-total mining-camp < 3)
     (can-build mining-camp)
 =>
     (build mining-camp)
-    (chat-to-all "遠い金のため鉱山キャンプ建設")
 )
 
-; ===== 領主時代：畑の大量建設 =====
+; ===== 金の鉱山キャンプ =====
 (defrule
     (current-age >= feudal-age)
-    (building-type-count-total farm < 10)
-    (wood-amount >= 60)
-    (can-build farm)
+    (dropsite-min-distance gold > 5)
+    (building-type-count-total mining-camp < 4)
+    (can-build mining-camp)
 =>
-    (build farm)
+    (build mining-camp)
 )
 
-; ===== 兵舎の建設（優先） =====
+; ===== 兵舎の建設（最優先） =====
 (defrule
     (current-age == feudal-age)
     (building-type-count-total barracks < 2)
@@ -229,7 +292,7 @@
     (chat-to-all "兵舎建設")
 )
 
-; ===== 鍛冶場の建設 =====
+; ===== 鍛冶場の建設（優先） =====
 (defrule
     (current-age == feudal-age)
     (building-type-count-total barracks >= 1)
@@ -257,6 +320,17 @@
 =>
     (research ri-man-at-arms)
     (chat-to-all "民兵を研究")
+)
+
+; ===== 弓兵育成所の建設 =====
+(defrule
+    (current-age == feudal-age)
+    (building-type-count-total barracks >= 2)
+    (building-type-count-total blacksmith >= 1)
+    (building-type-count-total archery-range < 1)
+    (can-build archery-range)
+=>
+    (build archery-range)
 )
 
 ; ===== 前線建築者の派遣開始 =====
@@ -294,55 +368,78 @@
 (defrule
     (current-age == feudal-age)
     (building-type-count-total barracks >= 1)
-    (unit-type-count militia-line < 15)
+    (unit-type-count militia-line < 20)
     (can-train militia-line)
 =>
     (train militia-line)
 )
 
-; ===== タワー建設後に軍兵を前線へ派遣 =====
+; ===== タワー建設後に軍兵を前線へ派遣1 =====
 (defrule
     (current-age == feudal-age)
     (building-type-count-total watch-tower >= 1)
-    (unit-type-count militia-line >= 5)
+    (unit-type-count militia-line >= 6)
     (goal gl-military-sent 0)
 =>
-    (set-strategic-number sn-number-attack-groups 1)
-    (set-strategic-number sn-minimum-attack-group-size 5)
-    (set-strategic-number sn-maximum-attack-group-size 20)
-    (set-strategic-number sn-attack-group-gather-spacing 3)
+    (set-strategic-number sn-number-attack-groups 5)
+    (set-strategic-number sn-minimum-attack-group-size 3)
+    (set-strategic-number sn-maximum-attack-group-size 5)
+    (set-strategic-number sn-attack-group-gather-spacing 10)
     (set-goal gl-military-sent 1)
     (chat-to-all "軍兵を前線へ派遣")
     (disable-self)
 )
 
-; ===== 攻撃グループの編成と送り込み =====
+; ===== タワー建設後に軍兵を前線へ派遣2 =====
 (defrule
     (current-age == feudal-age)
-    (unit-type-count militia-line >= 8)
     (goal gl-military-sent 1)
+=>
+    (set-strategic-number sn-target-evaluation-distance 30)
+    (set-strategic-number sn-attack-intelligence 0)
+    (set-strategic-number sn-minimum-defend-group-size 0)
+    (set-strategic-number sn-sentry-distance 5)
+    (disable-self)
+)
+
+; ===== 敵の伐採所を狙う攻撃 =====
+(defrule
+    (current-age == feudal-age)
+    (unit-type-count militia-line >= 6)
+    (goal gl-military-sent 1)
+    (players-building-type-count any-enemy lumber-camp > 0)
 =>
     (attack-now)
 )
 
-; ===== 槍兵も生産（対騎兵用） =====
+; ===== 敵の粉ひき所を狙う攻撃 =====
+(defrule
+    (current-age == feudal-age)
+    (unit-type-count militia-line >= 6)
+    (goal gl-military-sent 1)
+    (players-building-type-count any-enemy mill > 0)
+=>
+    (attack-now)
+)
+
+; ===== 敵の鉱山キャンプを狙う攻撃 =====
+(defrule
+    (current-age == feudal-age)
+    (unit-type-count militia-line >= 6)
+    (goal gl-military-sent 1)
+    (players-building-type-count any-enemy mining-camp > 0)
+=>
+    (attack-now)
+)
+
+; ===== 槍兵も生産 =====
 (defrule
     (current-age == feudal-age)
     (building-type-count-total watch-tower >= 1)
-    (unit-type-count spearman-line < 8)
+    (unit-type-count spearman-line < 10)
     (can-train spearman-line)
 =>
     (train spearman-line)
-)
-
-; ===== 弓兵育成所の建設 =====
-(defrule
-    (current-age == feudal-age)
-    (building-type-count-total archery-range < 1)
-    (wood-amount >= 175)
-    (can-build archery-range)
-=>
-    (build archery-range)
 )
 
 ; ===== 弓兵生産 =====
@@ -355,15 +452,6 @@
     (train archer-line)
 )
 
-; ===== 追加の家建設 =====
-(defrule
-    (goal gl-houses-built 1)
-    (housing-headroom < 5)
-    (can-build house)
-=>
-    (build house)
-)
-
 ; ===== 石不足時の採掘強化 =====
 (defrule
     (current-age == feudal-age)
@@ -373,7 +461,7 @@
     (set-strategic-number sn-stone-gatherer-percentage 30)
 )
 
-; ===== 金採掘の強化（軍兵生産のため） =====
+; ===== 金採掘の強化 =====
 (defrule
     (current-age == feudal-age)
     (gold-amount < 300)
