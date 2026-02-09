@@ -178,6 +178,20 @@
 )
 
 
+;(defconst scout-timer 20)
+(defrule
+    (or
+        (goal gl-researching-feudal 1)
+        (current-age == feudal-age)
+    )
+    =>
+    ;(enable-timer scout-timer 60)
+    (up-send-scout group-type-land-explore scout-enemy)
+    (disable-self)
+)
+
+
+;**********TR**********
 ;(defrule
 ;    (current-age == feudal-age)
 ;    (can-build watch-tower)
@@ -259,6 +273,7 @@
     (up-modify-goal gl-tower-point-x-end c:+ 1)
     (up-build-line gl-tower-point-x-start gl-tower-point-x-end c: palisade-wall)
 )
+;**********TR (end)**********
 
 (defrule
     (or
@@ -275,6 +290,12 @@
     =>
     (research ri-man-at-arms)
 )
+
+;(defrule
+;    (true)
+;    =>
+;    (up-find-local c: militiaman-line c: 100)
+;)
 
 
 ;******************** BOAR HUNTING **************************************
