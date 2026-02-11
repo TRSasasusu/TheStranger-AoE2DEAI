@@ -1,5 +1,6 @@
 (defconst gl-far-food-check 10)
 (defconst gl-researching-feudal 11)
+(defconst gl-tmp 5)
 
 
 (defrule
@@ -201,23 +202,24 @@
 
 
 ;**********TR**********
-;(defrule
-;    (current-age == feudal-age)
-;    (can-build watch-tower)
-;    =>
-;    (build-forward watch-tower)
-;)
-
 (defrule
+    (current-age == feudal-age)
     (can-build watch-tower)
     (unit-type-count militiaman-line > 2)
     =>
-    (chat-to-all "I would like to build a tower")
-    ;(up-set-placement-data target-player lumber-camp c: 8)
-    (up-set-placement-data any-enemy lumber-camp c: -4)
-    (up-build place-control 0 c: watch-tower)
-    (chat-to-all "I am proceeding to build a tower now")
+    (build-forward watch-tower)
 )
+
+;(defrule
+;    (can-build watch-tower)
+;    (unit-type-count militiaman-line > 2)
+;    =>
+;    (chat-to-all "I would like to build a tower")
+;    ;(up-set-placement-data target-player lumber-camp c: 8)
+;    (up-set-placement-data any-enemy lumber-camp c: -4) ; this command is only applicable to ally
+;    (up-build place-control 0 c: watch-tower)
+;    (chat-to-all "I am proceeding to build a tower now")
+;)
 
 
 (defconst gl-tower-point-x 100)
@@ -304,14 +306,21 @@
 )
 
 (defrule
+    (unit-type-count militiaman-line >= 2)
     (can-research ri-man-at-arms)
     =>
     (research ri-man-at-arms)
 )
 
 (defconst t-attack-timer 30)
+(defconst gl-attack-go-deep 31)
 (defrule
-    (unit-type-count militiaman-line > 2)
+    (true)
+    =>
+    (set-goal gl-attack-go-deep 0)
+)
+(defrule
+    (unit-type-count militiaman-line >= 2)
     (up-timer-status t-attack-timer != timer-running)
     =>
     (up-set-offense-priority c: lumber-camp c: 1)
@@ -322,6 +331,10 @@
     (set-strategic-number sn-percent-attack-boats 100)
     (attack-now)
     (enable-timer t-attack-timer 60)
+    (chat-to-all "start attacking!")
+    (generate-random-number 10)
+    (up-get-fact random-number 0 gl-attack-go-deep)
+    ;(up-chat-data-to-all "start attacking!")
 )
 
 (defconst gl-enemy-tc-local-total 150)
@@ -334,12 +347,18 @@
 (defconst gl-avoiding-unit-y 157)
 (defconst gl-avoiding-target-x 158)
 (defconst gl-avoiding-target-y 159)
+(defconst gl-position-self-x 160)
+(defconst gl-position-self-y 161)
+(defconst gl-deep-point-x 162)
+(defconst gl-deep-point-y 163)
+(defconst gl-self-to-enemy-dist 164)
 (defrule
     (true)
     =>
     (up-set-attack-stance militiaman-line c: stance-aggressive)
 )
 (defrule
+    ;(unit-type-count militiaman-line < 30)
     (true)
     =>
     (up-full-reset-search)
@@ -348,7 +367,7 @@
     (up-get-point position-object gl-enemy-tc-x)
     (up-set-target-point gl-enemy-tc-x)
     (up-full-reset-search)
-    (up-filter-distance c: -1 c: 10)
+    (up-filter-distance c: -1 c: 11)
     (up-find-local c: militiaman-line c: 30)
     (up-set-target-object search-local c: 0)
     (up-get-point position-object gl-avoiding-unit-x)
@@ -368,6 +387,38 @@
 ;    (up-find-local c: militiaman-line c: 210)
 ;    (up-set-attack-stance )
 ;)
+
+(defrule
+    (up-compare-goal gl-attack-go-deep > 8)
+    =>
+    (up-full-reset-search)
+    (up-find-local c: militiaman-line c: 8)
+    (up-get-point position-self gl-position-self-x)
+    (up-send-flare gl-position-self-x)
+    (up-copy-point gl-deep-point-x gl-enemy-tc-x)
+    (up-send-flare gl-deep-point-x)
+    ;(up-add-point gl-deep-point-x gl-position-self-x c:- 1)
+    (up-modify-goal gl-deep-point-x g:- gl-position-self-x)
+    (up-modify-goal gl-deep-point-y g:- gl-position-self-y)
+    (up-send-flare gl-deep-point-x)
+    (up-get-point-distance gl-position-self-x gl-enemy-tc-x gl-self-to-enemy-dist)
+    (up-modify-goal gl-self-to-enemy-dist c:/ 2)
+    (up-modify-goal gl-deep-point-x g:/ gl-self-to-enemy-dist)
+    (up-modify-goal gl-deep-point-y g:/ gl-self-to-enemy-dist)
+    (up-modify-goal gl-deep-point-x c:* 10)
+    (up-modify-goal gl-deep-point-y c:* 10)
+    (up-add-point gl-deep-point-x gl-enemy-tc-x c: 1)
+    (up-send-flare gl-deep-point-x)
+    (generate-random-number 40)
+    (up-get-fact random-number 0 gl-tmp)
+    (up-modify-goal gl-deep-point-x g:+ gl-tmp)
+    (generate-random-number 40)
+    (up-get-fact random-number 0 gl-tmp)
+    (up-modify-goal gl-deep-point-y g:+ gl-tmp)
+    (up-target-point gl-deep-point-x action-default -1 -1)
+    (chat-to-all "try going to deep")
+    (up-send-flare gl-deep-point-x)
+)
 
 
 ;******************** BOAR HUNTING **************************************
