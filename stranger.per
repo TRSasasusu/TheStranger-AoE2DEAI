@@ -191,6 +191,43 @@
     (disable-self)
 )
 
+(defrule
+    (building-type-count-total blacksmith == 0)
+    (building-type-count-total barracks > 0)
+    (can-build blacksmith)
+    =>
+    (build blacksmith)
+)
+
+(defrule
+    (building-type-count tower-class > 0)
+    (can-research ri-fletching)
+    =>
+    (research ri-fletching)
+)
+
+(defrule
+    (unit-type-count militiaman-line > 3)
+    (can-research ri-scale-mail)
+    =>
+    (research ri-scale-mail)
+)
+
+(defrule
+    (unit-type-count militiaman-line > 6)
+    (can-research ri-forging)
+    =>
+    (research ri-forging)
+)
+
+(defrule
+    (unit-type-count militiaman-line > 8)
+    (can-research ri-arson)
+    =>
+    (research ri-arson)
+)
+
+
 (defconst gl-closest-enemy 20)
 (defrule
     (true)
@@ -396,11 +433,11 @@
     (up-get-point position-self gl-position-self-x)
     (up-send-flare gl-position-self-x)
     (up-copy-point gl-deep-point-x gl-enemy-tc-x)
-    (up-send-flare gl-deep-point-x)
+    ;(up-send-flare gl-deep-point-x)
     ;(up-add-point gl-deep-point-x gl-position-self-x c:- 1)
     (up-modify-goal gl-deep-point-x g:- gl-position-self-x)
     (up-modify-goal gl-deep-point-y g:- gl-position-self-y)
-    (up-send-flare gl-deep-point-x)
+    ;(up-send-flare gl-deep-point-x)
     (up-get-point-distance gl-position-self-x gl-enemy-tc-x gl-self-to-enemy-dist)
     (up-modify-goal gl-self-to-enemy-dist c:/ 2)
     (up-modify-goal gl-deep-point-x g:/ gl-self-to-enemy-dist)
@@ -408,14 +445,16 @@
     (up-modify-goal gl-deep-point-x c:* 10)
     (up-modify-goal gl-deep-point-y c:* 10)
     (up-add-point gl-deep-point-x gl-enemy-tc-x c: 1)
-    (up-send-flare gl-deep-point-x)
+    ;(up-send-flare gl-deep-point-x)
     (generate-random-number 40)
     (up-get-fact random-number 0 gl-tmp)
+    (up-modify-goal gl-tmp c:- 20)
     (up-modify-goal gl-deep-point-x g:+ gl-tmp)
     (generate-random-number 40)
     (up-get-fact random-number 0 gl-tmp)
+    (up-modify-goal gl-tmp c:- 20)
     (up-modify-goal gl-deep-point-y g:+ gl-tmp)
-    (up-target-point gl-deep-point-x action-default -1 -1)
+    (up-target-point gl-deep-point-x action-patrol -1 -1)
     (chat-to-all "try going to deep")
     (up-send-flare gl-deep-point-x)
 )
