@@ -494,7 +494,7 @@
 )
 (defrule
     (up-compare-goal gl-attack-target-rnd > 0)
-    (up-compare-goal gl-attack-target-rnd < 5)
+    (up-compare-goal gl-attack-target-rnd < 13)
     =>
     (generate-random-number 100)
     (up-get-fact random-number 0 gl-tmp)
@@ -666,115 +666,4 @@
 )
 ;***avoid TC (end)***
 
-
-;******************** BOAR HUNTING **************************************
-
-#load-if-not-defined DIFFICULTY-EASIEST
-#load-if-not-defined DIFFICULTY-EASY
-(defrule
-	(unit-type-count villager >= 9); 8
-	(dropsite-min-distance live-boar <= 32)
-	(can-research ri-loom)
-=>
-	(research ri-loom))
-
-(defrule ; split rule
-(or	(dropsite-min-distance live-boar <= -1)
-(or	(unit-type-count 216 >= 1); male hunter
-(or	(unit-type-count 122 >= 1); female hunter
-(or	(unit-type-count villager < 9)
-	(up-research-status c: ri-loom != research-complete)))))
-=>
-	(up-jump-rule 2))
-
-(defrule
-;	(timer-triggered tensec)
-	(dropsite-min-distance live-boar s:<= sn-maximum-hunt-drop-distance)
-; nn	(dropsite-min-distance boar-hunting >= 5); no slain boar left
-;(or
-; j	(unit-type-count villager >= 9)
-;	(unit-type-count 958 <= 0)); living domestic animals ; not working?
-;(or	(unit-type-count villager >= 14)
-;(or	(food-amount >= 50)
-;(or	(up-pending-objects c: villager >= 1)
-;	(building-type-count-total farm >= 3))))
-=>
-	(set-strategic-number sn-enable-boar-hunting 2)
-	(set-strategic-number sn-minimum-boar-hunt-group-size 1)
-	(set-strategic-number sn-minimum-number-hunters 1)
-	(set-strategic-number sn-maximum-food-drop-distance 16) ; "failed" hunt
-	(set-strategic-number sn-maximum-hunt-drop-distance 32)
-;	(up-retask-gatherers food c: 1)
-	(up-request-hunters c: 1)
-;	(chat-local-to-self "Trying to start a hunt.")
-)
-(defrule
-	(dropsite-min-distance live-boar <= 32)
-	(dropsite-min-distance live-boar >= 0)
-	(strategic-number sn-enable-boar-hunting == 2)
-	(strategic-number sn-minimum-boar-hunt-group-size == 1)
-	(strategic-number sn-minimum-number-hunters == 1)
-	(unit-type-count 216 <= 0); male hunter
-	(unit-type-count 122 <= 0); female hunter
-=>
-	(up-retask-gatherers food c: 1)
-	(disable-self)); test
-
-(defrule
-	(dropsite-min-distance live-boar <= 16)
-	(strategic-number sn-enable-boar-hunting >= 1)
-	(unit-type-count 216 < 2); male hunter
-	(unit-type-count 122 < 2); female hunter
-(or	(unit-type-count 216 >= 1); male hunter
-	(unit-type-count 122 >= 1)); female hunter
-=>
-	(set-strategic-number sn-minimum-number-hunters 2)
-	(up-request-hunters c: 1)
-;	(chat-local-to-self "Requesting a support hunter.")
-)
-(defrule
-	(dropsite-min-distance live-boar <= 10) ; else the risc of a dead vill is still too high
-	(dropsite-min-distance live-boar >= 0)
-	(unit-type-count 216 <= 2); male hunter
-	(unit-type-count 122 <= 2); female hunter
-	(strategic-number sn-enable-boar-hunting >= 1)
-;(or	(unit-type-count 216 >= 1); at least 1 hunter = the boar is not just standing too close to the mill
-;	(unit-type-count 122 >= 1))
-=>
-	(set-strategic-number sn-minimum-boar-hunt-group-size 7)
-	(set-strategic-number sn-minimum-number-hunters 7)
-	(up-retask-gatherers food c: 1)
-	(up-request-hunters c: 6)
-;	(chat-local-to-self "Adding more hunters.")
-)
-
-(defrule
-(or	(dropsite-min-distance live-boar s:> sn-maximum-hunt-drop-distance)
-	(and	(dropsite-min-distance live-boar >= 11)
-		(dropsite-min-distance boar-hunting <= 10))); eating a boar right now
-	(strategic-number sn-minimum-number-hunters > 2)
-=>
-	(set-strategic-number sn-minimum-boar-hunt-group-size 1)
-	(set-strategic-number sn-minimum-number-hunters 2)
-;	(chat-local-to-self "Lowering min-hunters.")
-)
-
-(defrule
-(or	(dropsite-min-distance live-boar > 32)
-	(dropsite-min-distance live-boar <= -1))
-(or	(building-type-count-total mill >= 2)
-	(unit-type-count villager >= 12))
-(or	(unit-type-count villager >= 18)
-	(and	(cc-players-unit-type-count 0 48 == 0); no boar on the map
-		(cc-players-unit-type-count 0 822 == 0)))
-	(strategic-number sn-enable-boar-hunting != 1)
-=>
-	(set-strategic-number sn-enable-boar-hunting 1); enable hunting of all kinds
-	(set-strategic-number sn-minimum-boar-hunt-group-size 2)
-	(set-strategic-number sn-minimum-number-hunters 2)
-;	(chat-local-to-self "Disabling hunting restrictions.")
-)
-#end-if
-#end-if
-
-;******************** BOAR HUNTING (end) **************************************
+(load "The Stranger/hd_boar")
