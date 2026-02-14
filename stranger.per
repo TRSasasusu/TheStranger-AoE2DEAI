@@ -389,12 +389,14 @@
 ;    (up-set-attack-stance )
 ;)
 
-(defconst t-attack-timer 30)
-(defconst gl-attack-target-rnd 31)
-(defconst gl-attack-target-local-total 32)
-(defconst gl-attack-target-local-last 33)
-(defconst gl-attack-target-remote-total 34)
-(defconst gl-attack-target-remote-last 35)
+(defconst t-attack-timer 13)
+(defconst gl-attack-target-rnd 131)
+(defconst gl-attack-target-local-total 132)
+(defconst gl-attack-target-local-last 133)
+(defconst gl-attack-target-remote-total 134)
+(defconst gl-attack-target-remote-last 135)
+(defconst gl-attack-target-x 136)
+(defconst gl-attack-target-y 137)
 (defrule
     (true)
     =>
@@ -423,8 +425,9 @@
     (up-timer-status t-attack-timer != timer-running)
     =>
     (up-full-reset-search)
-    (generate-random-number 10);25
+    (generate-random-number 25);25
     (up-get-fact random-number 0 gl-attack-target-rnd)
+    (up-chat-data-to-all "gl-attack-target-rnd: %d" g: gl-attack-target-rnd)
     (enable-timer t-attack-timer 60)
 )
 (defrule
@@ -433,6 +436,7 @@
     =>
     (up-find-remote c: lumber-camp c: 5)
     (up-get-search-state gl-attack-target-local-total)
+    (chat-to-all "try attacking to lumber-camp")
 )
 (defrule
     (up-compare-goal gl-attack-target-rnd > 0)
@@ -440,27 +444,7 @@
     (goal gl-attack-target-remote-total 0)
     =>
     (set-goal gl-attack-target-rnd 5)
-)
-(defrule
-    (up-compare-goal gl-attack-target-rnd > 0)
-    (up-compare-goal gl-attack-target-rnd < 5)
-    =>
-    (generate-random-number 100)
-    (up-get-fact random-number 0 gl-tmp)
-    ;(up-chat-data-to-all "gl-tmp: %d" g: gl-tmp)
-    (up-modify-goal gl-tmp c:- 1)
-    ;(up-chat-data-to-all "gl-tmp: %d" g: gl-tmp)
-    (up-modify-goal gl-tmp g:* gl-attack-target-remote-total)
-    ;(up-chat-data-to-all "gl-tmp: %d" g: gl-tmp)
-    (up-modify-goal gl-tmp c:z/ 100)
-    ;(up-chat-data-to-all "gl-tmp: %d" g: gl-tmp)
-    (up-set-target-object search-remote g: gl-tmp)
-    (up-find-local c: militiaman-line c: 220)
-    ;(up-target-objects 1 action-default -1 stance-aggressive)
-    (chat-to-all "attacking to lumber-camp")
-    (up-get-point position-object gl-tmp-x)
-    (up-target-point gl-tmp-x action-attack-move -1 -1)
-    (up-send-flare gl-tmp-x)
+    (chat-to-all "attacking to NOT lumber-camp")
 )
 (defrule
     (up-compare-goal gl-attack-target-rnd >= 5)
@@ -468,6 +452,7 @@
     =>
     (up-find-remote c: mill c: 5)
     (up-get-search-state gl-attack-target-local-total)
+    (chat-to-all "try attacking to lumber-camp")
 )
 (defrule
     (up-compare-goal gl-attack-target-rnd >= 5)
@@ -475,27 +460,7 @@
     (goal gl-attack-target-remote-total 0)
     =>
     (set-goal gl-attack-target-rnd 8)
-)
-(defrule
-    (up-compare-goal gl-attack-target-rnd >= 5)
-    (up-compare-goal gl-attack-target-rnd < 8)
-    =>
-    (generate-random-number 100)
-    (up-get-fact random-number 0 gl-tmp)
-    (up-chat-data-to-all "gl-tmp: %d" g: gl-tmp)
-    (up-modify-goal gl-tmp c:- 1)
-    (up-chat-data-to-all "gl-tmp: %d" g: gl-tmp)
-    (up-modify-goal gl-tmp g:* gl-attack-target-remote-total)
-    (up-chat-data-to-all "gl-tmp: %d" g: gl-tmp)
-    (up-modify-goal gl-tmp c:z/ 100)
-    (up-chat-data-to-all "gl-tmp: %d" g: gl-tmp)
-    (up-set-target-object search-remote g: gl-tmp)
-    (up-find-local c: militiaman-line c: 220)
-    ;(up-target-objects 1 action-default -1 stance-aggressive)
-    (chat-to-all "attacking to mill")
-    (up-get-point position-object gl-tmp-x)
-    (up-target-point gl-tmp-x action-attack-move -1 -1)
-    (up-send-flare gl-tmp-x)
+    (chat-to-all "attacking to NOT mill")
 )
 (defrule
     (up-compare-goal gl-attack-target-rnd >= 8)
@@ -510,22 +475,7 @@
     (goal gl-attack-target-remote-total 0)
     =>
     (set-goal gl-attack-target-rnd 11)
-)
-(defrule
-    (up-compare-goal gl-attack-target-rnd >= 8)
-    (up-compare-goal gl-attack-target-rnd < 11)
-    =>
-    (generate-random-number 100)
-    (up-get-fact random-number 0 gl-tmp)
-    (up-modify-goal gl-tmp c:- 1)
-    (up-modify-goal gl-tmp g:* gl-attack-target-remote-total)
-    (up-modify-goal gl-tmp c:z/ 100)
-    (up-set-target-object search-remote g: gl-tmp)
-    (up-find-local c: militiaman-line c: 220)
-    ;(up-target-objects 1 action-default -1 stance-aggressive)
-    (chat-to-all "attacking to mining-camp")
-    (up-get-point position-object gl-tmp-x)
-    (up-target-point gl-tmp-x action-attack-move -1 -1)
+    (chat-to-all "attacking to NOT mining-camp")
 )
 (defrule
     (up-compare-goal gl-attack-target-rnd >= 11)
@@ -540,28 +490,28 @@
     (goal gl-attack-target-remote-total 0)
     =>
     (set-goal gl-attack-target-rnd 22)
+    (chat-to-all "attacking to NOT town-center or deep")
 )
 (defrule
-    (up-compare-goal gl-attack-target-rnd >= 11)
-    (up-compare-goal gl-attack-target-rnd < 22)
+    (up-compare-goal gl-attack-target-rnd > 0)
+    (up-compare-goal gl-attack-target-rnd < 5)
     =>
     (generate-random-number 100)
     (up-get-fact random-number 0 gl-tmp)
+    (up-chat-data-to-all "gl-attack-target-rnd: %d" g: gl-attack-target-rnd)
+    (up-chat-data-to-all "gl-tmp: %d" g: gl-tmp)
     (up-modify-goal gl-tmp c:- 1)
+    (up-chat-data-to-all "gl-tmp: %d" g: gl-tmp)
     (up-modify-goal gl-tmp g:* gl-attack-target-remote-total)
+    (up-chat-data-to-all "gl-tmp: %d" g: gl-tmp)
     (up-modify-goal gl-tmp c:z/ 100)
+    (up-chat-data-to-all "gl-tmp: %d" g: gl-tmp)
     (up-set-target-object search-remote g: gl-tmp)
-)
-(defrule
-    (up-compare-goal gl-attack-target-rnd >= 11)
-    (up-compare-goal gl-attack-target-rnd < 13)
-    =>
-    (up-find-local c: militiaman-line c: 220)
-    ;(up-target-objects 1 action-default -1 stance-aggressive)
-    (chat-to-all "attacking to town-center")
+    (up-target-objects 1 action-default -1 stance-aggressive)
     (up-get-point position-object gl-tmp-x)
-    (up-target-point gl-tmp-x action-attack-move -1 -1)
+    (up-copy-point gl-attack-target-x gl-tmp-x)
 )
+
 (defconst gl-enemy-tc-x 154)
 (defconst gl-enemy-tc-y 155)
 (defconst gl-position-self-x 162)
@@ -606,10 +556,21 @@
     (up-get-fact random-number 0 gl-tmp)
     (up-modify-goal gl-tmp c:- 15)
     (up-modify-goal gl-deep-point-y g:+ gl-tmp)
-    (up-target-point gl-deep-point-x action-default -1 stance-stand-ground)
-    (chat-to-all "try going to deep")
-    (up-send-flare gl-deep-point-x)
+    (up-copy-point gl-attack-target-x gl-deep-point-x)
+    ;(up-target-point gl-deep-point-x action-default -1 stance-stand-ground)
+    ;(chat-to-all "try going to deep")
+    ;(up-send-flare gl-deep-point-x)
 )
+(defrule
+    (up-compare-goal gl-attack-target-rnd > 0)
+    (up-compare-goal gl-attack-target-rnd < 22)
+    =>
+    (up-find-local c: militiaman-line c: 220)
+    (up-target-point gl-attack-target-x action-attack-move -1 -1)
+    (up-send-flare gl-attack-target-x)
+)
+
+
 (defrule
     (up-compare-goal gl-attack-target-rnd >= 22)
     =>
