@@ -1,0 +1,114 @@
+;***avoid TC***
+(defconst gl-enemy-tc-local-total 150)
+(defconst gl-enemy-tc-local-last 151)
+(defconst gl-enemy-tc-remote-total 152)
+(defconst gl-enemy-tc-remote-last 153)
+;(defconst gl-enemy-tc-x 154)
+;(defconst gl-enemy-tc-y 155)
+(defconst gl-avoiding-unit-x 156)
+(defconst gl-avoiding-unit-y 157)
+(defconst gl-avoiding-target-x 158)
+(defconst gl-avoiding-target-y 159)
+(defconst gl-enemy-tc-unit-dist 160)
+(defconst gl-enemy-tc-unit-dist-minus 161)
+(defconst gl-avoiding-unit-type 162)
+(defrule
+    (true)
+    =>
+    (up-set-attack-stance archer-line c: stance-aggressive)
+    (up-set-attack-stance cavalry-archer-line c: stance-aggressive)
+    (up-set-attack-stance skirmisher-line c: stance-aggressive)
+    (up-set-attack-stance militiaman-line c: stance-aggressive)
+    (up-set-attack-stance spearman-line c: stance-aggressive)
+    (up-set-attack-stance scout-cavalry-line c: stance-aggressive)
+    (up-set-attack-stance eagle-warrior-line c: stance-aggressive)
+)
+(defrule
+    (true)
+    =>
+    (set-goal gl-avoiding-unit-type archer-line)
+)
+(defrule
+    ;(unit-type-count militiaman-line < 30)
+    (true)
+    =>
+    (up-full-reset-search)
+    (up-find-remote c: town-center c: 10)
+    (up-get-search-state gl-enemy-tc-local-total)
+    (up-modify-goal gl-enemy-tc-remote-total c:- 1)
+    ;(up-chat-data-to-all "enemy tc id: %d" g: gl-enemy-tc-remote-total)
+)
+(defrule
+    (up-compare-goal gl-enemy-tc-remote-total >= 0)
+    =>
+    (up-set-target-object search-remote g: gl-enemy-tc-remote-total)
+    ;(up-chat-data-to-all "enemy tc id: %d" g: gl-enemy-tc-remote-total)
+    (up-modify-goal gl-enemy-tc-remote-total c:- 1)
+    (up-get-point position-object gl-enemy-tc-x)
+    ;(up-send-flare gl-enemy-tc-x)
+    (up-set-target-point gl-enemy-tc-x)
+    ;(up-full-reset-search)
+    (up-filter-distance c: -1 c: 11)
+    (up-find-local g: gl-avoiding-unit-type c: 30)
+    (up-set-target-object search-local c: 0)
+    (up-get-point position-object gl-avoiding-unit-x)
+    (up-get-point-distance gl-avoiding-unit-x gl-enemy-tc-x gl-enemy-tc-unit-dist)
+    (up-modify-goal gl-avoiding-target-x g:= gl-avoiding-unit-x)
+    (up-modify-goal gl-avoiding-target-y g:= gl-avoiding-unit-y)
+    (up-modify-goal gl-avoiding-target-x g:- gl-enemy-tc-x)
+    (up-modify-goal gl-avoiding-target-y g:- gl-enemy-tc-y)
+    (up-modify-goal gl-enemy-tc-unit-dist c:/ 2)
+    (up-modify-goal gl-avoiding-target-x g:/ gl-enemy-tc-unit-dist)
+    (up-modify-goal gl-avoiding-target-y g:/ gl-enemy-tc-unit-dist)
+    (up-modify-goal gl-enemy-tc-unit-dist-minus c:= 8)
+    (up-modify-goal gl-enemy-tc-unit-dist-minus g:- gl-enemy-tc-unit-dist)
+    (up-modify-goal gl-avoiding-target-x g:* gl-enemy-tc-unit-dist-minus)
+    (up-modify-goal gl-avoiding-target-y g:* gl-enemy-tc-unit-dist-minus)
+    (up-modify-goal gl-avoiding-target-x g:+ gl-avoiding-unit-x)
+    (up-modify-goal gl-avoiding-target-y g:+ gl-avoiding-unit-y)
+    (up-target-point gl-avoiding-target-x action-default -1 stance-no-attack)
+    (up-jump-rule -1) ; iterate for all enemy (focus player) tc
+)
+(defrule
+    (goal gl-avoiding-unit-type archer-line)
+    =>
+    (set-goal gl-avoiding-unit-type cavalry-archer-line)
+    (up-jump-rule -3)
+)
+(defrule
+    (goal gl-avoiding-unit-type cavalry-archer-line)
+    =>
+    (set-goal gl-avoiding-unit-type skirmisher-line)
+    (up-jump-rule -4)
+)
+(defrule
+    (goal gl-avoiding-unit-type skirmisher-line)
+    =>
+    (set-goal gl-avoiding-unit-type militiaman-line)
+    (up-jump-rule -5)
+)
+(defrule
+    (goal gl-avoiding-unit-type militiaman-line)
+    =>
+    (set-goal gl-avoiding-unit-type spearman-line)
+    (up-jump-rule -6)
+)
+(defrule
+    (goal gl-avoiding-unit-type spearman-line)
+    =>
+    (set-goal gl-avoiding-unit-type scout-cavalry-line)
+    (up-jump-rule -7)
+)
+(defrule
+    (goal gl-avoiding-unit-type scout-cavalry-line)
+    =>
+    (set-goal gl-avoiding-unit-type eagle-warrior-line)
+    (up-jump-rule -8)
+)
+;(defrule
+;    (goal gl-avoiding-unit-type eagle-warrior-line)
+;    =>
+;    (set-goal gl-avoiding-unit-type eagle-warrior-line)
+;    (up-jump-rule -8)
+;)
+;***avoid TC (end)***
