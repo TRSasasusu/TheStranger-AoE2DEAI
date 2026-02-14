@@ -1,0 +1,93 @@
+;**********TR**********
+(defrule
+    (current-age == feudal-age)
+    (can-build watch-tower)
+    (unit-type-count militiaman-line > 2); depends on militia...
+    =>
+    (build-forward watch-tower)
+)
+
+;(defrule
+;    (can-build watch-tower)
+;    (unit-type-count militiaman-line > 2)
+;    =>
+;    (chat-to-all "I would like to build a tower")
+;    ;(up-set-placement-data target-player lumber-camp c: 8)
+;    (up-set-placement-data any-enemy lumber-camp c: -4) ; this command is only applicable to ally
+;    (up-build place-control 0 c: watch-tower)
+;    (chat-to-all "I am proceeding to build a tower now")
+;)
+
+
+(defconst gl-tower-point-x 100)
+(defconst gl-tower-point-y 101)
+(defconst gl-tower-point-x-start 102)
+(defconst gl-tower-point-y-start 103)
+(defconst gl-tower-point-x-end 104)
+(defconst gl-tower-point-y-end 105)
+(defconst gl-tower-wall-now 106)
+(defconst gl-tower-local-total 107)
+(defconst gl-tower-local-last 108)
+(defconst gl-tower-remote-total 109)
+(defconst gl-tower-remote-last 110)
+(defrule
+    (true)
+    =>
+    (set-goal gl-tower-wall-now 0)
+)
+(defrule
+    (wood-amount >= 16)
+    (building-type-count-total tower-class > 0)
+    =>
+    (up-full-reset-search)
+    (up-find-local c: tower-class c: 20)
+    (up-get-search-state gl-tower-local-total)
+)
+(defrule
+    (wood-amount >= 16)
+    (building-type-count-total tower-class > 0)
+    (up-compare-goal gl-tower-local-total > 0)
+    =>
+    (up-modify-goal gl-tower-local-total c:- 1)
+    (up-set-target-object search-local g: gl-tower-local-total)
+    (up-get-point position-object gl-tower-point-x)
+    ;(up-chat-data-to-all "target tower: %d" g: gl-tower-local-total)
+    (set-goal gl-tower-wall-now 1)
+    (up-modify-goal gl-tower-point-x-start g:= gl-tower-point-x)
+    (up-modify-goal gl-tower-point-y-start g:= gl-tower-point-y)
+    (up-modify-goal gl-tower-point-x-start c:+ 1)
+    (up-modify-goal gl-tower-point-y-start c:+ 1)
+    (up-modify-goal gl-tower-point-x-end g:= gl-tower-point-x)
+    (up-modify-goal gl-tower-point-y-end g:= gl-tower-point-y)
+    (up-modify-goal gl-tower-point-y-end c:+ 1)
+    (up-build-line gl-tower-point-x-start gl-tower-point-x-end c: palisade-wall)
+    (up-modify-goal gl-tower-point-x-start g:= gl-tower-point-x)
+    (up-modify-goal gl-tower-point-y-start g:= gl-tower-point-y)
+    (up-modify-goal gl-tower-point-x-start c:- 1)
+    (up-modify-goal gl-tower-point-y-start c:+ 1)
+    (up-modify-goal gl-tower-point-x-end g:= gl-tower-point-x)
+    (up-modify-goal gl-tower-point-y-end g:= gl-tower-point-y)
+    (up-modify-goal gl-tower-point-x-end c:- 1)
+    (up-build-line gl-tower-point-x-start gl-tower-point-x-end c: palisade-wall)
+)
+(defrule
+    (goal gl-tower-wall-now 1)
+    =>
+    (up-modify-goal gl-tower-point-x-start g:= gl-tower-point-x)
+    (up-modify-goal gl-tower-point-y-start g:= gl-tower-point-y)
+    (up-modify-goal gl-tower-point-x-start c:- 1)
+    (up-modify-goal gl-tower-point-y-start c:- 1)
+    (up-modify-goal gl-tower-point-x-end g:= gl-tower-point-x)
+    (up-modify-goal gl-tower-point-y-end g:= gl-tower-point-y)
+    (up-modify-goal gl-tower-point-y-end c:- 1)
+    (up-build-line gl-tower-point-x-start gl-tower-point-x-end c: palisade-wall)
+    (up-modify-goal gl-tower-point-x-start g:= gl-tower-point-x)
+    (up-modify-goal gl-tower-point-y-start g:= gl-tower-point-y)
+    (up-modify-goal gl-tower-point-x-start c:+ 1)
+    (up-modify-goal gl-tower-point-y-start c:- 1)
+    (up-modify-goal gl-tower-point-x-end g:= gl-tower-point-x)
+    (up-modify-goal gl-tower-point-y-end g:= gl-tower-point-y)
+    (up-modify-goal gl-tower-point-x-end c:+ 1)
+    (up-build-line gl-tower-point-x-start gl-tower-point-x-end c: palisade-wall)
+)
+;**********TR (end)**********
