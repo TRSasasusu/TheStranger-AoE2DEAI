@@ -6,11 +6,13 @@
 (defconst gl-attack-target-remote-last 135)
 (defconst gl-attack-target-x 136)
 (defconst gl-attack-target-y 137)
+(defconst gl-attacking-unit-type 138)
 (defrule
     (true)
     =>
     (set-goal gl-attack-target-rnd 0)
     (set-goal gl-attack-target-local-total 0)
+    (set-goal gl-attacking-unit-type archer-line)
 )
 ;(defrule
 ;    (unit-type-count militiaman-line >= 2)
@@ -30,18 +32,28 @@
 ;    ;(up-chat-data-to-all "start attacking!")
 ;)
 (defrule
-    (unit-type-count militiaman-line >= 2)
+    ;(or
+        ;(unit-type-count archer-line >= 2)
+        ;(unit-type-count cavalry-archer-line >= 2)
+        ;(unit-type-count skirmisher-line >= 2)
+        ;(unit-type-count militiaman-line >= 2)
+        ;(unit-type-count spearman-line >= 2)
+        ;(unit-type-count scout-cavalry-line >= 2)
+        ;(unit-type-count eagle-warrior-line >= 2)
+    ;)
+    (soldier-count >= 2)
     (up-timer-status t-attack-timer != timer-running)
     =>
     (up-full-reset-search)
     (generate-random-number 25);25
     (up-get-fact random-number 0 gl-attack-target-rnd)
-    (up-chat-data-to-all "gl-attack-target-rnd: %d" g: gl-attack-target-rnd)
+    ;(up-chat-data-to-all "gl-attack-target-rnd: %d" g: gl-attack-target-rnd)
     (enable-timer t-attack-timer 60)
 )
 (defrule
     (up-compare-goal gl-attack-target-rnd > 0)
     (up-compare-goal gl-attack-target-rnd < 5)
+    (up-object-type-count g: gl-attacking-unit-type >= 2)
     =>
     (up-find-remote c: lumber-camp c: 5)
     (up-get-search-state gl-attack-target-local-total)
@@ -51,6 +63,7 @@
     (up-compare-goal gl-attack-target-rnd > 0)
     (up-compare-goal gl-attack-target-rnd < 5)
     (goal gl-attack-target-remote-total 0)
+    (up-object-type-count g: gl-attacking-unit-type >= 2)
     =>
     (set-goal gl-attack-target-rnd 5)
     (chat-to-all "attacking to NOT lumber-camp")
@@ -58,6 +71,7 @@
 (defrule
     (up-compare-goal gl-attack-target-rnd >= 5)
     (up-compare-goal gl-attack-target-rnd < 8)
+    (up-object-type-count g: gl-attacking-unit-type >= 2)
     =>
     (up-find-remote c: mill c: 5)
     (up-get-search-state gl-attack-target-local-total)
@@ -67,6 +81,7 @@
     (up-compare-goal gl-attack-target-rnd >= 5)
     (up-compare-goal gl-attack-target-rnd < 8)
     (goal gl-attack-target-remote-total 0)
+    (up-object-type-count g: gl-attacking-unit-type >= 2)
     =>
     (set-goal gl-attack-target-rnd 8)
     (chat-to-all "attacking to NOT mill")
@@ -74,6 +89,7 @@
 (defrule
     (up-compare-goal gl-attack-target-rnd >= 8)
     (up-compare-goal gl-attack-target-rnd < 11)
+    (up-object-type-count g: gl-attacking-unit-type >= 2)
     =>
     (up-find-remote c: mining-camp c: 5)
     (up-get-search-state gl-attack-target-local-total)
@@ -82,6 +98,7 @@
     (up-compare-goal gl-attack-target-rnd >= 8)
     (up-compare-goal gl-attack-target-rnd < 11)
     (goal gl-attack-target-remote-total 0)
+    (up-object-type-count g: gl-attacking-unit-type >= 2)
     =>
     (set-goal gl-attack-target-rnd 11)
     (chat-to-all "attacking to NOT mining-camp")
@@ -89,6 +106,7 @@
 (defrule
     (up-compare-goal gl-attack-target-rnd >= 11)
     (up-compare-goal gl-attack-target-rnd < 22)
+    (up-object-type-count g: gl-attacking-unit-type >= 2)
     =>
     (up-find-remote c: town-center c: 5)
     (up-get-search-state gl-attack-target-local-total)
@@ -97,6 +115,7 @@
     (up-compare-goal gl-attack-target-rnd >= 11)
     (up-compare-goal gl-attack-target-rnd < 22)
     (goal gl-attack-target-remote-total 0)
+    (up-object-type-count g: gl-attacking-unit-type >= 2)
     =>
     (set-goal gl-attack-target-rnd 22)
     (chat-to-all "attacking to NOT town-center or deep")
@@ -104,6 +123,7 @@
 (defrule
     (up-compare-goal gl-attack-target-rnd > 0)
     (up-compare-goal gl-attack-target-rnd < 13)
+    (up-object-type-count g: gl-attacking-unit-type >= 2)
     =>
     (generate-random-number 100)
     (up-get-fact random-number 0 gl-tmp)
@@ -131,6 +151,7 @@
 (defrule
     (up-compare-goal gl-attack-target-rnd >= 13)
     (up-compare-goal gl-attack-target-rnd < 22)
+    (up-object-type-count g: gl-attacking-unit-type >= 2)
     =>
     (generate-random-number 100)
     (up-get-fact random-number 0 gl-tmp)
@@ -190,8 +211,9 @@
 (defrule
     (up-compare-goal gl-attack-target-rnd > 0)
     (up-compare-goal gl-attack-target-rnd < 22)
+    (up-object-type-count g: gl-attacking-unit-type >= 2)
     =>
-    (up-find-local c: militiaman-line c: 220)
+    (up-find-local g: gl-attacking-unit-type c: 220)
     (up-get-search-state gl-attack-unit-local-total)
     (generate-random-number 100)
     (up-get-fact random-number 0 gl-tmp)
@@ -204,11 +226,12 @@
     (up-set-target-point gl-tmp-x)
     (up-full-reset-search)
     (up-filter-distance c: -1 c: 3)
-    (up-find-local c: militiaman-line c: 20)
+    (up-find-local g: gl-attacking-unit-type c: 20)
 )
 (defrule
     (up-compare-goal gl-attack-target-rnd > 0)
     (up-compare-goal gl-attack-target-rnd < 22)
+    (up-object-type-count g: gl-attacking-unit-type >= 2)
     =>
     (up-set-target-object search-local c: 0)
     (up-get-point position-object gl-tmp-x)
@@ -223,6 +246,7 @@
     (up-compare-goal gl-attack-target-rnd > 0)
     (up-compare-goal gl-attack-target-rnd < 22)
     (up-compare-goal gl-attacking-vil-local-total > 0)
+    (up-object-type-count g: gl-attacking-unit-type >= 2)
     =>
     (up-target-point gl-attack-target-x action-attack-move -1 -1)
     (up-send-flare gl-attack-target-x)
@@ -231,6 +255,7 @@
     (up-compare-goal gl-attack-target-rnd > 0)
     (up-compare-goal gl-attack-target-rnd < 22)
     (goal gl-attacking-vil-local-total 0)
+    (up-object-type-count g: gl-attacking-unit-type >= 2)
     =>
     (up-target-point gl-attack-target-x action-default -1 -1)
     (up-send-flare gl-attack-target-x)
@@ -239,6 +264,7 @@
 
 (defrule
     (up-compare-goal gl-attack-target-rnd >= 22)
+    (up-object-type-count g: gl-attacking-unit-type >= 2)
     =>
     (up-set-offense-priority c: lumber-camp c: 1)
     (up-set-offense-priority c: mill c: 2)
@@ -248,3 +274,47 @@
     (set-strategic-number sn-percent-attack-boats 100)
     (attack-now)
 )
+
+
+(defrule
+    (goal gl-attacking-unit-type archer-line)
+    =>
+    (set-goal gl-attacking-unit-type cavalry-archer-line)
+    (up-jump-rule -16)
+)
+(defrule
+    (goal gl-attacking-unit-type cavalry-archer-line)
+    =>
+    (set-goal gl-attacking-unit-type skirmisher-line)
+    (up-jump-rule -17)
+)
+(defrule
+    (goal gl-attacking-unit-type skirmisher-line)
+    =>
+    (set-goal gl-attacking-unit-type militiaman-line)
+    (up-jump-rule -18)
+)
+(defrule
+    (goal gl-attacking-unit-type militiaman-line)
+    =>
+    (set-goal gl-attacking-unit-type spearman-line)
+    (up-jump-rule -19)
+)
+(defrule
+    (goal gl-attacking-unit-type spearman-line)
+    =>
+    (set-goal gl-attacking-unit-type scout-cavalry-line)
+    (up-jump-rule -20)
+)
+(defrule
+    (goal gl-attacking-unit-type scout-cavalry-line)
+    =>
+    (set-goal gl-attacking-unit-type eagle-warrior-line)
+    (up-jump-rule -21)
+)
+;(defrule
+;    (goal gl-attacking-unit-type eagle-warrior-line)
+;    =>
+;    (set-goal gl-attacking-unit-type eagle-warrior-line)
+;    (up-jump-rule -22)
+;)
