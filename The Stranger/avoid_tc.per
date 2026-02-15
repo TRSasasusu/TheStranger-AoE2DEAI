@@ -84,9 +84,9 @@
     (up-modify-goal gl-avoiding-target-y g:* gl-enemy-tc-unit-dist-minus)
     (up-modify-goal gl-avoiding-cross-x g:= gl-avoiding-target-y)
     (up-modify-goal gl-avoiding-cross-y g:= gl-avoiding-target-x)
-    (generate-random-number 4)
+    (generate-random-number 8)
     (up-get-fact random-number 0 gl-avoiding-cross-corr)
-    (up-modify-goal gl-avoiding-cross-corr c:- 2)
+    (up-modify-goal gl-avoiding-cross-corr c:- 4)
     (up-modify-goal gl-avoiding-cross-x g:* gl-avoiding-cross-corr)
     (up-modify-goal gl-avoiding-cross-y g:* gl-avoiding-cross-corr)
     (up-modify-goal gl-avoiding-cross-x c:* -1)
@@ -98,7 +98,7 @@
     ;(up-modify-goal gl-avoiding-target-y g:+ gl-avoiding-unit-y)
     (up-target-point gl-avoiding-target-x action-default -1 stance-no-attack)
     (up-chat-data-to-all "gl-enemy-tc-remote-total: %d" g: gl-enemy-tc-remote-total)
-    (up-send-flare gl-avoiding-target-x)
+    ;(up-send-flare gl-avoiding-target-x)
     (up-jump-rule -2) ; iterate for all enemy (focus player) tc
 )
 (defrule

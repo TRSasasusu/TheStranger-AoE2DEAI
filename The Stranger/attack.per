@@ -175,6 +175,10 @@
 (defconst gl-attack-unit-local-last 168)
 (defconst gl-attack-unit-remote-total 169)
 (defconst gl-attack-unit-remote-last 170)
+(defconst gl-attacking-vil-local-total 171)
+(defconst gl-attacking-vil-local-last 172)
+(defconst gl-attacking-vil-remote-total 173)
+(defconst gl-attacking-vil-remote-last 174)
 ;(defrule
 ;    (up-compare-goal gl-attack-target-rnd > 0)
 ;    (up-compare-goal gl-attack-target-rnd < 22)
@@ -201,7 +205,34 @@
     (up-full-reset-search)
     (up-filter-distance c: -1 c: 3)
     (up-find-local c: militiaman-line c: 20)
+)
+(defrule
+    (up-compare-goal gl-attack-target-rnd > 0)
+    (up-compare-goal gl-attack-target-rnd < 22)
+    =>
+    (up-set-target-object search-local c: 0)
+    (up-get-point position-object gl-tmp-x)
+    (up-set-target-point gl-tmp-x)
+    (up-reset-search 0 0 1 1)
+    (up-reset-filters)
+    (up-filter-distance c: -1 c: 6)
+    (up-find-remote c: villager-class c: 10)
+    (up-get-search-state gl-attacking-vil-local-total)
+)
+(defrule
+    (up-compare-goal gl-attack-target-rnd > 0)
+    (up-compare-goal gl-attack-target-rnd < 22)
+    (up-compare-goal gl-attacking-vil-local-total > 0)
+    =>
     (up-target-point gl-attack-target-x action-attack-move -1 -1)
+    (up-send-flare gl-attack-target-x)
+)
+(defrule
+    (up-compare-goal gl-attack-target-rnd > 0)
+    (up-compare-goal gl-attack-target-rnd < 22)
+    (goal gl-attacking-vil-local-total 0)
+    =>
+    (up-target-point gl-attack-target-x action-default -1 -1)
     (up-send-flare gl-attack-target-x)
 )
 
