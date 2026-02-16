@@ -1,0 +1,135 @@
+(defrule
+    (can-research feudal-age)
+    (civilian-population > 19)
+    =>
+    (set-goal gl-researching-feudal 1)
+    (research feudal-age)
+)
+
+(defrule
+    (current-age >= feudal-age)
+    =>
+    (set-goal gl-researching-feudal 0)
+)
+
+
+(defrule
+    (or
+        (goal gl-researching-feudal 1)
+        (current-age >= feudal-age)
+    )
+    (can-build farm)
+    (building-type-count-total barracks > 0)
+    (building-type-count-total mining-camp >= 2)
+    (wood-amount >= 100)
+    =>
+    (build farm)
+)
+
+
+(defrule
+    (can-research ri-double-bit-axe)
+    =>
+    (research ri-double-bit-axe)
+)
+
+(defrule
+    (or
+        (goal gl-researching-feudal 1)
+        (current-age >= feudal-age)
+    )
+    (can-build barracks)
+    (building-type-count-total barracks == 0)
+    =>
+    (build barracks)
+)
+
+(defrule
+    (or
+        (goal gl-researching-feudal 1)
+        (current-age == feudal-age)
+    )
+    (can-build mining-camp)
+    (building-type-count-total mining-camp < 1)
+    =>
+    (set-strategic-number sn-food-gatherer-percentage 30)
+    (set-strategic-number sn-wood-gatherer-percentage 60)
+    (set-strategic-number sn-gold-gatherer-percentage 10)
+    (set-strategic-number sn-stone-gatherer-percentage 0)
+    (build mining-camp)
+)
+
+(defrule
+    (or
+        (goal gl-researching-feudal 1)
+        (current-age == feudal-age)
+    )
+    (can-build mining-camp)
+    (building-type-count-total mining-camp < 2)
+    (building-type-count-total barracks >= 1)
+    =>
+    (build mining-camp)
+    (set-strategic-number sn-food-gatherer-percentage 30)
+    (set-strategic-number sn-wood-gatherer-percentage 50)
+    (set-strategic-number sn-gold-gatherer-percentage 10)
+    (set-strategic-number sn-stone-gatherer-percentage 10)
+)
+
+
+
+
+(defrule
+    (building-type-count-total blacksmith == 0)
+    (building-type-count-total barracks > 0)
+    (can-build blacksmith)
+    =>
+    (build blacksmith)
+)
+
+(defrule
+    (building-type-count tower-class > 0)
+    (can-research ri-fletching)
+    =>
+    (research ri-fletching)
+)
+
+(defrule
+    (unit-type-count militiaman-line > 3)
+    (can-research ri-scale-mail)
+    =>
+    (research ri-scale-mail)
+)
+
+(defrule
+    (unit-type-count militiaman-line > 6)
+    (can-research ri-forging)
+    =>
+    (research ri-forging)
+)
+
+(defrule
+    (unit-type-count militiaman-line > 8)
+    (can-research ri-arson)
+    =>
+    (research ri-arson)
+)
+
+(defrule
+    (unit-type-count militiaman-line >= 2)
+    (can-research ri-man-at-arms)
+    =>
+    (research ri-man-at-arms)
+)
+
+
+(defrule
+    (or
+        (goal gl-researching-feudal 1)
+        (current-age >= feudal-age)
+    )
+    (can-train militiaman-line)
+    =>
+    (train militiaman-line)
+)
+
+(load "The Stranger/tr")

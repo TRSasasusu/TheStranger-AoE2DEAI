@@ -1,5 +1,7 @@
-(defconst gl-far-food-check 10)
-(defconst gl-researching-feudal 11)
+(defconst gl-far-food-check 50)
+(defconst gl-researching-feudal 51)
+(defconst gl-researching-castle 52)
+(defconst gl-researching-imp 53)
 (defconst gl-tmp 41)
 (defconst gl-tmp-x 42)
 (defconst gl-tmp-y 43)
@@ -54,42 +56,6 @@
     (disable-self)
 )
 
-;********ゴール初期化******
-(defrule
-    (true)
-    =>
-    (set-goal gl-far-food-check 0)
-    (set-goal gl-researching-feudal 0)
-    (disable-self)
-)
-
-(defrule
-    (can-research ri-loom)
-    =>
-    (research ri-loom)
-)
-
-(defrule
-    (can-research feudal-age)
-    (civilian-population > 19)
-    =>
-    (set-goal gl-researching-feudal 1)
-    (research feudal-age)
-)
-
-(defrule
-    (current-age >= feudal-age)
-    =>
-    (set-goal gl-researching-feudal 0)
-)
-
-
-(defrule
-    (true)
-    =>
-    (train villager)
-)
-
 (defrule
     (can-build house)
     (housing-headroom < 3)
@@ -98,105 +64,12 @@
     (build house)
 )
 
+
 (defrule
-    (civilian-population > 6)
-    (can-build lumber-camp)
-    (building-type-count-total lumber-camp == 0)
+    (true)
     =>
-    (build lumber-camp)
-    (set-strategic-number sn-food-gatherer-percentage 80)
-    (set-strategic-number sn-wood-gatherer-percentage 20)
-)
-
-(defrule
-    (civilian-population > 11)
-    (can-build mill)
-    (building-type-count-total mill == 0)
-    =>
-    (build mill)
-)
-
-(defrule
-    (current-age >= dark-age)
-    (dropsite-min-distance food > 12)
-=>
-    (set-goal gl-far-food-check 1)
-)
-
-
-;*********畑*********
-
-(defrule
-    (current-age == dark-age)
-    (goal gl-far-food-check 1)
-    (can-build farm)
-=>
-    (build farm)
-)
-
-(defrule
-    (or
-        (goal gl-researching-feudal 1)
-        (current-age >= feudal-age)
-    )
-    (can-build farm)
-    (building-type-count-total barracks > 0)
-    (building-type-count-total mining-camp >= 2)
-    (wood-amount >= 100)
-    =>
-    (build farm)
-)
-
-
-
-;*********畑 (end)*********
-
-(defrule
-    (can-research ri-double-bit-axe)
-    =>
-    (research ri-double-bit-axe)
-)
-
-(defrule
-    (or
-        (goal gl-researching-feudal 1)
-        (current-age >= feudal-age)
-    )
-    (can-build barracks)
-    (building-type-count-total barracks == 0)
-    =>
-    (build barracks)
-)
-
-(defrule
-    (or
-        (goal gl-researching-feudal 1)
-        (current-age == feudal-age)
-    )
-    (can-build mining-camp)
-    (building-type-count-total mining-camp < 1)
-    =>
-    (set-strategic-number sn-food-gatherer-percentage 30)
-    (set-strategic-number sn-wood-gatherer-percentage 60)
-    (set-strategic-number sn-gold-gatherer-percentage 10)
-    (set-strategic-number sn-stone-gatherer-percentage 0)
-    (build mining-camp)
-)
-
-(defrule
-    (or
-        (goal gl-researching-feudal 1)
-        (current-age == feudal-age)
-    )
-    (can-build mining-camp)
-    (building-type-count-total mining-camp < 2)
-    (building-type-count-total barracks >= 1)
-    =>
-    (build mining-camp)
-    (set-strategic-number sn-food-gatherer-percentage 30)
-    (set-strategic-number sn-wood-gatherer-percentage 50)
-    (set-strategic-number sn-gold-gatherer-percentage 10)
-    (set-strategic-number sn-stone-gatherer-percentage 10)
+    (set-goal gl-researching-feudal 0)
+    (disable-self)
 )
 
 
@@ -223,43 +96,6 @@
     (disable-self)
 )
 
-(defrule
-    (building-type-count-total blacksmith == 0)
-    (building-type-count-total barracks > 0)
-    (can-build blacksmith)
-    =>
-    (build blacksmith)
-)
-
-(defrule
-    (building-type-count tower-class > 0)
-    (can-research ri-fletching)
-    =>
-    (research ri-fletching)
-)
-
-(defrule
-    (unit-type-count militiaman-line > 3)
-    (can-research ri-scale-mail)
-    =>
-    (research ri-scale-mail)
-)
-
-(defrule
-    (unit-type-count militiaman-line > 6)
-    (can-research ri-forging)
-    =>
-    (research ri-forging)
-)
-
-(defrule
-    (unit-type-count militiaman-line > 8)
-    (can-research ri-arson)
-    =>
-    (research ri-arson)
-)
-
-
 (defconst gl-closest-enemy 20)
 (defrule
     (true)
@@ -269,22 +105,10 @@
     ;(up-chat-data-to-all "set focus player: %d" g: gl-closest-enemy)
 )
 
-(defrule
-    (or
-        (goal gl-researching-feudal 1)
-        (current-age >= feudal-age)
-    )
-    (can-train militiaman-line)
-    =>
-    (train militiaman-line)
-)
 
-(defrule
-    (unit-type-count militiaman-line >= 2)
-    (can-research ri-man-at-arms)
-    =>
-    (research ri-man-at-arms)
-)
+
+(load "The Stranger/manatarms_w_tr")
+
 
 
 ;(defrule
@@ -296,10 +120,16 @@
 ;    (up-set-attack-stance )
 ;)
 
-(load "The Stranger/tr")
+(load "The Stranger/darkage_common")
 
 (load "The Stranger/attack")
 
 (load "The Stranger/avoid_tc")
 
 (load "The Stranger/hd_boar")
+
+(defrule
+    (true)
+    =>
+    (train villager)
+)

@@ -1,0 +1,46 @@
+(defrule
+    (true)
+    =>
+    (set-goal gl-far-food-check 0)
+    (disable-self)
+)
+
+(defrule
+    (can-research ri-loom)
+    =>
+    (research ri-loom)
+)
+
+(defrule
+    (civilian-population > 6)
+    (can-build lumber-camp)
+    (building-type-count-total lumber-camp == 0)
+    =>
+    (build lumber-camp)
+    (set-strategic-number sn-food-gatherer-percentage 80)
+    (set-strategic-number sn-wood-gatherer-percentage 20)
+)
+
+(defrule
+    (civilian-population > 11)
+    (can-build mill)
+    (building-type-count-total mill == 0)
+    =>
+    (build mill)
+)
+
+(defrule
+    (current-age >= dark-age)
+    (dropsite-min-distance food > 12)
+=>
+    (set-goal gl-far-food-check 1)
+)
+
+
+(defrule
+    (current-age == dark-age)
+    (goal gl-far-food-check 1)
+    (can-build farm)
+=>
+    (build farm)
+)
