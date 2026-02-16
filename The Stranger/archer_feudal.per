@@ -1,0 +1,121 @@
+(defrule
+    (can-research feudal-age)
+    (civilian-population > 19)
+    =>
+    (set-goal gl-researching-feudal 1)
+    (research feudal-age)
+)
+
+(defrule
+    (current-age >= feudal-age)
+    =>
+    (set-goal gl-researching-feudal 0)
+)
+
+
+(defrule
+    (or
+        (goal gl-researching-feudal 1)
+        (current-age >= feudal-age)
+    )
+    (can-build farm)
+    (building-type-count-total barracks > 0)
+    (building-type-count-total archery-range >= 2)
+    (building-type-count-total blacksmith >= 1)
+    (building-type-count-total mining-camp >= 1)
+    (wood-amount >= 110)
+    =>
+    (build farm)
+)
+
+
+(defrule
+    (can-research ri-double-bit-axe)
+    =>
+    (research ri-double-bit-axe)
+)
+
+(defrule
+    (or
+        (goal gl-researching-feudal 1)
+        (current-age >= feudal-age)
+    )
+    (can-build barracks)
+    (building-type-count-total barracks == 0)
+    =>
+    (build barracks)
+)
+
+(defrule
+    (current-age >= feudal-age)
+    (can-build archery-range)
+    (building-type-count-total archery-range < 2)
+    =>
+    (build archery-range)
+)
+
+(defrule
+    (current-age >= feudal-age)
+    (can-build blacksmith)
+    (building-type-count-total archery-range >= 2)
+    (building-type-count-total blacksmith == 0)
+    =>
+    (build blacksmith)
+)
+
+(defrule
+    (or
+        (goal gl-researching-feudal 1)
+        (current-age == feudal-age)
+    )
+    (can-build mining-camp)
+    (building-type-count-total mining-camp < 1)
+    =>
+    (set-strategic-number sn-food-gatherer-percentage 20)
+    (set-strategic-number sn-wood-gatherer-percentage 60)
+    (set-strategic-number sn-gold-gatherer-percentage 20)
+    (set-strategic-number sn-stone-gatherer-percentage 0)
+    (build mining-camp)
+)
+
+(defrule
+    (current-age == feudal-age)
+    (building-type-count-total archery-range >= 2)
+    (building-type-count-total blacksmith >= 1)
+    =>
+    (set-strategic-number sn-food-gatherer-percentage 25)
+    (set-strategic-number sn-wood-gatherer-percentage 45)
+    (set-strategic-number sn-gold-gatherer-percentage 30)
+    (set-strategic-number sn-stone-gatherer-percentage 0)
+)
+
+;(defrule
+;    (building-type-count-total blacksmith > 0)
+;    (food-amount >= 600)
+;    (building-type-count-total market == 0)
+;    =>
+;    (build market)
+;)
+
+
+
+(defrule
+    (unit-type-count archer-line > 0)
+    (can-research ri-fletching)
+    =>
+    (research ri-fletching)
+)
+
+(defrule
+    (unit-type-count archer-line > 10)
+    (can-research ri-padded-archer-armor)
+    =>
+    (research ri-padded-archer-armor)
+)
+
+(defrule
+    (current-age >= feudal-age)
+    (can-train archer-line)
+    =>
+    (train archer-line)
+)
