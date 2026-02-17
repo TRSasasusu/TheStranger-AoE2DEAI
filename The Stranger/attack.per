@@ -248,6 +248,14 @@
     (up-compare-goal gl-attacking-vil-local-total > 0)
     (up-object-type-count g: gl-attacking-unit-type >= 2)
     =>
+    (generate-random-number 6)
+    (up-get-fact random-number 0 gl-tmp)
+    (up-modify-goal gl-tmp c:- 3)
+    (up-modify-goal gl-attack-target-x g:+ gl-tmp)
+    (generate-random-number 6)
+    (up-get-fact random-number 0 gl-tmp)
+    (up-modify-goal gl-tmp c:- 3)
+    (up-modify-goal gl-attack-target-y g:+ gl-tmp)
     (up-target-point gl-attack-target-x action-attack-move -1 -1)
     (up-send-flare gl-attack-target-x)
 )
@@ -257,7 +265,7 @@
     (goal gl-attacking-vil-local-total 0)
     (up-object-type-count g: gl-attacking-unit-type >= 2)
     =>
-    (up-target-point gl-attack-target-x action-default -1 -1)
+    (up-target-point gl-attack-target-x action-move -1 -1)
     (up-send-flare gl-attack-target-x)
 )
 

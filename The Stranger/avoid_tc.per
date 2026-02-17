@@ -67,6 +67,12 @@
     (up-get-search-state gl-avoiding-units-local-total)
 )
 (defrule
+    (up-compare-goal gl-enemy-tc-remote-total >= 0)
+    (goal gl-avoiding-units-local-total 0)
+    =>
+    (up-jump-rule -2)
+)
+(defrule
     (up-compare-goal gl-avoiding-units-local-total > 0)
     =>
     (generate-random-number 100)
@@ -94,23 +100,40 @@
     ;(up-modify-goal gl-avoiding-target-y g:= gl-avoiding-unit-y)
     (up-modify-goal gl-avoiding-target-x g:- gl-enemy-tc-x)
     (up-modify-goal gl-avoiding-target-y g:- gl-enemy-tc-y)
-    (up-modify-goal gl-enemy-tc-unit-dist c:/ 2)
+    ;(up-chat-data-to-all "raw gl-avoiding-target-x: %d" g: gl-avoiding-target-x)
+    ;(up-chat-data-to-all "raw gl-avoiding-target-y: %d" g: gl-avoiding-target-y)
+    ;(up-chat-data-to-all "raw gl-enemy-tc-unit-dist: %d" g: gl-enemy-tc-unit-dist)
+    (up-modify-goal gl-avoiding-target-x c:* 100)
+    (up-modify-goal gl-avoiding-target-y c:* 100)
+    ;(up-modify-goal gl-enemy-tc-unit-dist c:/ 2)
     (up-modify-goal gl-avoiding-target-x g:/ gl-enemy-tc-unit-dist)
     (up-modify-goal gl-avoiding-target-y g:/ gl-enemy-tc-unit-dist)
-    (up-modify-goal gl-enemy-tc-unit-dist-minus c:= 8)
+    (up-modify-goal gl-enemy-tc-unit-dist-minus c:= 14)
     (up-modify-goal gl-enemy-tc-unit-dist-minus g:- gl-enemy-tc-unit-dist)
     (up-modify-goal gl-avoiding-target-x g:* gl-enemy-tc-unit-dist-minus)
     (up-modify-goal gl-avoiding-target-y g:* gl-enemy-tc-unit-dist-minus)
+    (up-modify-goal gl-avoiding-target-x c:/ 100)
+    (up-modify-goal gl-avoiding-target-y c:/ 100)
     (up-modify-goal gl-avoiding-cross-x g:= gl-avoiding-target-y)
     (up-modify-goal gl-avoiding-cross-y g:= gl-avoiding-target-x)
-    (up-modify-goal gl-avoiding-cross-y c:* 1.41) ; due to diagonal coordinate
-    (up-modify-goal gl-avoiding-cross-y g:+ gl-avoiding-target-y) ; due to diagonal coordinate
-    (generate-random-number 8)
+    (up-modify-goal gl-avoiding-cross-x c:* -1)
+    ;(up-modify-goal gl-avoiding-cross-x c:* 1.5)
+    ;(up-modify-goal gl-avoiding-cross-y c:* 1.5)
+    ;(up-modify-goal gl-avoiding-cross-y c:* 1.41) ; due to diagonal coordinate
+    ;(up-modify-goal gl-avoiding-cross-y g:- gl-avoiding-target-y) ; due to diagonal coordinate
+    (generate-random-number 3)
     (up-get-fact random-number 0 gl-avoiding-cross-corr)
-    (up-modify-goal gl-avoiding-cross-corr c:- 4)
     (up-modify-goal gl-avoiding-cross-x g:* gl-avoiding-cross-corr)
     (up-modify-goal gl-avoiding-cross-y g:* gl-avoiding-cross-corr)
-    (up-modify-goal gl-avoiding-cross-x c:* -1)
+    ;(up-modify-goal gl-avoiding-cross-corr c:- 4)
+    ;(up-modify-goal gl-avoiding-cross-x g:* gl-avoiding-cross-corr)
+    ;(up-modify-goal gl-avoiding-cross-y g:* gl-avoiding-cross-corr)
+    ;(up-send-flare gl-avoiding-target-x)
+    ;(up-send-flare gl-avoiding-cross-x)
+    ;(up-chat-data-to-all "gl-avoiding-target-x: %d" g: gl-avoiding-target-x)
+    ;(up-chat-data-to-all "gl-avoiding-target-y: %d" g: gl-avoiding-target-y)
+    ;(up-chat-data-to-all "gl-avoiding-cross-x: %d" g: gl-avoiding-cross-x)
+    ;(up-chat-data-to-all "gl-avoiding-cross-y: %d" g: gl-avoiding-cross-y)
     (up-add-point gl-avoiding-target-x gl-avoiding-cross-x c: 1)
     ;(up-modify-goal gl-avoiding-target-x g:+ gl-avoiding-cross-x)
     ;(up-modify-goal gl-avoiding-target-y g:+ gl-avoiding-cross-y)
@@ -118,50 +141,50 @@
     ;(up-modify-goal gl-avoiding-target-x g:+ gl-avoiding-unit-x)
     ;(up-modify-goal gl-avoiding-target-y g:+ gl-avoiding-unit-y)
     (up-target-point gl-avoiding-target-x action-default -1 stance-no-attack)
-    (up-chat-data-to-all "gl-enemy-tc-remote-total: %d" g: gl-enemy-tc-remote-total)
+    ;(up-chat-data-to-all "gl-enemy-tc-remote-total: %d" g: gl-enemy-tc-remote-total)
     ;(up-send-flare gl-avoiding-target-x)
-    (up-jump-rule -3) ; iterate for all enemy (focus player) tc
+    (up-jump-rule -4) ; iterate for all enemy (focus player) tc
 )
 (defrule
     (goal gl-avoiding-unit-type archer-line)
     =>
     (set-goal gl-avoiding-unit-type cavalry-archer-line)
-    (up-jump-rule -5)
+    (up-jump-rule -6)
 )
 (defrule
     (goal gl-avoiding-unit-type cavalry-archer-line)
     =>
     (set-goal gl-avoiding-unit-type skirmisher-line)
-    (up-jump-rule -6)
+    (up-jump-rule -7)
 )
 (defrule
     (goal gl-avoiding-unit-type skirmisher-line)
     =>
     (set-goal gl-avoiding-unit-type militiaman-line)
-    (up-jump-rule -7)
+    (up-jump-rule -8)
 )
 (defrule
     (goal gl-avoiding-unit-type militiaman-line)
     =>
     (set-goal gl-avoiding-unit-type spearman-line)
-    (up-jump-rule -8)
+    (up-jump-rule -9)
 )
 (defrule
     (goal gl-avoiding-unit-type spearman-line)
     =>
     (set-goal gl-avoiding-unit-type scout-cavalry-line)
-    (up-jump-rule -9)
+    (up-jump-rule -10)
 )
 (defrule
     (goal gl-avoiding-unit-type scout-cavalry-line)
     =>
     (set-goal gl-avoiding-unit-type eagle-warrior-line)
-    (up-jump-rule -10)
+    (up-jump-rule -11)
 )
 ;(defrule
 ;    (goal gl-avoiding-unit-type eagle-warrior-line)
 ;    =>
 ;    (set-goal gl-avoiding-unit-type eagle-warrior-line)
-;    (up-jump-rule -11)
+;    (up-jump-rule -12)
 ;)
 ;***avoid TC (end)***
