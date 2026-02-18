@@ -48,7 +48,7 @@
     (generate-random-number 25);25
     (up-get-fact random-number 0 gl-attack-target-rnd)
     ;(up-chat-data-to-all "gl-attack-target-rnd: %d" g: gl-attack-target-rnd)
-    (enable-timer t-attack-timer 60)
+    (enable-timer t-attack-timer 10)
 )
 (defrule
     (up-compare-goal gl-attack-target-rnd > 0)
