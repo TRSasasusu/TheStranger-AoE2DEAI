@@ -47,7 +47,7 @@
 )
 
 (defrule
-    (current-age >= feudal-age)
+    (current-age == feudal-age)
     (can-build archery-range)
     (building-type-count-total archery-range < 2)
     =>
@@ -114,7 +114,7 @@
 )
 
 (defrule
-    (current-age >= feudal-age)
+    (current-age == feudal-age)
     (can-train archer-line)
     =>
     (train archer-line)

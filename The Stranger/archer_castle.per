@@ -1,0 +1,108 @@
+(defrule
+    (can-research castle-age)
+    =>
+    (set-goal gl-researching-castle 1)
+    (research castle-age)
+)
+
+(defrule
+    (current-age >= castle-age)
+    =>
+    (set-goal gl-researching-castle 0)
+)
+
+(defrule
+    (building-type-count-total blacksmith > 0)
+    (food-amount >= 600)
+    (building-type-count-total market == 0)
+    =>
+    (build market)
+)
+
+(defrule
+    (or
+        (goal gl-researching-castle 1)
+        (current-age >= castle-age)
+    )
+    (can-build archery-range)
+    (building-type-count-total archery-range <= 2)
+    (building-type-count-total blacksmith >= 1)
+    =>
+    (build archery-range)
+)
+
+(defrule
+    (current-age >= castle-age)
+    (can-build university)
+    (building-type-count-total archery-range >= 2)
+    (building-type-count-total blacksmith >= 1)
+    (building-type-count-total university == 0)
+    =>
+    (build university)
+)
+
+(defrule
+    (current-age >= castle-age)
+    (can-build siege-workshop)
+    (building-type-count-total archery-range >= 2)
+    (building-type-count-total blacksmith >= 1)
+    (building-type-count-total siege-workshop == 0)
+    =>
+    (build siege-workshop)
+)
+
+(defrule
+    (unit-type-count archer-line > 0)
+    (can-research ri-bodkin-arrow)
+    =>
+    (research ri-bodkin-arrow)
+)
+
+(defrule
+    (unit-type-count archer-line > 0)
+    (can-research ri-crossbow)
+    =>
+    (research ri-crossbow)
+)
+
+(defrule
+    (can-research ri-bow-saw)
+    =>
+    (research ri-bow-saw)
+)
+
+(defrule
+    (unit-type-count archer-line > 2)
+    (can-research ri-ballistics)
+    =>
+    (research ri-ballistics)
+)
+
+(defrule
+    (unit-type-count archer-line > 10)
+    (can-research ri-thumb-ring)
+    =>
+    (research ri-thumb-ring)
+)
+
+;(defrule
+;    (unit-type-count archer-line > 10)
+;    (can-research ri-padded-archer-armor)
+;    =>
+;    (research ri-padded-archer-armor)
+;)
+
+(defrule
+    (current-age == castle-age)
+    (can-train archer-line)
+    =>
+    (train archer-line)
+)
+
+(defrule
+    (current-age == castle-age)
+    (can-train mangonel-line)
+    (up-object-type-count c: archer-line >= 10)
+    =>
+    (train mangonel-line)
+)
