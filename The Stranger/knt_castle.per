@@ -1,0 +1,91 @@
+(defrule
+    (can-research castle-age)
+    =>
+    (set-goal gl-researching-castle 1)
+    (research castle-age)
+    (set-strategic-number sn-food-gatherer-percentage 30)
+    (set-strategic-number sn-wood-gatherer-percentage 40)
+    (set-strategic-number sn-gold-gatherer-percentage 30)
+    (set-strategic-number sn-stone-gatherer-percentage 0)
+)
+
+(defrule
+    (current-age >= castle-age)
+    =>
+    (set-goal gl-researching-castle 0)
+)
+
+(defrule
+    (building-type-count-total blacksmith > 0)
+    (food-amount >= 600)
+    (building-type-count-total market == 0)
+    =>
+    (build market)
+)
+
+(defrule
+    (or
+        (goal gl-researching-castle 1)
+        (current-age >= castle-age)
+    )
+    (can-build stable)
+    (building-type-count-total stable <= 2)
+    (building-type-count-total blacksmith >= 1)
+    =>
+    (build stable)
+)
+
+(defrule
+    (or
+        (goal gl-researching-castle 1)
+        (current-age >= castle-age)
+    )
+    (can-research ri-bloodlines)
+    =>
+    (research ri-bloodlines)
+)
+
+(defrule
+    (or
+        (unit-type-count scout-cavalry-line > 5)
+        (unit-type-count knight-line > 2)
+    )
+    (can-research ri-chain-barding)
+    =>
+    (research ri-chain-barding)
+)
+
+(defrule
+    (unit-type-count scout-cavalry-line > 4)
+    (can-research ri-light-cavalry)
+    =>
+    (research ri-light-cavalry)
+)
+
+(defrule
+    (unit-type-count knight-line > 10)
+    (can-research ri-iron-casting)
+    =>
+    (research ri-iron-casting)
+)
+
+(defrule
+    (can-research ri-bow-saw)
+    =>
+    (research ri-bow-saw)
+)
+
+
+;(defrule
+;    (unit-type-count archer-line > 10)
+;    (can-research ri-padded-archer-armor)
+;    =>
+;    (research ri-padded-archer-armor)
+;)
+
+(defrule
+    (current-age == castle-age)
+    (can-train knight-line)
+    =>
+    (train knight-line)
+)

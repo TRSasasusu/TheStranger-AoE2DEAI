@@ -31,6 +31,7 @@
     (up-set-attack-stance scout-cavalry-line c: stance-aggressive)
     (up-set-attack-stance eagle-warrior-line c: stance-aggressive)
     (up-set-attack-stance mangonel-line c: stance-aggressive)
+    (up-set-attack-stance knight-line c: stance-aggressive)
 )
 (defrule
     (true)
@@ -183,6 +184,7 @@
     (goal gl-avoiding-unit-type scout-cavalry-line)
     =>
     (set-goal gl-avoiding-unit-type eagle-warrior-line)
+    (set-goal gl-avoiding-start-distance 11)
     (up-jump-rule -11)
 )
 (defrule
@@ -192,10 +194,18 @@
     (set-goal gl-avoiding-start-distance 9)
     (up-jump-rule -12)
 )
+(defrule
+    (goal gl-avoiding-unit-type mangonel-line)
+    =>
+    (set-goal gl-avoiding-unit-type knight-line)
+    (set-goal gl-avoiding-start-distance 11)
+    (up-jump-rule -13)
+)
 ;(defrule
-;    (goal gl-avoiding-unit-type eagle-warrior-line)
+;    (goal gl-avoiding-unit-type mangonel-line)
 ;    =>
-;    (set-goal gl-avoiding-unit-type mangonel-line)
-;    (up-jump-rule -13)
+;    (set-goal gl-avoiding-unit-type knight-line)
+;    (set-goal gl-avoiding-start-distance 11)
+;    (up-jump-rule -14)
 ;)
 ;***avoid TC (end)***

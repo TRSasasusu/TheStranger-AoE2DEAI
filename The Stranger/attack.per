@@ -335,9 +335,15 @@
     ;(chat-to-all "mangonel go!!")
     (up-jump-rule -22)
 )
+(defrule
+    (goal gl-attacking-unit-type mangonel-line)
+    =>
+    (set-goal gl-attacking-unit-type knight-line)
+    (up-jump-rule -23)
+)
 ;(defrule
 ;    (goal gl-attacking-unit-type mangonel-line)
 ;    =>
-;    (set-goal gl-attacking-unit-type eagle-warrior-line)
-;    (up-jump-rule -23)
+;    (set-goal gl-attacking-unit-type knight-line)
+;    (up-jump-rule -24)
 ;)
