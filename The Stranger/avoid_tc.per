@@ -20,6 +20,7 @@
 (defconst gl-avoiding-units-remote-total 168)
 (defconst gl-avoiding-units-remote-last 169)
 (defconst gl-avoiding-start-distance 170)
+(defconst gl-avoiding-building 171)
 (defrule
     (true)
     =>
@@ -38,13 +39,14 @@
     =>
     (set-goal gl-avoiding-unit-type archer-line)
     (set-goal gl-avoiding-start-distance 11)
+    (set-goal gl-avoiding-building town-center)
 )
 (defrule
     ;(unit-type-count militiaman-line < 30)
     (true)
     =>
     (up-full-reset-search)
-    (up-find-remote c: town-center c: 10)
+    (up-find-remote g: gl-avoiding-building c: 10)
     (set-goal gl-avoiding-units-local-total 0)
     ;(set-goal gl-avoiding-unit-id -1)
     (up-get-search-state gl-enemy-tc-local-total)
@@ -164,12 +166,16 @@
 )
 (defrule
     (goal gl-avoiding-unit-type skirmisher-line)
+    (not(goal gl-avoiding-building watch-tower))
     =>
     (set-goal gl-avoiding-unit-type militiaman-line)
     (up-jump-rule -8)
 )
 (defrule
-    (goal gl-avoiding-unit-type militiaman-line)
+    (or
+        (goal gl-avoiding-unit-type skirmisher-line)
+        (goal gl-avoiding-unit-type militiaman-line)
+    )
     =>
     (set-goal gl-avoiding-unit-type spearman-line)
     (up-jump-rule -9)
@@ -189,13 +195,26 @@
 )
 (defrule
     (goal gl-avoiding-unit-type eagle-warrior-line)
+    (not(goal gl-avoiding-building watch-tower))
     =>
     (set-goal gl-avoiding-unit-type mangonel-line)
     (set-goal gl-avoiding-start-distance 9)
     (up-jump-rule -12)
 )
 (defrule
-    (goal gl-avoiding-unit-type mangonel-line)
+    (or
+        (goal gl-avoiding-unit-type eagle-warrior-line)
+        (goal gl-avoiding-unit-type mangonel-line)
+    )
+    (and
+        (not(goal gl-avoiding-building watch-tower))
+        (not
+            (and
+                (up-object-type-count c: knight-line > 10)
+                (research-completed ri-chain-barding)
+            )
+        )
+    )
     =>
     (set-goal gl-avoiding-unit-type knight-line)
     (set-goal gl-avoiding-start-distance 11)
@@ -208,4 +227,11 @@
 ;    (set-goal gl-avoiding-start-distance 11)
 ;    (up-jump-rule -14)
 ;)
+
+(defrule
+    (goal gl-avoiding-building town-center)
+    =>
+    (set-goal gl-avoiding-building watch-tower)
+    (up-jump-rule -14)
+)
 ;***avoid TC (end)***
