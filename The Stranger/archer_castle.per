@@ -19,6 +19,7 @@
     (build market)
 )
 
+;(defconst t-)
 (defrule
     (or
         (goal gl-researching-castle 1)
@@ -103,6 +104,10 @@
     (current-age == castle-age)
     (can-train mangonel-line)
     (up-object-type-count c: archer-line >= 10)
+    (or
+        (research-completed ri-ballistics)
+        (unit-type-count mangonel-line <= 2)
+    )
     =>
     (train mangonel-line)
 )

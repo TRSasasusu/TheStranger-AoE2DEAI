@@ -45,7 +45,7 @@
     (up-timer-status t-attack-timer != timer-running)
     =>
     (up-full-reset-search)
-    (generate-random-number 25);25
+    (generate-random-number 21);25
     (up-get-fact random-number 0 gl-attack-target-rnd)
     ;(up-chat-data-to-all "gl-attack-target-rnd: %d" g: gl-attack-target-rnd)
     (enable-timer t-attack-timer 10)
@@ -245,7 +245,7 @@
 (defrule
     (up-compare-goal gl-attack-target-rnd > 0)
     (up-compare-goal gl-attack-target-rnd < 22)
-    (up-compare-goal gl-attacking-vil-local-total > 0)
+    (up-compare-goal gl-attacking-vil-remote-total > 0)
     (up-object-type-count g: gl-attacking-unit-type >= 2)
     =>
     (generate-random-number 6)
@@ -257,31 +257,38 @@
     (up-modify-goal gl-tmp c:- 3)
     (up-modify-goal gl-attack-target-y g:+ gl-tmp)
     (up-target-point gl-attack-target-x action-attack-move -1 -1)
+    (chat-to-all "attack move!")
     (up-send-flare gl-attack-target-x)
+    (up-full-reset-search)
 )
 (defrule
     (up-compare-goal gl-attack-target-rnd > 0)
     (up-compare-goal gl-attack-target-rnd < 22)
-    (goal gl-attacking-vil-local-total 0)
+    (goal gl-attacking-vil-remote-total 0)
     (up-object-type-count g: gl-attacking-unit-type >= 2)
     =>
     (up-target-point gl-attack-target-x action-move -1 -1)
+    (chat-to-all "only moving!")
     (up-send-flare gl-attack-target-x)
+    (up-full-reset-search)
 )
 
 
 (defrule
-    (up-compare-goal gl-attack-target-rnd >= 22)
-    (up-object-type-count g: gl-attacking-unit-type >= 2)
+    (true)
     =>
-    (up-set-offense-priority c: lumber-camp c: 1)
-    (up-set-offense-priority c: mill c: 2)
-    (up-set-offense-priority c: mining-camp c: 3)
-    (up-set-offense-priority c: town-center c: 4)
-    (set-strategic-number sn-percent-attack-soldiers 100)
-    (set-strategic-number sn-percent-attack-boats 100)
-    (chat-to-all "attack now!")
-    (attack-now)
+    (do-nothing)
+    ;(up-compare-goal gl-attack-target-rnd >= 22)
+    ;(up-object-type-count g: gl-attacking-unit-type >= 2)
+    ;=>
+    ;(up-set-offense-priority c: lumber-camp c: 1)
+    ;(up-set-offense-priority c: mill c: 2)
+    ;(up-set-offense-priority c: mining-camp c: 3)
+    ;(up-set-offense-priority c: town-center c: 4)
+    ;(set-strategic-number sn-percent-attack-soldiers 100)
+    ;(set-strategic-number sn-percent-attack-boats 100)
+    ;(chat-to-all "attack now!")
+    ;(attack-now)
 )
 
 
@@ -321,9 +328,16 @@
     (set-goal gl-attacking-unit-type eagle-warrior-line)
     (up-jump-rule -21)
 )
+(defrule
+    (goal gl-attacking-unit-type eagle-warrior-line)
+    =>
+    (set-goal gl-attacking-unit-type mangonel-line)
+    ;(chat-to-all "mangonel go!!")
+    (up-jump-rule -22)
+)
 ;(defrule
-;    (goal gl-attacking-unit-type eagle-warrior-line)
+;    (goal gl-attacking-unit-type mangonel-line)
 ;    =>
 ;    (set-goal gl-attacking-unit-type eagle-warrior-line)
-;    (up-jump-rule -22)
+;    (up-jump-rule -23)
 ;)

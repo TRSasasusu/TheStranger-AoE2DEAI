@@ -19,7 +19,7 @@
 (defconst gl-avoiding-units-local-last 167)
 (defconst gl-avoiding-units-remote-total 168)
 (defconst gl-avoiding-units-remote-last 169)
-;(defconst gl-avoiding-unit-id 170)
+(defconst gl-avoiding-start-distance 170)
 (defrule
     (true)
     =>
@@ -30,11 +30,13 @@
     (up-set-attack-stance spearman-line c: stance-aggressive)
     (up-set-attack-stance scout-cavalry-line c: stance-aggressive)
     (up-set-attack-stance eagle-warrior-line c: stance-aggressive)
+    (up-set-attack-stance mangonel-line c: stance-aggressive)
 )
 (defrule
     (true)
     =>
     (set-goal gl-avoiding-unit-type archer-line)
+    (set-goal gl-avoiding-start-distance 11)
 )
 (defrule
     ;(unit-type-count militiaman-line < 30)
@@ -62,7 +64,7 @@
     ;(up-send-flare gl-enemy-tc-x)
     (up-set-target-point gl-enemy-tc-x)
     ;(up-full-reset-search)
-    (up-filter-distance c: -1 c: 11)
+    (up-filter-distance c: -1 g: gl-avoiding-start-distance)
     (up-find-local g: gl-avoiding-unit-type c: 30)
     (up-get-search-state gl-avoiding-units-local-total)
 )
@@ -108,7 +110,9 @@
     ;(up-modify-goal gl-enemy-tc-unit-dist c:/ 2)
     (up-modify-goal gl-avoiding-target-x g:/ gl-enemy-tc-unit-dist)
     (up-modify-goal gl-avoiding-target-y g:/ gl-enemy-tc-unit-dist)
-    (up-modify-goal gl-enemy-tc-unit-dist-minus c:= 14)
+    ;(up-modify-goal gl-enemy-tc-unit-dist-minus c:= 14)
+    (up-modify-goal gl-enemy-tc-unit-dist-minus g:= gl-avoiding-start-distance)
+    (up-modify-goal gl-enemy-tc-unit-dist-minus c:+ 3)
     (up-modify-goal gl-enemy-tc-unit-dist-minus g:- gl-enemy-tc-unit-dist)
     (up-modify-goal gl-avoiding-target-x g:* gl-enemy-tc-unit-dist-minus)
     (up-modify-goal gl-avoiding-target-y g:* gl-enemy-tc-unit-dist-minus)
@@ -181,10 +185,17 @@
     (set-goal gl-avoiding-unit-type eagle-warrior-line)
     (up-jump-rule -11)
 )
+(defrule
+    (goal gl-avoiding-unit-type eagle-warrior-line)
+    =>
+    (set-goal gl-avoiding-unit-type mangonel-line)
+    (set-goal gl-avoiding-start-distance 9)
+    (up-jump-rule -12)
+)
 ;(defrule
 ;    (goal gl-avoiding-unit-type eagle-warrior-line)
 ;    =>
-;    (set-goal gl-avoiding-unit-type eagle-warrior-line)
-;    (up-jump-rule -12)
+;    (set-goal gl-avoiding-unit-type mangonel-line)
+;    (up-jump-rule -13)
 ;)
 ;***avoid TC (end)***
