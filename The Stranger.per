@@ -8,6 +8,13 @@
 ;(defconst gl-tmp2-x 44)
 ;(defconst gl-tmp2-y 45)
 (defconst action-attack-move 19)
+(defconst list-active 0)
+(defconst list-inactive 1)
+(defconst status-pending 0)
+(defconst status-ready 2)
+(defconst status-resource 3)
+(defconst status-down 4)
+(defconst status-gather 5)
 
 
 (defrule
@@ -132,7 +139,6 @@
 (load "The Stranger/cavarcher_castle")
 
 
-
 ;(defrule
 ;    (true)
 ;    =>
@@ -144,14 +150,61 @@
 
 (load "The Stranger/darkage_common")
 
+(load "The Stranger/add_camps")
+
 (load "The Stranger/attack")
 
 (load "The Stranger/avoid_tc")
 
 (load "The Stranger/hd_boar")
 
+
+
+#load-if-defined DIFFICULTY-EASIEST
 (defrule
-    (true)
+    (civilian-population < 7)
+    (can-train villager)
     =>
     (train villager)
 )
+#end-if
+#load-if-defined DIFFICULTY-EASY
+(defrule
+    (civilian-population < 17)
+    (can-train villager)
+    =>
+    (train villager)
+)
+#end-if
+#load-if-defined DIFFICULTY-MODERATE
+(defrule
+    (civilian-population < 35)
+    (can-train villager)
+    =>
+    (train villager)
+)
+#end-if
+#load-if-defined DIFFICULTY-HARD
+(defrule
+    (civilian-population < 80)
+    (can-train villager)
+    =>
+    (train villager)
+)
+#end-if
+#load-if-defined DIFFICULTY-HARDEST
+(defrule
+    (civilian-population < 120)
+    (can-train villager)
+    =>
+    (train villager)
+)
+#end-if
+#load-if-defined DIFFICULTY-EXTREME
+(defrule
+    (civilian-population < 120)
+    (can-train villager)
+    =>
+    (train villager)
+)
+#end-if
