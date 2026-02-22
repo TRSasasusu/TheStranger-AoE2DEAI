@@ -88,6 +88,25 @@
     (can-build stable)
     =>
     (build stable)
+    (set-strategic-number sn-food-gatherer-percentage 20)
+    (set-strategic-number sn-wood-gatherer-percentage 45)
+    (set-strategic-number sn-gold-gatherer-percentage 35)
+    (set-strategic-number sn-stone-gatherer-percentage 0)
+)
+
+(defrule
+    (or
+        (goal gl-researching-castle 1)
+        (current-age >= castle-age)
+    )
+    (can-build farm)
+    (building-type-count-total mining-camp >= 1)
+    (building-type-count-total archery-range >= 2)
+    (building-type-count-total blacksmith >= 1)
+    (idle-farm-count <= 1)
+    (wood-amount >= 180)
+    =>
+    (build farm)
 )
 
 ;(defrule
