@@ -1,0 +1,59 @@
+(defrule
+    (can-research feudal-age)
+    (civilian-population > 23)
+    =>
+    (set-goal gl-researching-feudal 1)
+    (research feudal-age)
+    (set-strategic-number sn-food-gatherer-percentage 50)
+    (set-strategic-number sn-wood-gatherer-percentage 40)
+    (set-strategic-number sn-gold-gatherer-percentage 10)
+    (set-strategic-number sn-stone-gatherer-percentage 0)
+)
+
+(defrule
+    (current-age >= feudal-age)
+    =>
+    (set-goal gl-researching-feudal 0)
+)
+
+(defrule
+    (current-age >= feudal-age)
+    (can-build blacksmith)
+    (building-type-count-total blacksmith == 0)
+    =>
+    (build blacksmith)
+)
+
+(defrule
+    (current-age >= feudal-age)
+    (can-build market)
+    (building-type-count-total market == 0)
+    =>
+    (build market)
+)
+
+(defrule
+    (or
+        (goal gl-researching-feudal 1)
+        (current-age == feudal-age)
+    )
+    (can-build farm)
+    (building-type-count-total market >= 1)
+    (building-type-count-total mining-camp >= 1)
+    (idle-farm-count <= 0)
+    (wood-amount >= 180)
+    =>
+    (build farm)
+)
+
+
+(defrule
+    (or
+        (goal gl-researching-feudal 1)
+        (current-age == feudal-age)
+    )
+    (can-build mining-camp)
+    (building-type-count-total mining-camp < 1)
+    =>
+    (build mining-camp)
+)
