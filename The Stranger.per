@@ -128,15 +128,15 @@
 
 
 ;(load "The Stranger/manatarms_w_tr")
-;#load-if-defined UP-POCKET-POSITION
-;    (load "The Stranger/sc_feudal")
-;    (load "The Stranger/knt_castle")
-;#else
-;    (load "The Stranger/archer_feudal")
-;    (load "The Stranger/archer_castle")
-;#end-if
-(load "The Stranger/fast_castle")
-(load "The Stranger/cavarcher_castle")
+#load-if-defined UP-POCKET-POSITION
+    (load "The Stranger/sc_feudal")
+    (load "The Stranger/knt_castle")
+#else
+    (load "The Stranger/archer_feudal")
+    (load "The Stranger/archer_castle")
+#end-if
+;(load "The Stranger/fast_castle")
+;(load "The Stranger/cavarcher_castle")
 
 
 ;(defrule
