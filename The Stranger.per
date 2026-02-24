@@ -44,6 +44,7 @@
 	(set-strategic-number sn-task-ungrouped-soldiers 0)
     ;(set-strategic-number sn-attack-intelligence 1)
     (set-strategic-number sn-enable-new-building-system 1)
+    (set-strategic-number sn-camp-max-distance 200)
 	(disable-self)
 )
 (defrule
@@ -131,12 +132,15 @@
 #load-if-defined UP-POCKET-POSITION
     (load "The Stranger/sc_feudal")
     (load "The Stranger/knt_castle")
+    (load "The Stranger/knt_imp")
 #else
     (load "The Stranger/archer_feudal")
     (load "The Stranger/archer_castle")
+    (load "The Stranger/archer_imp")
 #end-if
 ;(load "The Stranger/fast_castle")
 ;(load "The Stranger/cavarcher_castle")
+(load "The Stranger/trade.per")
 
 
 ;(defrule

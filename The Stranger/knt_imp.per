@@ -1,0 +1,226 @@
+(defrule
+    (can-research imperial-age)
+    =>
+    (set-goal gl-researching-imp 1)
+    (research imperial-age)
+    (set-strategic-number sn-food-gatherer-percentage 40)
+    (set-strategic-number sn-wood-gatherer-percentage 30)
+    (set-strategic-number sn-gold-gatherer-percentage 30)
+    (set-strategic-number sn-stone-gatherer-percentage 0)
+)
+
+(defrule
+    (current-age >= imperial-age)
+    =>
+    (set-goal gl-researching-imp 0)
+)
+
+(defrule
+    (current-age == castle-age)
+    (food-amount > 700)
+    (building-type-count-total monastery == 0)
+    (can-build monastery)
+    =>
+    (build monastery)
+)
+
+(defrule
+    (current-age == castle-age)
+    (food-amount > 700)
+    (building-type-count-total siege-workshop == 0)
+    (can-build siege-workshop)
+    =>
+    (build siege-workshop)
+)
+
+(defrule
+    (or
+        (goal gl-researching-imp 1)
+        (current-age >= imperial-age)
+    )
+    (can-build stable)
+    (civilian-population > 50)
+    (building-type-count-total stable < 5)
+    (building-type-count-total blacksmith >= 1)
+    =>
+    (build stable)
+)
+
+(defrule
+    (or
+        (goal gl-researching-castle 1)
+        (current-age >= castle-age)
+    )
+    (can-research ri-bloodlines)
+    =>
+    (research ri-bloodlines)
+)
+
+(defrule
+    (or
+        (unit-type-count scout-cavalry-line > 5)
+        (unit-type-count knight-line > 2)
+    )
+    (can-research ri-scale-barding)
+    =>
+    (research ri-chain-barding)
+)
+
+(defrule
+    (or
+        (unit-type-count scout-cavalry-line > 5)
+        (unit-type-count knight-line > 2)
+    )
+    (can-research ri-chain-barding)
+    =>
+    (research ri-chain-barding)
+)
+
+(defrule
+    (or
+        (unit-type-count scout-cavalry-line > 5)
+        (unit-type-count knight-line > 2)
+    )
+    (can-research ri-plate-barding)
+    =>
+    (research ri-plate-barding)
+)
+
+(defrule
+    (unit-type-count knight-line > 10)
+    (can-research ri-cavalier)
+    =>
+    (research ri-cavalier)
+)
+
+(defrule
+    (unit-type-count knight-line > 10)
+    (can-research ri-paladin)
+    =>
+    (research ri-paladin)
+)
+
+(defrule
+    (unit-type-count scout-cavalry-line > 4)
+    (can-research ri-light-cavalry)
+    =>
+    (research ri-light-cavalry)
+)
+
+(defrule
+    (unit-type-count scout-cavalry-line > 20)
+    (can-research ri-hussar)
+    =>
+    (research ri-hussar)
+)
+
+(defrule
+    (unit-type-count knight-line > 10)
+    (can-research ri-forging)
+    =>
+    (research ri-forging)
+)
+
+(defrule
+    (unit-type-count knight-line > 10)
+    (can-research ri-iron-casting)
+    =>
+    (research ri-iron-casting)
+)
+
+(defrule
+    (unit-type-count knight-line > 10)
+    (can-research ri-blast-furnace)
+    =>
+    (research ri-blast-furnace)
+)
+
+(defrule
+    (unit-type-count knight-line > 15)
+    (can-research ri-husbandry)
+    =>
+    (research ri-husbandry)
+)
+
+(defrule
+    (can-research ri-bow-saw)
+    =>
+    (research ri-bow-saw)
+)
+
+(defrule
+    (civilian-population > 70)
+    (can-research ri-two-man-saw)
+    =>
+    (research ri-two-man-saw)
+)
+
+(defrule
+    (or
+        (goal gl-researching-castle 1)
+        (current-age >= castle-age)
+    )
+    (can-research ri-horse-collar)
+    =>
+    (research ri-horse-collar)
+)
+
+(defrule
+    (civilian-population > 45)
+    (can-research ri-heavy-plow)
+    =>
+    (research ri-heavy-plow)
+)
+
+(defrule
+    (civilian-population > 45)
+    (can-research ri-wheel-barrow)
+    =>
+    (research ri-wheel-barrow)
+)
+
+(defrule
+    (civilian-population > 75)
+    (can-research ri-hand-cart)
+    =>
+    (research ri-hand-cart)
+)
+
+(defrule
+    (civilian-population > 45)
+    (can-build town-center)
+    (building-type-count-total town-center < 3)
+    =>
+    (up-assign-builders c: town-center-foundation c: 4)
+    (build town-center)
+    (set-strategic-number sn-food-gatherer-percentage 40)
+    (set-strategic-number sn-wood-gatherer-percentage 30)
+    (set-strategic-number sn-gold-gatherer-percentage 30)
+    (set-strategic-number sn-stone-gatherer-percentage 0)
+)
+
+
+;(defrule
+;    (unit-type-count archer-line > 10)
+;    (can-research ri-padded-archer-armor)
+;    =>
+;    (research ri-padded-archer-armor)
+;)
+
+(defrule
+    (current-age == imperial-age)
+    (can-train knight-line)
+    =>
+    (train knight-line)
+)
+
+(defrule
+    (current-age == imperial-age)
+    (or
+        (civilian-population > 75)
+        (gold-amount < 400)
+    )
+    (can-train scout-cavalry-line)
+    =>
+    (train scout-cavalry-line)
+)

@@ -73,6 +73,16 @@
 )
 
 (defrule
+    (or
+        (goal gl-researching-castle 1)
+        (current-age >= castle-age)
+    )
+    (can-research ri-horse-collar)
+    =>
+    (research ri-horse-collar)
+)
+
+(defrule
     (unit-type-count archer-line > 2)
     (can-research ri-ballistics)
     =>
@@ -92,6 +102,24 @@
 ;    =>
 ;    (research ri-padded-archer-armor)
 ;)
+
+(defrule
+    (current-age >= castle-age)
+    (civilian-population > 40)
+    =>
+    (set-strategic-number sn-food-gatherer-percentage 20)
+    (set-strategic-number sn-wood-gatherer-percentage 30)
+    (set-strategic-number sn-gold-gatherer-percentage 45)
+    (set-strategic-number sn-stone-gatherer-percentage 5)
+    (disable-self)
+)
+
+(defrule
+    (can-build castle)
+    =>
+    (up-assign-builders c: castle c: 10)
+    (build castle)
+)
 
 (defrule
     (current-age == castle-age)

@@ -7,12 +7,14 @@
 (defconst gl-attack-target-x 136)
 (defconst gl-attack-target-y 137)
 (defconst gl-attacking-unit-type 138)
+(defconst gl-attack-only-attack-move 139)
 (defrule
     (true)
     =>
     (set-goal gl-attack-target-rnd 0)
     (set-goal gl-attack-target-local-total 0)
     (set-goal gl-attacking-unit-type archer-line)
+    (set-goal gl-attack-only-attack-move 0)
 )
 ;(defrule
 ;    (unit-type-count militiaman-line >= 2)
@@ -245,7 +247,10 @@
 (defrule
     (up-compare-goal gl-attack-target-rnd > 0)
     (up-compare-goal gl-attack-target-rnd < 22)
-    (up-compare-goal gl-attacking-vil-remote-total > 0)
+    (or
+        (up-compare-goal gl-attacking-vil-remote-total > 0)
+        (goal gl-attack-only-attack-move 1)
+    )
     (up-object-type-count g: gl-attacking-unit-type >= 2)
     =>
     (generate-random-number 6)
@@ -264,7 +269,10 @@
 (defrule
     (up-compare-goal gl-attack-target-rnd > 0)
     (up-compare-goal gl-attack-target-rnd < 22)
-    (goal gl-attacking-vil-remote-total 0)
+    (and
+        (goal gl-attacking-vil-remote-total 0)
+        (goal gl-attack-only-attack-move 0)
+    )
     (up-object-type-count g: gl-attacking-unit-type >= 2)
     =>
     (up-target-point gl-attack-target-x action-move -1 -1)
@@ -333,17 +341,27 @@
     =>
     (set-goal gl-attacking-unit-type mangonel-line)
     ;(chat-to-all "mangonel go!!")
+    (set-goal gl-attack-only-attack-move 1)
     (up-jump-rule -22)
 )
 (defrule
     (goal gl-attacking-unit-type mangonel-line)
     =>
     (set-goal gl-attacking-unit-type knight-line)
+    (set-goal gl-attack-only-attack-move 0)
     (up-jump-rule -23)
 )
-;(defrule
-;    (goal gl-attacking-unit-type mangonel-line)
-;    =>
-;    (set-goal gl-attacking-unit-type knight-line)
-;    (up-jump-rule -24)
-;)
+(defrule
+    (goal gl-attacking-unit-type knight-line)
+    =>
+    (set-goal gl-attacking-unit-type bombard-cannon-line)
+    (set-goal gl-attack-only-attack-move 1)
+    (up-jump-rule -24)
+)
+(defrule
+    (goal gl-attacking-unit-type bombard-cannon-line)
+    =>
+    (set-goal gl-attacking-unit-type trebuchet)
+    (set-goal gl-attack-only-attack-move 1)
+    (up-jump-rule -25)
+)

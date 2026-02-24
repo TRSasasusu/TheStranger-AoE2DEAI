@@ -29,6 +29,7 @@
         (current-age >= castle-age)
     )
     (can-build stable)
+    (civilian-population > 45)
     (building-type-count-total stable <= 2)
     (building-type-count-total blacksmith >= 1)
     =>
@@ -70,9 +71,53 @@
 )
 
 (defrule
+    (unit-type-count knight-line > 15)
+    (can-research ri-husbandry)
+    =>
+    (research ri-husbandry)
+)
+
+(defrule
     (can-research ri-bow-saw)
     =>
     (research ri-bow-saw)
+)
+
+(defrule
+    (or
+        (goal gl-researching-castle 1)
+        (current-age >= castle-age)
+    )
+    (can-research ri-horse-collar)
+    =>
+    (research ri-horse-collar)
+)
+
+(defrule
+    (civilian-population > 45)
+    (can-research ri-heavy-plow)
+    =>
+    (research ri-heavy-plow)
+)
+
+(defrule
+    (civilian-population > 45)
+    (can-research ri-wheel-barrow)
+    =>
+    (research ri-wheel-barrow)
+)
+
+(defrule
+    (civilian-population > 45)
+    (can-build town-center)
+    (building-type-count-total town-center < 3)
+    =>
+    (up-assign-builders c: town-center-foundation c: 4)
+    (build town-center)
+    (set-strategic-number sn-food-gatherer-percentage 40)
+    (set-strategic-number sn-wood-gatherer-percentage 30)
+    (set-strategic-number sn-gold-gatherer-percentage 30)
+    (set-strategic-number sn-stone-gatherer-percentage 0)
 )
 
 

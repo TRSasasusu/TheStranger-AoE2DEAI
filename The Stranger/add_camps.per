@@ -10,6 +10,8 @@
 (defconst gl-resource-camps 199)
 (defconst gl-resource-percentage 200)
 (defconst gl-resource-status 201)
+;(defconst gl-resource-lumber-camp-appear 202)
+;(defconst gl-resource-mining-camp-appear 203)
 
 (defrule
     (true)
@@ -22,7 +24,22 @@
     ;(chat-to-all "lumbercamp!")
 )
 (defrule
-    (up-object-type-count-total g: gl-resource-camps > 0)
+    (up-compare-goal gl-resource-percentage > 0)
+    =>
+    (up-full-reset-search)
+    (up-filter-status g: gl-resource-status c: list-active)
+    (up-find-resource g: gl-resource-type c: 30)
+    (up-get-search-state gl-resource-found-local-total)
+)
+(defrule
+    (up-compare-goal gl-resource-percentage > 0)
+    (up-compare-goal gl-resource-found-remote-total == 0)
+    =>
+    (chat-to-all "no resource")
+    (up-jump-rule 5)
+)
+(defrule
+    ;(up-object-type-count-total g: gl-resource-camps > 0)
     (up-compare-goal gl-resource-percentage > 0)
     =>
     (up-full-reset-search)
@@ -33,7 +50,7 @@
     (up-get-search-state gl-resource-camps-local-total)
 )
 (defrule
-    (up-object-type-count-total g: gl-resource-camps > 0)
+    ;(up-object-type-count-total g: gl-resource-camps > 0)
     (up-compare-goal gl-resource-percentage > 0)
     (up-compare-goal gl-resource-camps-local-total > 0)
     =>
@@ -51,14 +68,14 @@
     ;(up-chat-data-to-all "number of res: %d" g: gl-resource-found-remote-total)
 )
 (defrule
-    (up-object-type-count-total g: gl-resource-camps > 0)
+    ;(up-object-type-count-total g: gl-resource-camps > 0)
     (up-compare-goal gl-resource-percentage > 0)
     (up-compare-goal gl-resource-found-remote-total > 0)
     =>
     (up-jump-rule 2)
 )
 (defrule
-    (up-object-type-count-total g: gl-resource-camps > 0)
+    ;(up-object-type-count-total g: gl-resource-camps > 0)
     (up-compare-goal gl-resource-percentage > 0)
     (up-compare-goal gl-resource-camps-local-total > 0)
     (up-compare-goal gl-resource-found-remote-total == 0)
@@ -67,7 +84,7 @@
     (up-jump-rule -3)
 )
 (defrule
-    (up-object-type-count-total g: gl-resource-camps > 0)
+    ;(up-object-type-count-total g: gl-resource-camps > 0)
     (up-compare-goal gl-resource-percentage > 0)
     (goal gl-resource-camps-local-total 0)
     (up-can-build 0 g: gl-resource-camps)
@@ -83,7 +100,7 @@
     (set-goal gl-resource-camps-local-total -1)
     (up-modify-goal gl-resource-percentage s:= sn-gold-gatherer-percentage)
     (set-goal gl-resource-status status-resource)
-    (up-jump-rule -6)
+    (up-jump-rule -8)
 )
 (defrule
     (goal gl-resource-type gold)
@@ -91,5 +108,5 @@
     (set-goal gl-resource-type stone)
     (set-goal gl-resource-camps-local-total -1)
     (up-modify-goal gl-resource-percentage s:= sn-stone-gatherer-percentage)
-    (up-jump-rule -7)
+    (up-jump-rule -9)
 )

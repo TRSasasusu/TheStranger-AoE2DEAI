@@ -1,0 +1,208 @@
+(defrule
+    (can-research imperial-age)
+    =>
+    (set-goal gl-researching-imp 1)
+    (research imperial-age)
+)
+
+(defrule
+    (current-age >= imperial-age)
+    =>
+    (set-goal gl-researching-imp 0)
+)
+
+(defrule
+    (or
+        (goal gl-researching-imp 1)
+        (current-age >= imperial-age)
+    )
+    (can-build archery-range)
+    (building-type-count-total archery-range < 2)
+    (building-type-count-total blacksmith >= 1)
+    (building-type-count-total university >= 1)
+    =>
+    (build archery-range)
+)
+
+(defrule
+    (or
+        (goal gl-researching-imp 1)
+        (current-age >= imperial-age)
+    )
+    (can-build archery-range)
+    (building-type-count-total archery-range < 5)
+    (building-type-count-total blacksmith >= 1)
+    (building-type-count-total university >= 1)
+    (research-completed ri-bracer)
+    (research-completed ri-chemistry)
+    =>
+    (build archery-range)
+)
+
+(defrule
+    (current-age >= castle-age)
+    (can-build university)
+    (building-type-count-total archery-range >= 2)
+    (building-type-count-total blacksmith >= 1)
+    (building-type-count-total university == 0)
+    =>
+    (build university)
+)
+
+(defrule
+    (current-age >= castle-age)
+    (can-build siege-workshop)
+    (building-type-count-total archery-range >= 2)
+    (building-type-count-total blacksmith >= 1)
+    (building-type-count-total siege-workshop == 0)
+    =>
+    (build siege-workshop)
+)
+
+(defrule
+    (unit-type-count archer-line > 0)
+    (can-research ri-bodkin-arrow)
+    =>
+    (research ri-bodkin-arrow)
+)
+
+(defrule
+    (unit-type-count archer-line > 0)
+    (can-research ri-bracer)
+    =>
+    (research ri-bracer)
+)
+
+(defrule
+    (unit-type-count archer-line > 0)
+    (can-research ri-crossbow)
+    =>
+    (research ri-crossbow)
+)
+
+(defrule
+    (unit-type-count archer-line > 0)
+    (can-research ri-arbalest)
+    =>
+    (research ri-arbalest)
+)
+
+(defrule
+    (can-research ri-bow-saw)
+    =>
+    (research ri-bow-saw)
+)
+
+(defrule
+    (civilian-population > 70)
+    (can-research ri-two-man-saw)
+    =>
+    (research ri-two-man-saw)
+)
+
+(defrule
+    (or
+        (goal gl-researching-castle 1)
+        (current-age >= castle-age)
+    )
+    (can-research ri-horse-collar)
+    =>
+    (research ri-horse-collar)
+)
+
+(defrule
+    (civilian-population > 50)
+    (can-research ri-heavy-plow)
+    =>
+    (research ri-heavy-plow)
+)
+
+(defrule
+    (civilian-population > 75)
+    (can-research ri-crop-rotation)
+    =>
+    (research ri-crop-rotation)
+)
+
+(defrule
+    (civilian-population > 60)
+    (can-research ri-wheel-barrow)
+    =>
+    (research ri-wheel-barrow)
+)
+
+(defrule
+    (unit-type-count archer-line > 2)
+    (can-research ri-ballistics)
+    =>
+    (research ri-ballistics)
+)
+
+(defrule
+    (unit-type-count archer-line > 2)
+    (can-research ri-chemistry)
+    =>
+    (research ri-chemistry)
+)
+
+(defrule
+    (unit-type-count archer-line > 10)
+    (can-research ri-thumb-ring)
+    =>
+    (research ri-thumb-ring)
+)
+
+;(defrule
+;    (unit-type-count archer-line > 10)
+;    (can-research ri-padded-archer-armor)
+;    =>
+;    (research ri-padded-archer-armor)
+;)
+
+(defrule
+    (civilian-population > 40)
+    =>
+    (set-strategic-number sn-food-gatherer-percentage 30)
+    (set-strategic-number sn-wood-gatherer-percentage 30)
+    (set-strategic-number sn-gold-gatherer-percentage 30)
+    (set-strategic-number sn-stone-gatherer-percentage 10)
+    (disable-self)
+)
+
+(defrule
+    (can-build castle)
+    =>
+    (up-assign-builders c: castle c: 10)
+    (build castle)
+)
+
+(defrule
+    (current-age == imperial-age)
+    (can-train archer-line)
+    =>
+    (train archer-line)
+)
+
+(defrule
+    (current-age == imperial-age)
+    (can-train trebuchet)
+    (up-object-type-count c: archer-line >= 10)
+    (or
+        (research-completed ri-ballistics)
+        (unit-type-count trebuchet <= 2)
+    )
+    =>
+    (train trebuchet)
+)
+
+(defrule
+    (current-age == imperial-age)
+    (can-train bombard-cannon-line)
+    (up-object-type-count c: archer-line >= 10)
+    (or
+        (research-completed ri-ballistics)
+        (unit-type-count bombard-cannon-line <= 2)
+    )
+    =>
+    (train bombard-cannon-line)
+)

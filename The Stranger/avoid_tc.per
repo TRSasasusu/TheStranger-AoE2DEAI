@@ -22,6 +22,7 @@
 (defconst gl-avoiding-start-distance 170)
 (defconst gl-avoiding-building 171)
 (defconst gl-avoiding-player 172)
+(defconst gl-avoiding-additional-distance 173)
 (defrule
     (true)
     =>
@@ -34,6 +35,7 @@
     (up-set-attack-stance eagle-warrior-line c: stance-aggressive)
     (up-set-attack-stance mangonel-line c: stance-aggressive)
     (up-set-attack-stance knight-line c: stance-aggressive)
+    (up-set-attack-stance bombard-cannon-line c: stance-aggressive)
 
     (set-goal gl-avoiding-player 0)
 )
@@ -117,6 +119,7 @@
     =>
     (set-goal gl-avoiding-unit-type archer-line)
     (set-goal gl-avoiding-start-distance 11)
+    (set-goal gl-avoiding-additional-distance 0)
 )
 (defrule
     ;(unit-type-count militiaman-line < 30)
@@ -144,7 +147,9 @@
     ;(up-send-flare gl-enemy-tc-x)
     (up-set-target-point gl-enemy-tc-x)
     ;(up-full-reset-search)
+    (up-modify-goal gl-avoiding-start-distance g:+ gl-avoiding-additional-distance)
     (up-filter-distance c: -1 g: gl-avoiding-start-distance)
+    (up-modify-goal gl-avoiding-start-distance g:- gl-avoiding-additional-distance)
     (up-find-local g: gl-avoiding-unit-type c: 30)
     (up-get-search-state gl-avoiding-units-local-total)
 )
@@ -193,6 +198,7 @@
     ;(up-modify-goal gl-enemy-tc-unit-dist-minus c:= 14)
     (up-modify-goal gl-enemy-tc-unit-dist-minus g:= gl-avoiding-start-distance)
     (up-modify-goal gl-enemy-tc-unit-dist-minus c:+ 3)
+    (up-modify-goal gl-enemy-tc-unit-dist-minus g:+ gl-avoiding-additional-distance)
     (up-modify-goal gl-enemy-tc-unit-dist-minus g:- gl-enemy-tc-unit-dist)
     (up-modify-goal gl-avoiding-target-x g:* gl-enemy-tc-unit-dist-minus)
     (up-modify-goal gl-avoiding-target-y g:* gl-enemy-tc-unit-dist-minus)
@@ -283,12 +289,15 @@
         (goal gl-avoiding-unit-type eagle-warrior-line)
         (goal gl-avoiding-unit-type mangonel-line)
     )
-    (and
-        (not(goal gl-avoiding-building watch-tower))
-        (not
-            (and
-                (up-object-type-count c: knight-line > 10)
-                (research-completed ri-chain-barding)
+    (or
+        (goal gl-avoiding-building castle)
+        (and
+            (not(goal gl-avoiding-building watch-tower))
+            (not
+                (and
+                    (up-object-type-count c: knight-line > 10)
+                    (research-completed ri-chain-barding)
+                )
             )
         )
     )
@@ -297,19 +306,39 @@
     (set-goal gl-avoiding-start-distance 11)
     (up-jump-rule -13)
 )
+(defrule
+    (or
+        (goal gl-avoiding-unit-type eagle-warrior-line)
+        (or
+            (goal gl-avoiding-unit-type mangonel-line)
+            (goal gl-avoiding-unit-type knight-line)
+        )
+    )
+    =>
+    (set-goal gl-avoiding-unit-type bombard-cannon-line)
+    (set-goal gl-avoiding-start-distance 14); 14!
+    (up-jump-rule -14)
+)
 ;(defrule
 ;    (goal gl-avoiding-unit-type mangonel-line)
 ;    =>
 ;    (set-goal gl-avoiding-unit-type knight-line)
 ;    (set-goal gl-avoiding-start-distance 11)
-;    (up-jump-rule -14)
+;    (up-jump-rule -15)
 ;)
 
 (defrule
     (goal gl-avoiding-building town-center)
     =>
     (set-goal gl-avoiding-building watch-tower)
-    (up-jump-rule -15)
+    (up-jump-rule -16)
+)
+(defrule
+    (goal gl-avoiding-building watch-tower)
+    =>
+    (set-goal gl-avoiding-building castle)
+    (set-goal gl-avoiding-additional-distance 3)
+    (up-jump-rule -17)
 )
 
 (defrule
@@ -319,7 +348,7 @@
     =>
     (up-modify-sn sn-focus-player-number c:= 2)
     (set-goal gl-avoiding-player 2)
-    (up-jump-rule -17)
+    (up-jump-rule -19)
 )
 (defrule
     (up-compare-goal gl-avoiding-player <= 2)
@@ -328,7 +357,7 @@
     =>
     (up-modify-sn sn-focus-player-number c:= 3)
     (set-goal gl-avoiding-player 3)
-    (up-jump-rule -18)
+    (up-jump-rule -20)
 )
 (defrule
     (up-compare-goal gl-avoiding-player <= 3)
@@ -337,7 +366,7 @@
     =>
     (up-modify-sn sn-focus-player-number c:= 4)
     (set-goal gl-avoiding-player 4)
-    (up-jump-rule -19)
+    (up-jump-rule -21)
 )
 (defrule
     (up-compare-goal gl-avoiding-player <= 4)
@@ -348,7 +377,7 @@
     (set-goal gl-avoiding-player 5)
     ;(chat-to-all "the 5 is enemy, so in the next, I would avoid their TC!")
     ;(up-chat-data-to-all "focus-player: %d" s: sn-focus-player-number)
-    (up-jump-rule -20)
+    (up-jump-rule -22)
 )
 (defrule
     (up-compare-goal gl-avoiding-player <= 5)
@@ -359,7 +388,7 @@
     (set-goal gl-avoiding-player 6)
     ;(chat-to-all "the 6 is enemy, so in the next, I would avoid their TC!")
     ;(up-chat-data-to-all "focus-player: %d" s: sn-focus-player-number)
-    (up-jump-rule -21)
+    (up-jump-rule -23)
 )
 (defrule
     (up-compare-goal gl-avoiding-player <= 6)
@@ -370,7 +399,7 @@
     (set-goal gl-avoiding-player 7)
     ;(chat-to-all "the 7 is enemy, so in the next, I would avoid their TC!")
     ;(up-chat-data-to-all "focus-player: %d" s: sn-focus-player-number)
-    (up-jump-rule -22)
+    (up-jump-rule -24)
 )
 (defrule
     (up-compare-goal gl-avoiding-player <= 7)
@@ -381,6 +410,6 @@
     (set-goal gl-avoiding-player 8)
     ;(chat-to-all "the 8 is enemy, so in the next, I would avoid their TC!")
     ;(up-chat-data-to-all "focus-player: %d" s: sn-focus-player-number)
-    (up-jump-rule -23)
+    (up-jump-rule -25)
 )
 ;***avoid TC (end)***

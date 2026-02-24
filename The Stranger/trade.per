@@ -1,0 +1,17 @@
+(defrule
+    (game-time > 1200)
+    (current-age >= castle-age)
+    (can-research ri-caravan)
+    (unit-type-count-total trade-cart > 2)
+    =>
+    (research ri-caravan)
+)
+
+(defrule
+    (game-time > 1200)
+    (current-age >= castle-age)
+    (can-train trade-cart)
+    (unit-type-count-total trade-cart < 20)
+    =>
+    (train trade-cart)
+)
