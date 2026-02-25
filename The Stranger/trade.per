@@ -1,4 +1,27 @@
+(defconst gl-trade-market 220)
+
 (defrule
+    (true)
+    =>
+    (set-goal gl-trade-market 0)
+    (disable-self)
+)
+
+(defrule
+    (player-in-game any-ally)
+    (game-time > 1200)
+    (current-age >= castle-age)
+    (goal gl-trade-market 0)
+    (can-build market)
+    =>
+    (delete-building market)
+    (up-set-placement-data my-player-number -1 c: -40)
+    (up-build place-control 0 c: market)
+    (set-goal gl-trade-market 1)
+)
+
+(defrule
+    (player-in-game any-ally)
     (game-time > 1200)
     (current-age >= castle-age)
     (can-research ri-caravan)
@@ -8,6 +31,7 @@
 )
 
 (defrule
+    (player-in-game any-ally)
     (game-time > 1200)
     (current-age >= castle-age)
     (can-train trade-cart)

@@ -1,6 +1,6 @@
 (defrule
     (can-research feudal-age)
-    (civilian-population > 19)
+    (civilian-population > 18)
     =>
     (set-goal gl-researching-feudal 1)
     (research feudal-age)
@@ -52,6 +52,7 @@
     (can-build archery-range)
     (building-type-count-total archery-range < 2)
     =>
+    (up-assign-builders c: archery-range c: 2)
     (build archery-range)
 )
 
@@ -88,6 +89,18 @@
     (set-strategic-number sn-wood-gatherer-percentage 35)
     (set-strategic-number sn-gold-gatherer-percentage 30)
     (set-strategic-number sn-stone-gatherer-percentage 0)
+    (disable-self)
+)
+
+(defrule
+    (current-age == feudal-age)
+    (civilian-population > 30)
+    =>
+    (set-strategic-number sn-food-gatherer-percentage 45)
+    (set-strategic-number sn-wood-gatherer-percentage 30)
+    (set-strategic-number sn-gold-gatherer-percentage 25)
+    (set-strategic-number sn-stone-gatherer-percentage 0)
+    (disable-self)
 )
 
 ;(defrule
@@ -107,16 +120,24 @@
     (research ri-fletching)
 )
 
-(defrule
-    (unit-type-count archer-line > 10)
-    (can-research ri-padded-archer-armor)
-    =>
-    (research ri-padded-archer-armor)
-)
+;(defrule
+;    (unit-type-count archer-line > 10)
+;    (can-research ri-padded-archer-armor)
+;    =>
+;    (research ri-padded-archer-armor)
+;)
 
 (defrule
     (current-age == feudal-age)
     (can-train archer-line)
     =>
     (train archer-line)
+)
+
+(defrule
+    (current-age == feudal-age)
+    (players-unit-type-count focus-player skirmisher-line > 4)
+    =>
+    (set-goal gl-attack-stop 1)
+    (set-goal gl-attack-only-attack-move-whole 1)
 )

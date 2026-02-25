@@ -13,6 +13,30 @@
 ;(defconst gl-resource-lumber-camp-appear 202)
 ;(defconst gl-resource-mining-camp-appear 203)
 
+
+
+(defrule
+    (game-time > 1200)
+    =>
+    (set-strategic-number sn-camp-max-distance 30)
+    (disable-self)
+)
+(defrule
+    (game-time > 1800)
+    =>
+    (set-strategic-number sn-camp-max-distance 80)
+    (disable-self)
+)
+(defrule
+    (game-time > 2400)
+    =>
+    (set-strategic-number sn-camp-max-distance 200)
+    (disable-self)
+)
+
+
+
+
 (defrule
     (true)
     =>

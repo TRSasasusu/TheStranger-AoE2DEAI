@@ -59,7 +59,7 @@
 (defrule
     (or
         (unit-type-count scout-cavalry-line > 5)
-        (unit-type-count knight-line > 2)
+        (unit-type-count cav-line > 2)
     )
     (can-research ri-scale-barding)
     =>
@@ -69,7 +69,7 @@
 (defrule
     (or
         (unit-type-count scout-cavalry-line > 5)
-        (unit-type-count knight-line > 2)
+        (unit-type-count cav-line > 2)
     )
     (can-research ri-chain-barding)
     =>
@@ -79,26 +79,34 @@
 (defrule
     (or
         (unit-type-count scout-cavalry-line > 5)
-        (unit-type-count knight-line > 2)
+        (unit-type-count cav-line > 2)
     )
     (can-research ri-plate-barding)
     =>
     (research ri-plate-barding)
 )
 
+#load-if-defined MONGOL-CIV
 (defrule
-    (unit-type-count knight-line > 10)
+    (unit-type-count cav-line > 10)
+    (can-research ri-elite-steppe-lancer)
+    =>
+    (research ri-elite-steppe-lancer)
+)
+#else
+(defrule
+    (unit-type-count cav-line > 10)
     (can-research ri-cavalier)
     =>
     (research ri-cavalier)
 )
-
 (defrule
-    (unit-type-count knight-line > 10)
+    (unit-type-count cav-line > 10)
     (can-research ri-paladin)
     =>
     (research ri-paladin)
 )
+#end-if
 
 (defrule
     (unit-type-count scout-cavalry-line > 4)
@@ -115,28 +123,28 @@
 )
 
 (defrule
-    (unit-type-count knight-line > 10)
+    (unit-type-count cav-line > 10)
     (can-research ri-forging)
     =>
     (research ri-forging)
 )
 
 (defrule
-    (unit-type-count knight-line > 10)
+    (unit-type-count cav-line > 10)
     (can-research ri-iron-casting)
     =>
     (research ri-iron-casting)
 )
 
 (defrule
-    (unit-type-count knight-line > 10)
+    (unit-type-count cav-line > 10)
     (can-research ri-blast-furnace)
     =>
     (research ri-blast-furnace)
 )
 
 (defrule
-    (unit-type-count knight-line > 15)
+    (unit-type-count cav-line > 15)
     (can-research ri-husbandry)
     =>
     (research ri-husbandry)
@@ -209,9 +217,9 @@
 
 (defrule
     (current-age == imperial-age)
-    (can-train knight-line)
+    (can-train cav-line)
     =>
-    (train knight-line)
+    (train cav-line)
 )
 
 (defrule

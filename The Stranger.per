@@ -15,6 +15,14 @@
 (defconst status-resource 3)
 (defconst status-down 4)
 (defconst status-gather 5)
+(defconst gl-attack-stop 250)
+(defconst gl-attack-only-attack-move-whole 251)
+#load-if-defined MONGOL-CIV
+(defconst cav-line steppe-lancer-line) ; steppe-lancer-line
+#else
+(defconst cav-line knight-line) ; knight-line
+#end-if
+
 
 
 (defrule
@@ -44,7 +52,7 @@
 	(set-strategic-number sn-task-ungrouped-soldiers 0)
     ;(set-strategic-number sn-attack-intelligence 1)
     (set-strategic-number sn-enable-new-building-system 1)
-    (set-strategic-number sn-camp-max-distance 200)
+    ;(set-strategic-number sn-camp-max-distance 200)
 	(disable-self)
 )
 (defrule
@@ -79,6 +87,8 @@
     (true)
     =>
     (set-goal gl-researching-feudal 0)
+    (set-goal gl-attack-stop 0)
+    (set-goal gl-attack-only-attack-move-whole 0)
     (disable-self)
 )
 
@@ -118,10 +128,12 @@
 )
 
 (defconst gl-closest-enemy 20)
+(defconst gl-next-closest-enemy 21)
 (defrule
     (true)
     =>
     (up-find-player enemy find-closest gl-closest-enemy)
+    (up-find-next-player enemy find-closest gl-next-closest-enemy)
     (up-modify-sn sn-focus-player-number g:= gl-closest-enemy)
     ;(up-chat-data-to-all "set focus player: %d" g: gl-closest-enemy)
 )

@@ -45,6 +45,7 @@
     ;)
     (soldier-count >= 2)
     (up-timer-status t-attack-timer != timer-running)
+    (goal gl-attack-stop 0)
     =>
     (up-full-reset-search)
     (generate-random-number 21);25
@@ -249,7 +250,10 @@
     (up-compare-goal gl-attack-target-rnd < 22)
     (or
         (up-compare-goal gl-attacking-vil-remote-total > 0)
-        (goal gl-attack-only-attack-move 1)
+        (or
+            (goal gl-attack-only-attack-move 1)
+            (goal gl-attack-only-attack-move-whole 1)
+        )
     )
     (up-object-type-count g: gl-attacking-unit-type >= 2)
     =>
@@ -271,7 +275,10 @@
     (up-compare-goal gl-attack-target-rnd < 22)
     (and
         (goal gl-attacking-vil-remote-total 0)
-        (goal gl-attack-only-attack-move 0)
+        (and
+            (goal gl-attack-only-attack-move 0)
+            (goal gl-attack-only-attack-move-whole 0)
+        )
     )
     (up-object-type-count g: gl-attacking-unit-type >= 2)
     =>
@@ -364,4 +371,11 @@
     (set-goal gl-attacking-unit-type trebuchet)
     (set-goal gl-attack-only-attack-move 1)
     (up-jump-rule -25)
+)
+(defrule
+    (goal gl-attacking-unit-type trebuchet)
+    =>
+    (set-goal gl-attacking-unit-type steppe-lancer-line)
+    (set-goal gl-attack-only-attack-move 0)
+    (up-jump-rule -26)
 )

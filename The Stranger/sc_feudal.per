@@ -106,10 +106,39 @@
     (research ri-bloodlines)
 )
 
+
+
+(defrule ; at first, go to the pocket
+    (game-time < 1020)
+    =>
+    (up-modify-sn sn-focus-player-number g:= gl-next-closest-enemy)
+)
+
+(defrule
+    (true)
+    =>
+    (up-modify-goal gl-tmp s:= sn-focus-player-number)
+    (up-modify-sn sn-focus-player-number g:= gl-next-closest-enemy)
+)
+;(defrule
+;    (players-current-age focus-player >= castle-age)
+;    (players-current-age-time focus-player >= 120)
+;    =>
+;
+;)
 (defrule
     (current-age == feudal-age)
     (can-train scout-cavalry-line)
     (unit-type-count scout-cavalry-line < 10)
+    (not(and
+        (players-current-age focus-player >= castle-age)
+        (players-current-age-time focus-player >= 120)
+    ))
     =>
     (train scout-cavalry-line)
+)
+(defrule
+    (true)
+    =>
+    (up-modify-sn sn-focus-player-number g:= gl-tmp)
 )

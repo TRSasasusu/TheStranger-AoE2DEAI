@@ -3,6 +3,10 @@
     =>
     (set-goal gl-researching-castle 1)
     (research castle-age)
+    (set-strategic-number sn-food-gatherer-percentage 35)
+    (set-strategic-number sn-wood-gatherer-percentage 35)
+    (set-strategic-number sn-gold-gatherer-percentage 30)
+    (set-strategic-number sn-stone-gatherer-percentage 0)
 )
 
 (defrule
@@ -67,6 +71,18 @@
 )
 
 (defrule
+    (research-completed ri-bodkin-arrow)
+    (research-completed ri-crossbow)
+    =>
+    (set-strategic-number sn-food-gatherer-percentage 20)
+    (set-strategic-number sn-wood-gatherer-percentage 35)
+    (set-strategic-number sn-gold-gatherer-percentage 45)
+    (set-strategic-number sn-stone-gatherer-percentage 0)
+    (set-goal gl-attack-stop 0)
+    (disable-self)
+)
+
+(defrule
     (can-research ri-bow-saw)
     =>
     (research ri-bow-saw)
@@ -105,10 +121,10 @@
 
 (defrule
     (current-age >= castle-age)
-    (civilian-population > 40)
+    (civilian-population > 45)
     =>
-    (set-strategic-number sn-food-gatherer-percentage 20)
-    (set-strategic-number sn-wood-gatherer-percentage 30)
+    (set-strategic-number sn-food-gatherer-percentage 25)
+    (set-strategic-number sn-wood-gatherer-percentage 25)
     (set-strategic-number sn-gold-gatherer-percentage 45)
     (set-strategic-number sn-stone-gatherer-percentage 5)
     (disable-self)
@@ -138,4 +154,10 @@
     )
     =>
     (train mangonel-line)
+)
+
+(defrule
+    (unit-type-count mangonel-line >= 2)
+    =>
+    (set-goal gl-attack-only-attack-move-whole 1)
 )
