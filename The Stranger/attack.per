@@ -166,7 +166,7 @@
     ;(up-full-reset-search)
     ;(up-find-local c: militiaman-line c: 8)
     (up-get-point position-self gl-position-self-x)
-    (up-send-flare gl-position-self-x)
+    ;(up-send-flare gl-position-self-x)
     (up-copy-point gl-deep-point-x gl-enemy-tc-x)
     ;(up-send-flare gl-deep-point-x)
     ;(up-add-point gl-deep-point-x gl-position-self-x c:- 1)
@@ -267,7 +267,7 @@
     (up-modify-goal gl-attack-target-y g:+ gl-tmp)
     (up-target-point gl-attack-target-x action-attack-move -1 -1)
     (chat-to-all "attack move!")
-    (up-send-flare gl-attack-target-x)
+    ;(up-send-flare gl-attack-target-x)
     (up-full-reset-search)
 )
 (defrule
@@ -284,7 +284,7 @@
     =>
     (up-target-point gl-attack-target-x action-move -1 -1)
     (chat-to-all "only moving!")
-    (up-send-flare gl-attack-target-x)
+    ;(up-send-flare gl-attack-target-x)
     (up-full-reset-search)
 )
 

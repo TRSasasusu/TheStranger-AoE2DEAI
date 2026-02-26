@@ -134,3 +134,10 @@
     =>
     (train cav-line)
 )
+
+(defrule
+    (current-age >= castle-age)
+    (game-time > 1500)
+    =>
+    (set-goal gl-attack-only-attack-move-whole 1)
+)

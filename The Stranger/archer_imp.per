@@ -37,6 +37,10 @@
     (research-completed ri-chemistry)
     =>
     (build archery-range)
+    (set-strategic-number sn-food-gatherer-percentage 5)
+    (set-strategic-number sn-wood-gatherer-percentage 45)
+    (set-strategic-number sn-gold-gatherer-percentage 45)
+    (set-strategic-number sn-stone-gatherer-percentage 5)
 )
 
 (defrule
@@ -159,15 +163,15 @@
 ;    (research ri-padded-archer-armor)
 ;)
 
-(defrule
-    (civilian-population > 40)
-    =>
-    (set-strategic-number sn-food-gatherer-percentage 30)
-    (set-strategic-number sn-wood-gatherer-percentage 30)
-    (set-strategic-number sn-gold-gatherer-percentage 30)
-    (set-strategic-number sn-stone-gatherer-percentage 10)
-    (disable-self)
-)
+;(defrule
+;    (civilian-population > 40)
+;    =>
+;    (set-strategic-number sn-food-gatherer-percentage 30)
+;    (set-strategic-number sn-wood-gatherer-percentage 30)
+;    (set-strategic-number sn-gold-gatherer-percentage 30)
+;    (set-strategic-number sn-stone-gatherer-percentage 10)
+;    (disable-self)
+;)
 
 (defrule
     (can-build castle)

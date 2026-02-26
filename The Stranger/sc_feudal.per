@@ -109,9 +109,10 @@
 
 
 (defrule ; at first, go to the pocket
-    (game-time < 1020)
+    (game-time < 1080)
     =>
     (up-modify-sn sn-focus-player-number g:= gl-next-closest-enemy)
+    ;(up-chat-data-to-all "im targeting %d" g: gl-next-closest-enemy)
 )
 
 (defrule

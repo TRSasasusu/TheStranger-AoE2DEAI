@@ -53,6 +53,7 @@
     ;(set-strategic-number sn-attack-intelligence 1)
     (set-strategic-number sn-enable-new-building-system 1)
     ;(set-strategic-number sn-camp-max-distance 200)
+    (set-strategic-number sn-retask-gather-amount 5)
 	(disable-self)
 )
 (defrule
@@ -133,7 +134,11 @@
     (true)
     =>
     (up-find-player enemy find-closest gl-closest-enemy)
-    (up-find-next-player enemy find-closest gl-next-closest-enemy)
+    (up-find-next-player enemy find-closest gl-closest-enemy)
+    (up-modify-goal gl-next-closest-enemy g:= gl-closest-enemy)
+    (up-find-player enemy find-closest gl-closest-enemy)
+    ;(up-chat-data-to-all "closest: %d" g: gl-closest-enemy)
+    ;(up-chat-data-to-all "next closest: %d" g: gl-next-closest-enemy)
     (up-modify-sn sn-focus-player-number g:= gl-closest-enemy)
     ;(up-chat-data-to-all "set focus player: %d" g: gl-closest-enemy)
 )

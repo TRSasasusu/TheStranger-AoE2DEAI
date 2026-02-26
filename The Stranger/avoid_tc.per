@@ -328,7 +328,7 @@
             (not(goal gl-avoiding-building watch-tower))
             (not
                 (and
-                    (up-object-type-count c: steppe-lancer-line > 10)
+                    (up-object-type-count c: steppe-lancer-line > 15)
                     (research-completed ri-chain-barding)
                 )
             )
@@ -357,7 +357,7 @@
     (goal gl-avoiding-building watch-tower)
     =>
     (set-goal gl-avoiding-building castle)
-    (set-goal gl-avoiding-additional-distance 3)
+    (set-goal gl-avoiding-additional-distance 5)
     (up-jump-rule -18)
 )
 

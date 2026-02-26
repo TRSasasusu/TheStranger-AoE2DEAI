@@ -136,8 +136,17 @@
 
 (defrule
     (current-age == feudal-age)
-    (players-unit-type-count focus-player skirmisher-line > 4)
+    (players-unit-type-count focus-player skirmisher-line > 2)
     =>
     (set-goal gl-attack-stop 1)
     (set-goal gl-attack-only-attack-move-whole 1)
+)
+
+(defrule
+    (current-age == feudal-age)
+    =>
+    (up-get-point position-self gl-tmp-x)
+    (up-full-reset-search)
+    (up-find-local c: archery-range c: 2)
+    (up-target-point gl-tmp-x action-gather -1 -1)
 )

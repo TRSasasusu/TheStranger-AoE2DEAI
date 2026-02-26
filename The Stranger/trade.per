@@ -9,7 +9,7 @@
 
 (defrule
     (player-in-game any-ally)
-    (game-time > 1200)
+    (game-time > 1500)
     (current-age >= castle-age)
     (goal gl-trade-market 0)
     (can-build market)
@@ -22,7 +22,7 @@
 
 (defrule
     (player-in-game any-ally)
-    (game-time > 1200)
+    (game-time > 1500)
     (current-age >= castle-age)
     (can-research ri-caravan)
     (unit-type-count-total trade-cart > 2)
@@ -32,7 +32,7 @@
 
 (defrule
     (player-in-game any-ally)
-    (game-time > 1200)
+    (game-time > 1500)
     (current-age >= castle-age)
     (can-train trade-cart)
     (unit-type-count-total trade-cart < 20)
