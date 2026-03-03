@@ -8,6 +8,7 @@
 (defconst gl-attack-target-y 137)
 (defconst gl-attacking-unit-type 138)
 (defconst gl-attack-only-attack-move 139)
+(defconst gl-attack-ignore-count-limit 140)
 (defrule
     (true)
     =>
@@ -15,6 +16,7 @@
     (set-goal gl-attack-target-local-total 0)
     (set-goal gl-attacking-unit-type archer-line)
     (set-goal gl-attack-only-attack-move 0)
+    (set-goal gl-attack-ignore-count-limit 0)
 )
 ;(defrule
 ;    (unit-type-count militiaman-line >= 2)
@@ -56,7 +58,10 @@
 (defrule
     (up-compare-goal gl-attack-target-rnd > 0)
     (up-compare-goal gl-attack-target-rnd < 5)
-    (up-object-type-count g: gl-attacking-unit-type >= 2)
+    (or
+        (up-object-type-count g: gl-attacking-unit-type >= 2)
+        (goal gl-attack-ignore-count-limit 1)
+    )
     =>
     (up-find-remote c: lumber-camp c: 5)
     (up-get-search-state gl-attack-target-local-total)
@@ -66,7 +71,10 @@
     (up-compare-goal gl-attack-target-rnd > 0)
     (up-compare-goal gl-attack-target-rnd < 5)
     (goal gl-attack-target-remote-total 0)
-    (up-object-type-count g: gl-attacking-unit-type >= 2)
+    (or
+        (up-object-type-count g: gl-attacking-unit-type >= 2)
+        (goal gl-attack-ignore-count-limit 1)
+    )
     =>
     (set-goal gl-attack-target-rnd 5)
     (chat-to-all "attacking to NOT lumber-camp")
@@ -74,7 +82,10 @@
 (defrule
     (up-compare-goal gl-attack-target-rnd >= 5)
     (up-compare-goal gl-attack-target-rnd < 8)
-    (up-object-type-count g: gl-attacking-unit-type >= 2)
+    (or
+        (up-object-type-count g: gl-attacking-unit-type >= 2)
+        (goal gl-attack-ignore-count-limit 1)
+    )
     =>
     (up-find-remote c: mill c: 5)
     (up-get-search-state gl-attack-target-local-total)
@@ -84,7 +95,10 @@
     (up-compare-goal gl-attack-target-rnd >= 5)
     (up-compare-goal gl-attack-target-rnd < 8)
     (goal gl-attack-target-remote-total 0)
-    (up-object-type-count g: gl-attacking-unit-type >= 2)
+    (or
+        (up-object-type-count g: gl-attacking-unit-type >= 2)
+        (goal gl-attack-ignore-count-limit 1)
+    )
     =>
     (set-goal gl-attack-target-rnd 8)
     (chat-to-all "attacking to NOT mill")
@@ -92,7 +106,10 @@
 (defrule
     (up-compare-goal gl-attack-target-rnd >= 8)
     (up-compare-goal gl-attack-target-rnd < 11)
-    (up-object-type-count g: gl-attacking-unit-type >= 2)
+    (or
+        (up-object-type-count g: gl-attacking-unit-type >= 2)
+        (goal gl-attack-ignore-count-limit 1)
+    )
     =>
     (up-find-remote c: mining-camp c: 5)
     (up-get-search-state gl-attack-target-local-total)
@@ -101,7 +118,10 @@
     (up-compare-goal gl-attack-target-rnd >= 8)
     (up-compare-goal gl-attack-target-rnd < 11)
     (goal gl-attack-target-remote-total 0)
-    (up-object-type-count g: gl-attacking-unit-type >= 2)
+    (or
+        (up-object-type-count g: gl-attacking-unit-type >= 2)
+        (goal gl-attack-ignore-count-limit 1)
+    )
     =>
     (set-goal gl-attack-target-rnd 11)
     (chat-to-all "attacking to NOT mining-camp")
@@ -109,7 +129,10 @@
 (defrule
     (up-compare-goal gl-attack-target-rnd >= 11)
     (up-compare-goal gl-attack-target-rnd < 22)
-    (up-object-type-count g: gl-attacking-unit-type >= 2)
+    (or
+        (up-object-type-count g: gl-attacking-unit-type >= 2)
+        (goal gl-attack-ignore-count-limit 1)
+    )
     =>
     (up-find-remote c: town-center c: 5)
     (up-get-search-state gl-attack-target-local-total)
@@ -118,7 +141,10 @@
     (up-compare-goal gl-attack-target-rnd >= 11)
     (up-compare-goal gl-attack-target-rnd < 22)
     (goal gl-attack-target-remote-total 0)
-    (up-object-type-count g: gl-attacking-unit-type >= 2)
+    (or
+        (up-object-type-count g: gl-attacking-unit-type >= 2)
+        (goal gl-attack-ignore-count-limit 1)
+    )
     =>
     (set-goal gl-attack-target-rnd 22)
     (chat-to-all "attacking to NOT town-center or deep")
@@ -126,7 +152,10 @@
 (defrule
     (up-compare-goal gl-attack-target-rnd > 0)
     (up-compare-goal gl-attack-target-rnd < 13)
-    (up-object-type-count g: gl-attacking-unit-type >= 2)
+    (or
+        (up-object-type-count g: gl-attacking-unit-type >= 2)
+        (goal gl-attack-ignore-count-limit 1)
+    )
     =>
     (generate-random-number 100)
     (up-get-fact random-number 0 gl-tmp)
@@ -154,7 +183,10 @@
 (defrule
     (up-compare-goal gl-attack-target-rnd >= 13)
     (up-compare-goal gl-attack-target-rnd < 22)
-    (up-object-type-count g: gl-attacking-unit-type >= 2)
+    (or
+        (up-object-type-count g: gl-attacking-unit-type >= 2)
+        (goal gl-attack-ignore-count-limit 1)
+    )
     =>
     (generate-random-number 100)
     (up-get-fact random-number 0 gl-tmp)
@@ -214,7 +246,10 @@
 (defrule
     (up-compare-goal gl-attack-target-rnd > 0)
     (up-compare-goal gl-attack-target-rnd < 22)
-    (up-object-type-count g: gl-attacking-unit-type >= 2)
+    (or
+        (up-object-type-count g: gl-attacking-unit-type >= 2)
+        (goal gl-attack-ignore-count-limit 1)
+    )
     =>
     (up-find-local g: gl-attacking-unit-type c: 220)
     (up-get-search-state gl-attack-unit-local-total)
@@ -234,7 +269,10 @@
 (defrule
     (up-compare-goal gl-attack-target-rnd > 0)
     (up-compare-goal gl-attack-target-rnd < 22)
-    (up-object-type-count g: gl-attacking-unit-type >= 2)
+    (or
+        (up-object-type-count g: gl-attacking-unit-type >= 2)
+        (goal gl-attack-ignore-count-limit 1)
+    )
     =>
     (up-set-target-object search-local c: 0)
     (up-get-point position-object gl-tmp-x)
@@ -255,7 +293,10 @@
             (goal gl-attack-only-attack-move-whole 1)
         )
     )
-    (up-object-type-count g: gl-attacking-unit-type >= 2)
+    (or
+        (up-object-type-count g: gl-attacking-unit-type >= 2)
+        (goal gl-attack-ignore-count-limit 1)
+    )
     =>
     (generate-random-number 6)
     (up-get-fact random-number 0 gl-tmp)
@@ -280,7 +321,10 @@
             (goal gl-attack-only-attack-move-whole 0)
         )
     )
-    (up-object-type-count g: gl-attacking-unit-type >= 2)
+    (or
+        (up-object-type-count g: gl-attacking-unit-type >= 2)
+        (goal gl-attack-ignore-count-limit 1)
+    )
     =>
     (up-target-point gl-attack-target-x action-move -1 -1)
     (chat-to-all "only moving!")
@@ -349,6 +393,7 @@
     (set-goal gl-attacking-unit-type mangonel-line)
     ;(chat-to-all "mangonel go!!")
     (set-goal gl-attack-only-attack-move 1)
+    (set-goal gl-attack-ignore-count-limit 1)
     (up-jump-rule -22)
 )
 (defrule
@@ -356,6 +401,7 @@
     =>
     (set-goal gl-attacking-unit-type knight-line)
     (set-goal gl-attack-only-attack-move 0)
+    (set-goal gl-attack-ignore-count-limit 0)
     (up-jump-rule -23)
 )
 (defrule
@@ -363,6 +409,7 @@
     =>
     (set-goal gl-attacking-unit-type bombard-cannon-line)
     (set-goal gl-attack-only-attack-move 1)
+    (set-goal gl-attack-ignore-count-limit 1)
     (up-jump-rule -24)
 )
 (defrule
@@ -370,6 +417,7 @@
     =>
     (set-goal gl-attacking-unit-type trebuchet)
     (set-goal gl-attack-only-attack-move 1)
+    (set-goal gl-attack-ignore-count-limit 1)
     (up-jump-rule -25)
 )
 (defrule
@@ -377,5 +425,6 @@
     =>
     (set-goal gl-attacking-unit-type steppe-lancer-line)
     (set-goal gl-attack-only-attack-move 0)
+    (set-goal gl-attack-ignore-count-limit 0)
     (up-jump-rule -26)
 )

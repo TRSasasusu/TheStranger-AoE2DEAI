@@ -7,6 +7,7 @@
     (set-strategic-number sn-wood-gatherer-percentage 35)
     (set-strategic-number sn-gold-gatherer-percentage 30)
     (set-strategic-number sn-stone-gatherer-percentage 0)
+    (set-goal gl-trade-stop 1)
 )
 
 (defrule
@@ -154,10 +155,33 @@
     )
     =>
     (train mangonel-line)
+    (set-goal gl-trade-stop 0)
 )
 
 (defrule
     (unit-type-count mangonel-line >= 2)
     =>
     (set-goal gl-attack-only-attack-move-whole 1)
+)
+
+(defrule
+    (current-age >= castle-age)
+    (game-time > 2100)
+    =>
+    (set-goal gl-trade-stop 0)
+)
+
+(defrule
+    (current-age == castle-age)
+    =>
+    (up-full-reset-search)
+    (up-find-remote c: castle c: 1)
+    (up-get-search-state gl-tmp-local-total)
+    ;(players-building-type-count focus-player castle >= 1) ; it includes not only ready but also under construction
+)
+(defrule
+    (current-age == castle-age)
+    (up-compare-goal gl-tmp-remote-total > 0)
+    =>
+    (up-modify-sn sn-focus-player-number g:= gl-next-closest-enemy)
 )

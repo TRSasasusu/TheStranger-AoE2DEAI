@@ -197,6 +197,7 @@
     )
     =>
     (train trebuchet)
+    (up-modify-sn sn-focus-player-number g:= gl-closest-enemy)
 )
 
 (defrule
@@ -209,4 +210,5 @@
     )
     =>
     (train bombard-cannon-line)
+    (up-modify-sn sn-focus-player-number g:= gl-closest-enemy)
 )

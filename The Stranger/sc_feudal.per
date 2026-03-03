@@ -1,6 +1,6 @@
 (defrule
     (can-research feudal-age)
-    (civilian-population > 19)
+    (civilian-population > 18)
     =>
     (set-goal gl-researching-feudal 1)
     (research feudal-age)
@@ -50,6 +50,7 @@
     (can-build stable)
     (building-type-count-total stable < 1)
     =>
+    (up-assign-builders c: stable c: 2)
     (build stable)
     (set-strategic-number sn-food-gatherer-percentage 60)
     (set-strategic-number sn-wood-gatherer-percentage 40)
@@ -109,7 +110,7 @@
 
 
 (defrule ; at first, go to the pocket
-    (game-time < 1080)
+    (game-time < 1200)
     =>
     (up-modify-sn sn-focus-player-number g:= gl-next-closest-enemy)
     ;(up-chat-data-to-all "im targeting %d" g: gl-next-closest-enemy)

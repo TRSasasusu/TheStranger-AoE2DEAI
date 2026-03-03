@@ -23,6 +23,23 @@
 (defconst gl-avoiding-building 171)
 (defconst gl-avoiding-player 172)
 (defconst gl-avoiding-additional-distance 173)
+(defconst t-avoiding-rotate-timer 12)
+(defconst gl-avoiding-rotate-direction 174)
+
+(defrule
+    (true)
+    =>
+    (set-goal gl-avoiding-rotate-direction 1)
+    (enable-timer t-avoiding-rotate-timer 200)
+    (disable-self)
+)
+(defrule
+    (up-timer-status t-avoiding-rotate-timer != timer-running)
+    =>
+    (up-modify-goal gl-avoiding-rotate-direction c:* -1)
+    (enable-timer t-avoiding-rotate-timer 200)
+)
+
 (defrule
     (true)
     =>
@@ -214,6 +231,7 @@
     ;(up-modify-goal gl-avoiding-cross-y g:- gl-avoiding-target-y) ; due to diagonal coordinate
     (generate-random-number 3)
     (up-get-fact random-number 0 gl-avoiding-cross-corr)
+    (up-modify-goal gl-avoiding-cross-corr g:* gl-avoiding-rotate-direction)
     (up-modify-goal gl-avoiding-cross-x g:* gl-avoiding-cross-corr)
     (up-modify-goal gl-avoiding-cross-y g:* gl-avoiding-cross-corr)
     ;(up-modify-goal gl-avoiding-cross-corr c:- 4)

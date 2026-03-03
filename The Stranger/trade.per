@@ -4,10 +4,12 @@
     (true)
     =>
     (set-goal gl-trade-market 0)
+    (set-goal gl-trade-stop 0)
     (disable-self)
 )
 
 (defrule
+    (goal gl-trade-stop 0)
     (player-in-game any-ally)
     (game-time > 1500)
     (current-age >= castle-age)
@@ -21,6 +23,7 @@
 )
 
 (defrule
+    (goal gl-trade-stop 0)
     (player-in-game any-ally)
     (game-time > 1500)
     (current-age >= castle-age)
@@ -31,6 +34,7 @@
 )
 
 (defrule
+    (goal gl-trade-stop 0)
     (player-in-game any-ally)
     (game-time > 1500)
     (current-age >= castle-age)
