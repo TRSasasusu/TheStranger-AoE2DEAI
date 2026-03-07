@@ -155,13 +155,13 @@
     )
     =>
     (train mangonel-line)
-    (set-goal gl-trade-stop 0)
 )
 
 (defrule
     (unit-type-count mangonel-line >= 2)
     =>
     (set-goal gl-attack-only-attack-move-whole 1)
+    (set-goal gl-trade-stop 0)
 )
 
 (defrule
@@ -175,7 +175,9 @@
     (current-age == castle-age)
     =>
     (up-full-reset-search)
-    (up-find-remote c: castle c: 1)
+    (up-filter-status c: status-ready c: list-active)
+    (up-find-status-remote c: castle c: 1)
+    ;(up-find-remote c: castle c: 1)
     (up-get-search-state gl-tmp-local-total)
     ;(players-building-type-count focus-player castle >= 1) ; it includes not only ready but also under construction
 )

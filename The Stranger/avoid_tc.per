@@ -144,7 +144,9 @@
     (true)
     =>
     (up-full-reset-search)
-    (up-find-remote g: gl-avoiding-building c: 10)
+    (up-filter-status c: status-ready c: list-active)
+    ;(up-find-remote g: gl-avoiding-building c: 10)
+    (up-find-status-remote g: gl-avoiding-building c: 10)
     (set-goal gl-avoiding-units-local-total 0)
     ;(set-goal gl-avoiding-unit-id -1)
     (up-get-search-state gl-enemy-tc-local-total)

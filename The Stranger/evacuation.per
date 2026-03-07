@@ -1,0 +1,16 @@
+(defrule
+    (true)
+    =>
+	(set-goal gl-tmp with-escrow)
+)
+(defrule
+	(player-in-game any-ally)
+    (building-type-count-total town-center < 1)
+	;(up-pending-objects c: town-center < 1)
+	(up-can-build gl-tmp c: town-center)
+    (game-time > 1080)
+=>
+	(up-set-placement-data this-any-ally -1 c: -40) ;-1 = home tc
+    (up-assign-builders c: town-center-foundation c: 10)
+	(up-build place-control gl-tmp c: town-center)
+)

@@ -63,7 +63,7 @@
     )
     (can-research ri-scale-barding)
     =>
-    (research ri-chain-barding)
+    (research ri-scale-barding)
 )
 
 (defrule
@@ -84,6 +84,10 @@
     (can-research ri-plate-barding)
     =>
     (research ri-plate-barding)
+    (set-strategic-number sn-food-gatherer-percentage 47)
+    (set-strategic-number sn-wood-gatherer-percentage 18)
+    (set-strategic-number sn-gold-gatherer-percentage 30)
+    (set-strategic-number sn-stone-gatherer-percentage 5)
 )
 
 #load-if-defined MONGOL-CIV
@@ -92,6 +96,10 @@
     (can-research ri-elite-steppe-lancer)
     =>
     (research ri-elite-steppe-lancer)
+    (set-strategic-number sn-food-gatherer-percentage 47)
+    (set-strategic-number sn-wood-gatherer-percentage 18)
+    (set-strategic-number sn-gold-gatherer-percentage 30)
+    (set-strategic-number sn-stone-gatherer-percentage 5)
 )
 #else
 (defrule
@@ -201,10 +209,21 @@
     =>
     (up-assign-builders c: town-center-foundation c: 4)
     (build town-center)
-    (set-strategic-number sn-food-gatherer-percentage 40)
-    (set-strategic-number sn-wood-gatherer-percentage 30)
+    ;(set-strategic-number sn-food-gatherer-percentage 40)
+    ;(set-strategic-number sn-wood-gatherer-percentage 30)
+    ;(set-strategic-number sn-gold-gatherer-percentage 30)
+    ;(set-strategic-number sn-stone-gatherer-percentage 0)
+)
+
+(defrule
+    (can-build castle)
+    =>
+    (up-assign-builders c: castle c: 6)
+    (build castle)
+    (set-strategic-number sn-food-gatherer-percentage 48)
+    (set-strategic-number sn-wood-gatherer-percentage 18)
     (set-strategic-number sn-gold-gatherer-percentage 30)
-    (set-strategic-number sn-stone-gatherer-percentage 0)
+    (set-strategic-number sn-stone-gatherer-percentage 4)
 )
 
 
@@ -231,4 +250,10 @@
     (can-train scout-cavalry-line)
     =>
     (train scout-cavalry-line)
+)
+
+(defrule
+    (can-train trebuchet)
+    =>
+    (train trebuchet)
 )
