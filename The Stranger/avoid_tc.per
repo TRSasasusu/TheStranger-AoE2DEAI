@@ -286,12 +286,38 @@
 )
 (defrule
     (goal gl-avoiding-unit-type spearman-line)
+    (or
+        (and
+            (goal gl-avoiding-building castle)
+            (not
+                (and
+                    (up-object-type-count c: scout-cavalry-line > 10)
+                    (or
+                        (research-completed ri-plate-barding)
+                        (research-completed ri-light-cavalry)
+                    )
+                )
+            )
+        )
+        (and
+            (not(goal gl-avoiding-building watch-tower))
+            (not
+                (and
+                    (up-object-type-count c: steppe-lancer-line > 15)
+                    (research-completed ri-chain-barding)
+                )
+            )
+        )
+    )
     =>
     (set-goal gl-avoiding-unit-type scout-cavalry-line)
     (up-jump-rule -10)
 )
 (defrule
-    (goal gl-avoiding-unit-type scout-cavalry-line)
+    (or
+        (goal gl-avoiding-unit-type spearman-line)
+        (goal gl-avoiding-unit-type scout-cavalry-line)
+    )
     =>
     (set-goal gl-avoiding-unit-type eagle-warrior-line)
     (set-goal gl-avoiding-start-distance 11)
@@ -311,7 +337,15 @@
         (goal gl-avoiding-unit-type mangonel-line)
     )
     (or
-        (goal gl-avoiding-building castle)
+        (and
+            (goal gl-avoiding-building castle)
+            (not
+                (and
+                    (up-object-type-count c: knight-line > 10)
+                    (research-completed ri-plate-barding)
+                )
+            )
+        )
         (and
             (not(goal gl-avoiding-building watch-tower))
             (not
@@ -343,7 +377,18 @@
 (defrule
     (goal gl-avoiding-unit-type bombard-cannon-line)
     (or
-        (goal gl-avoiding-building castle)
+        (and
+            (goal gl-avoiding-building castle)
+            (not
+                (and
+                    (up-object-type-count c: knight-line > 10)
+                    (or
+                        (research-completed ri-plate-barding)
+                        (research-completed ri-elite-steppe-lancer)
+                    )
+                )
+            )
+        )
         (and
             (not(goal gl-avoiding-building watch-tower))
             (not
