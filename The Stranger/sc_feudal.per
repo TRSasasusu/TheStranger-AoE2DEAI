@@ -1,4 +1,11 @@
 (defrule
+    (can-research ri-loom)
+    (civilian-population > 18)
+    =>
+    (research ri-loom)
+)
+
+(defrule
     (can-research feudal-age)
     (civilian-population > 18)
     =>

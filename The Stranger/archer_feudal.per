@@ -1,4 +1,14 @@
 (defrule
+    (can-research ri-loom)
+    (or
+        (civilian-population > 18)
+        (civ-selected mayan)
+    )
+    =>
+    (research ri-loom)
+)
+
+(defrule
     (can-research feudal-age)
     (civilian-population > 18)
     =>

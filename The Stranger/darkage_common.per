@@ -6,12 +6,6 @@
 )
 
 (defrule
-    (can-research ri-loom)
-    =>
-    (research ri-loom)
-)
-
-(defrule
     (civilian-population > 6)
     (can-build lumber-camp)
     (building-type-count-total lumber-camp == 0)
