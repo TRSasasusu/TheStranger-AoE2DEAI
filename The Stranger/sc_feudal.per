@@ -139,7 +139,10 @@
     (unit-type-count scout-cavalry-line < 10)
     (not(and
         (players-current-age focus-player >= castle-age)
-        (players-current-age-time focus-player >= 120)
+        (and
+            (players-current-age-time focus-player >= 120)
+            (game-time >= 1140)
+        )
     ))
     =>
     (train scout-cavalry-line)

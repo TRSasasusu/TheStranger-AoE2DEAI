@@ -123,6 +123,8 @@
 (defrule
     (current-age >= castle-age)
     (civilian-population > 45)
+    (research-completed ri-bodkin-arrow)
+    (research-completed ri-crossbow)
     =>
     (set-strategic-number sn-food-gatherer-percentage 25)
     (set-strategic-number sn-wood-gatherer-percentage 25)
