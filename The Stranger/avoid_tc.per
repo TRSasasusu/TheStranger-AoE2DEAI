@@ -299,12 +299,29 @@
                 )
             )
         )
-        (and
-            (not(goal gl-avoiding-building watch-tower))
-            (not
-                (and
-                    (up-object-type-count c: steppe-lancer-line > 15)
-                    (research-completed ri-chain-barding)
+        (or
+            (and
+                (goal gl-avoiding-building watch-tower)
+                (not
+                    (and
+                        (up-object-type-count c: scout-cavalry-line > 3)
+                        (research-completed ri-scale-barding)
+                    )
+                )
+            )
+            (and
+                (goal gl-avoiding-building town-center)
+                (not
+                    (or
+                        (or
+                            (research-completed ri-plate-barding)
+                            (research-completed ri-hussar)
+                        )
+                        (and
+                            (up-object-type-count c: scout-cavalry-line > 10)
+                            (research-completed ri-chain-barding)
+                        )
+                    )
                 )
             )
         )
@@ -381,7 +398,7 @@
             (goal gl-avoiding-building castle)
             (not
                 (and
-                    (up-object-type-count c: knight-line > 10)
+                    (up-object-type-count c: steppe-lancer-line > 10)
                     (or
                         (research-completed ri-plate-barding)
                         (research-completed ri-elite-steppe-lancer)
