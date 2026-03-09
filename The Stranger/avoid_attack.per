@@ -8,6 +8,12 @@
 (defconst gl-threat-target-num-in-group 188)
 (defconst gl-threat-source-pos-x 189)
 (defconst gl-threat-source-pos-y 190)
+(defconst gl-threat-target-class-id 191)
+(defconst gl-threat-target-class-id-for-id 192)
+(defconst gl-threat-target-class-id-for-end 193)
+(defconst gl-threat-source-class-id 194)
+(defconst gl-threat-source-class-id-for-id 195)
+(defconst gl-threat-source-class-id-for-end 196)
 
 ; initialize
 (defrule
@@ -40,124 +46,249 @@
     (set-goal gl-avoid-attack-player-id-for-end 1)
 )
 
-; check is this player enemy
-(defrule
-    (goal gl-avoid-attack-player-id-for-end 0)
-    (not(and
-        (player-valid focus-player)
-        (players-stance focus-player enemy)
-    ))
-    =>
-    ;(up-chat-data-to-all "player %d is not enemy" s: sn-focus-player-number)
-    (up-jump-direct g: gl-avoid-attack-player-id-for-id)
-)
+    ; check is this player enemy
+    (defrule
+        (goal gl-avoid-attack-player-id-for-end 0)
+        (not(and
+            (player-valid focus-player)
+            (players-stance focus-player enemy)
+        ))
+        =>
+        ;(up-chat-data-to-all "player %d is not enemy" s: sn-focus-player-number)
+        (up-jump-direct g: gl-avoid-attack-player-id-for-id)
+    )
 
-(defrule
-    (goal gl-avoid-attack-player-id-for-end 0)
-    =>
-    (set-goal gl-threat-source-pos-x -1)
-    (set-goal gl-threat-target-pos-x -1)
-    ;(chat-to-all "hogehoge")
-)
+    (defrule
+        (goal gl-avoid-attack-player-id-for-end 0)
+        =>
+        (set-goal gl-threat-target-class-id 0)
+        (set-goal gl-threat-target-class-id-for-end 0)
+    )
+    (defrule
+        (goal gl-avoid-attack-player-id-for-end 0)
+        (goal gl-threat-target-class-id-for-end 0)
+        =>
+        (up-get-rule-id gl-threat-target-class-id-for-id)
+    )
 
-; villager
-(defrule
-    (goal gl-avoid-attack-player-id-for-end 0)
-    =>
-    (up-full-reset-search)
-    (up-filter-include -1 actionid-attack -1 -1)
-    ;(up-filter-include -1 -1 orderid-attack -1)
-    (up-find-remote c: villager-class c: 5)
-    (up-get-search-state gl-tmp-local-total)
-    ;(up-chat-data-to-all "vil num: %d" g: gl-tmp-remote-total)
-)
-(defrule
-    (goal gl-avoid-attack-player-id-for-end 0)
-    (up-compare-goal gl-tmp-remote-total > 0)
-    =>
-    (chat-to-all "attacked by vil!")
-    (up-set-target-object search-remote c: 0)
-    (up-get-point position-object gl-threat-source-pos-x)
-    (up-set-target-point gl-threat-source-pos-x)
-)
-(defrule
-    (goal gl-avoid-attack-player-id-for-end 0)
-    (up-compare-goal gl-threat-source-pos-x >= 0)
-    =>
-    (up-full-reset-search)
-    (up-filter-distance c: -1 c: 2)
-    (up-find-local c: scout-cavalry c: 5)
-    (up-get-search-state gl-tmp-local-total)
-)
-(defrule
-    (goal gl-avoid-attack-player-id-for-end 0)
-    (up-compare-goal gl-threat-source-pos-x >= 0)
-    (up-compare-goal gl-tmp-local-total == 1)
-    =>
-    (up-set-target-object search-local c: 0)
-    (up-get-point position-object gl-threat-target-pos-x)
-    (up-set-target-point gl-threat-target-pos-x)
-)
+        (defrule
+            (goal gl-avoid-attack-player-id-for-end 0)
+            (goal gl-threat-target-class-id-for-end 0)
+            (goal gl-threat-target-class-id archer-line)
+            =>
+            (set-goal gl-threat-target-class-id-for-end 1); endfor flag
+        )
+        (defrule
+            (goal gl-avoid-attack-player-id-for-end 0)
+            (goal gl-threat-target-class-id-for-end 0)
+            (goal gl-threat-target-class-id eagle-warrior-line)
+            =>
+            (set-goal gl-threat-target-class-id archer-line)
+        )
+        (defrule
+            (goal gl-avoid-attack-player-id-for-end 0)
+            (goal gl-threat-target-class-id-for-end 0)
+            (goal gl-threat-target-class-id scout-cavalry-line)
+            =>
+            (set-goal gl-threat-target-class-id eagle-warrior-line)
+        )
+        (defrule
+            (goal gl-avoid-attack-player-id-for-end 0)
+            (goal gl-threat-target-class-id-for-end 0)
+            (goal gl-threat-target-class-id 0)
+            =>
+            (set-goal gl-threat-target-class-id scout-cavalry-line)
+        )
 
-;*** avoid ***
-(defrule
-    (goal gl-avoid-attack-player-id-for-end 0)
-    (up-compare-goal gl-threat-source-pos-x >= 0)
-    (up-compare-goal gl-threat-target-pos-x >= 0)
-    =>
-    (up-get-point-distance gl-threat-target-pos-x gl-threat-source-pos-x gl-enemy-tc-unit-dist)
-    (up-copy-point gl-avoiding-target-x gl-threat-target-pos-x)
-    ;(up-modify-goal gl-avoiding-target-x g:= gl-avoiding-unit-x)
-    ;(up-modify-goal gl-avoiding-target-y g:= gl-avoiding-unit-y)
-    (up-modify-goal gl-avoiding-target-x g:- gl-threat-source-pos-x)
-    (up-modify-goal gl-avoiding-target-y g:- gl-threat-source-pos-y)
-    ;(up-chat-data-to-all "raw gl-avoiding-target-x: %d" g: gl-avoiding-target-x)
-    ;(up-chat-data-to-all "raw gl-avoiding-target-y: %d" g: gl-avoiding-target-y)
-    ;(up-chat-data-to-all "raw gl-enemy-tc-unit-dist: %d" g: gl-enemy-tc-unit-dist)
-    (up-modify-goal gl-avoiding-target-x c:* 100)
-    (up-modify-goal gl-avoiding-target-y c:* 100)
-    ;(up-modify-goal gl-enemy-tc-unit-dist c:/ 2)
-    (up-modify-goal gl-avoiding-target-x g:/ gl-enemy-tc-unit-dist)
-    (up-modify-goal gl-avoiding-target-y g:/ gl-enemy-tc-unit-dist)
-    ;(up-modify-goal gl-enemy-tc-unit-dist-minus c:= 14)
-    (up-modify-goal gl-enemy-tc-unit-dist-minus c:= 3)
-    (up-modify-goal gl-enemy-tc-unit-dist-minus g:- gl-enemy-tc-unit-dist)
-    (up-modify-goal gl-avoiding-target-x g:* gl-enemy-tc-unit-dist-minus)
-    (up-modify-goal gl-avoiding-target-y g:* gl-enemy-tc-unit-dist-minus)
-    (up-modify-goal gl-avoiding-target-x c:/ 100)
-    (up-modify-goal gl-avoiding-target-y c:/ 100)
-    (up-modify-goal gl-avoiding-cross-x g:= gl-avoiding-target-y)
-    (up-modify-goal gl-avoiding-cross-y g:= gl-avoiding-target-x)
-    (up-modify-goal gl-avoiding-cross-x c:* -1)
-    ;(up-modify-goal gl-avoiding-cross-x c:* 1.5)
-    ;(up-modify-goal gl-avoiding-cross-y c:* 1.5)
-    ;(up-modify-goal gl-avoiding-cross-y c:* 1.41) ; due to diagonal coordinate
-    ;(up-modify-goal gl-avoiding-cross-y g:- gl-avoiding-target-y) ; due to diagonal coordinate
-    (generate-random-number 3)
-    (up-get-fact random-number 0 gl-avoiding-cross-corr)
-    (up-modify-goal gl-avoiding-cross-corr g:* gl-avoiding-rotate-direction)
-    (up-modify-goal gl-avoiding-cross-x g:* gl-avoiding-cross-corr)
-    (up-modify-goal gl-avoiding-cross-y g:* gl-avoiding-cross-corr)
-    ;(up-modify-goal gl-avoiding-cross-corr c:- 4)
-    ;(up-modify-goal gl-avoiding-cross-x g:* gl-avoiding-cross-corr)
-    ;(up-modify-goal gl-avoiding-cross-y g:* gl-avoiding-cross-corr)
-    ;(up-send-flare gl-avoiding-target-x)
-    ;(up-send-flare gl-avoiding-cross-x)
-    ;(up-chat-data-to-all "gl-avoiding-target-x: %d" g: gl-avoiding-target-x)
-    ;(up-chat-data-to-all "gl-avoiding-target-y: %d" g: gl-avoiding-target-y)
-    ;(up-chat-data-to-all "gl-avoiding-cross-x: %d" g: gl-avoiding-cross-x)
-    ;(up-chat-data-to-all "gl-avoiding-cross-y: %d" g: gl-avoiding-cross-y)
-    (up-add-point gl-avoiding-target-x gl-avoiding-cross-x c: 1)
-    ;(up-modify-goal gl-avoiding-target-x g:+ gl-avoiding-cross-x)
-    ;(up-modify-goal gl-avoiding-target-y g:+ gl-avoiding-cross-y)
-    (up-add-point gl-avoiding-target-x gl-threat-target-pos-x c: 1)
-    ;(up-modify-goal gl-avoiding-target-x g:+ gl-avoiding-unit-x)
-    ;(up-modify-goal gl-avoiding-target-y g:+ gl-avoiding-unit-y)
-    (up-target-point gl-avoiding-target-x action-move -1 stance-no-attack)
-    ;(up-chat-data-to-all "gl-enemy-tc-remote-total: %d" g: gl-enemy-tc-remote-total)
-    ;(up-send-flare gl-avoiding-target-x)
-    ;(up-send-flare gl-avoiding-target-x)
-)
+
+        (defrule
+            (goal gl-avoid-attack-player-id-for-end 0)
+            (goal gl-threat-target-class-id-for-end 0)
+            =>
+            (set-goal gl-threat-source-class-id 0)
+            (set-goal gl-threat-source-class-id-for-end 0)
+        )
+        (defrule
+            (goal gl-avoid-attack-player-id-for-end 0)
+            (goal gl-threat-target-class-id-for-end 0)
+            (goal gl-threat-source-class-id-for-end 0)
+            =>
+            (up-get-rule-id gl-threat-source-class-id-for-id)
+        )
+
+            (defrule
+                (goal gl-avoid-attack-player-id-for-end 0)
+                (goal gl-threat-target-class-id-for-end 0)
+                (goal gl-threat-source-class-id-for-end 0)
+                (goal gl-threat-source-class-id villager-class)
+                =>
+                (set-goal gl-threat-source-class-id-for-end 1) ; endfor flag
+            )
+
+            (defrule
+                (goal gl-avoid-attack-player-id-for-end 0)
+                (goal gl-threat-target-class-id-for-end 0)
+                (goal gl-threat-source-class-id-for-end 0)
+                (goal gl-threat-source-class-id 0)
+                =>
+                (set-goal gl-threat-source-class-id villager-class)
+            )
+
+            (defrule
+                (goal gl-avoid-attack-player-id-for-end 0)
+                (goal gl-threat-target-class-id-for-end 0)
+                (goal gl-threat-source-class-id-for-end 0)
+                =>
+                (set-goal gl-threat-source-pos-x -1)
+                (set-goal gl-threat-target-pos-x -1)
+                ;(chat-to-all "hogehoge")
+                (set-goal gl-tmp-remote-total 0)
+            )
+
+            ; scout-cavalry
+            ;; villager
+            (defrule
+                (goal gl-avoid-attack-player-id-for-end 0)
+                (goal gl-threat-target-class-id-for-end 0)
+                (goal gl-threat-source-class-id-for-end 0)
+
+                (or
+                    (and
+                        (goal gl-threat-target-class-id scout-cavalry-line)
+                        (not(research-completed ri-scale-barding))
+                    )
+                    (or
+                        (and
+                            (goal gl-threat-target-class-id eagle-warrior-line)
+                            (not(research-completed ri-scale-mail))
+                        )
+                        (and
+                            (goal gl-threat-target-class-id archer-line)
+                            (not(research-completed ri-crossbow))
+                        )
+                    )
+                )
+                =>
+                (up-full-reset-search)
+                (up-filter-include -1 actionid-attack -1 -1)
+                ;(up-filter-include -1 -1 orderid-attack -1)
+                (up-find-remote g: gl-threat-source-class-id c: 5)
+                (up-get-search-state gl-tmp-local-total)
+                ;(up-chat-data-to-all "vil num: %d" g: gl-tmp-remote-total)
+            )
+            (defrule
+                (goal gl-avoid-attack-player-id-for-end 0)
+                (goal gl-threat-target-class-id-for-end 0)
+                (goal gl-threat-source-class-id-for-end 0)
+
+                (up-compare-goal gl-tmp-remote-total > 0)
+                =>
+                ;(chat-to-all "attacked by vil!")
+                (up-set-target-object search-remote c: 0)
+                (up-get-point position-object gl-threat-source-pos-x)
+                (up-set-target-point gl-threat-source-pos-x)
+            )
+            (defrule
+                (goal gl-avoid-attack-player-id-for-end 0)
+                (goal gl-threat-target-class-id-for-end 0)
+                (goal gl-threat-source-class-id-for-end 0)
+
+                (up-compare-goal gl-threat-source-pos-x >= 0)
+                =>
+                (up-full-reset-search)
+                (up-filter-distance c: -1 c: 2)
+                (up-find-local g: gl-threat-target-class-id c: 5)
+                (up-get-search-state gl-tmp-local-total)
+            )
+            (defrule
+                (goal gl-avoid-attack-player-id-for-end 0)
+                (goal gl-threat-target-class-id-for-end 0)
+                (goal gl-threat-source-class-id-for-end 0)
+
+                (up-compare-goal gl-threat-source-pos-x >= 0)
+                (up-compare-goal gl-tmp-local-total == 1)
+                =>
+                (up-set-target-object search-local c: 0)
+                (up-get-point position-object gl-threat-target-pos-x)
+                (up-set-target-point gl-threat-target-pos-x)
+            )
+
+            ;*** avoid ***
+            (defrule
+                (goal gl-avoid-attack-player-id-for-end 0)
+                (goal gl-threat-target-class-id-for-end 0)
+                (goal gl-threat-source-class-id-for-end 0)
+
+                (up-compare-goal gl-threat-source-pos-x >= 0)
+                (up-compare-goal gl-threat-target-pos-x >= 0)
+                =>
+                (up-get-point-distance gl-threat-target-pos-x gl-threat-source-pos-x gl-enemy-tc-unit-dist)
+                (up-copy-point gl-avoiding-target-x gl-threat-target-pos-x)
+                ;(up-modify-goal gl-avoiding-target-x g:= gl-avoiding-unit-x)
+                ;(up-modify-goal gl-avoiding-target-y g:= gl-avoiding-unit-y)
+                (up-modify-goal gl-avoiding-target-x g:- gl-threat-source-pos-x)
+                (up-modify-goal gl-avoiding-target-y g:- gl-threat-source-pos-y)
+                ;(up-chat-data-to-all "raw gl-avoiding-target-x: %d" g: gl-avoiding-target-x)
+                ;(up-chat-data-to-all "raw gl-avoiding-target-y: %d" g: gl-avoiding-target-y)
+                ;(up-chat-data-to-all "raw gl-enemy-tc-unit-dist: %d" g: gl-enemy-tc-unit-dist)
+                (up-modify-goal gl-avoiding-target-x c:* 100)
+                (up-modify-goal gl-avoiding-target-y c:* 100)
+                ;(up-modify-goal gl-enemy-tc-unit-dist c:/ 2)
+                (up-modify-goal gl-avoiding-target-x g:/ gl-enemy-tc-unit-dist)
+                (up-modify-goal gl-avoiding-target-y g:/ gl-enemy-tc-unit-dist)
+                ;(up-modify-goal gl-enemy-tc-unit-dist-minus c:= 14)
+                (up-modify-goal gl-enemy-tc-unit-dist-minus c:= 3)
+                (up-modify-goal gl-enemy-tc-unit-dist-minus g:- gl-enemy-tc-unit-dist)
+                (up-modify-goal gl-avoiding-target-x g:* gl-enemy-tc-unit-dist-minus)
+                (up-modify-goal gl-avoiding-target-y g:* gl-enemy-tc-unit-dist-minus)
+                (up-modify-goal gl-avoiding-target-x c:/ 100)
+                (up-modify-goal gl-avoiding-target-y c:/ 100)
+                (up-modify-goal gl-avoiding-cross-x g:= gl-avoiding-target-y)
+                (up-modify-goal gl-avoiding-cross-y g:= gl-avoiding-target-x)
+                (up-modify-goal gl-avoiding-cross-x c:* -1)
+                ;(up-modify-goal gl-avoiding-cross-x c:* 1.5)
+                ;(up-modify-goal gl-avoiding-cross-y c:* 1.5)
+                ;(up-modify-goal gl-avoiding-cross-y c:* 1.41) ; due to diagonal coordinate
+                ;(up-modify-goal gl-avoiding-cross-y g:- gl-avoiding-target-y) ; due to diagonal coordinate
+                (generate-random-number 3)
+                (up-get-fact random-number 0 gl-avoiding-cross-corr)
+                (up-modify-goal gl-avoiding-cross-corr g:* gl-avoiding-rotate-direction)
+                (up-modify-goal gl-avoiding-cross-x g:* gl-avoiding-cross-corr)
+                (up-modify-goal gl-avoiding-cross-y g:* gl-avoiding-cross-corr)
+                ;(up-modify-goal gl-avoiding-cross-corr c:- 4)
+                ;(up-modify-goal gl-avoiding-cross-x g:* gl-avoiding-cross-corr)
+                ;(up-modify-goal gl-avoiding-cross-y g:* gl-avoiding-cross-corr)
+                ;(up-send-flare gl-avoiding-target-x)
+                ;(up-send-flare gl-avoiding-cross-x)
+                ;(up-chat-data-to-all "gl-avoiding-target-x: %d" g: gl-avoiding-target-x)
+                ;(up-chat-data-to-all "gl-avoiding-target-y: %d" g: gl-avoiding-target-y)
+                ;(up-chat-data-to-all "gl-avoiding-cross-x: %d" g: gl-avoiding-cross-x)
+                ;(up-chat-data-to-all "gl-avoiding-cross-y: %d" g: gl-avoiding-cross-y)
+                (up-add-point gl-avoiding-target-x gl-avoiding-cross-x c: 1)
+                ;(up-modify-goal gl-avoiding-target-x g:+ gl-avoiding-cross-x)
+                ;(up-modify-goal gl-avoiding-target-y g:+ gl-avoiding-cross-y)
+                (up-add-point gl-avoiding-target-x gl-threat-target-pos-x c: 1)
+                ;(up-modify-goal gl-avoiding-target-x g:+ gl-avoiding-unit-x)
+                ;(up-modify-goal gl-avoiding-target-y g:+ gl-avoiding-unit-y)
+                (up-target-point gl-avoiding-target-x action-move -1 stance-no-attack)
+                ;(up-chat-data-to-all "gl-enemy-tc-remote-total: %d" g: gl-enemy-tc-remote-total)
+                ;(up-send-flare gl-avoiding-target-x)
+                ;(up-send-flare gl-avoiding-target-x)
+            )
+
+        (defrule
+            (goal gl-threat-target-class-id-for-end 0)
+            (goal gl-threat-source-class-id-for-end 0)
+            =>
+            (up-jump-direct g: gl-threat-source-class-id-for-id)
+        )
+
+    (defrule
+        (goal gl-threat-target-class-id-for-end 0)
+        =>
+        (up-jump-direct g: gl-threat-target-class-id-for-id)
+    )
+
 
 (defrule
     (goal gl-avoid-attack-player-id-for-end 0)
