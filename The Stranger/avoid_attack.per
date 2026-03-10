@@ -14,6 +14,7 @@
 (defconst gl-threat-source-class-id 194)
 (defconst gl-threat-source-class-id-for-id 195)
 (defconst gl-threat-source-class-id-for-end 196)
+(defconst gl-threat-hope-distance 197)
 
 ; initialize
 (defrule
@@ -120,9 +121,19 @@
                 (goal gl-avoid-attack-player-id-for-end 0)
                 (goal gl-threat-target-class-id-for-end 0)
                 (goal gl-threat-source-class-id-for-end 0)
-                (goal gl-threat-source-class-id villager-class)
+                (goal gl-threat-source-class-id skirmisher)
                 =>
                 (set-goal gl-threat-source-class-id-for-end 1) ; endfor flag
+            )
+
+            (defrule
+                (goal gl-avoid-attack-player-id-for-end 0)
+                (goal gl-threat-target-class-id-for-end 0)
+                (goal gl-threat-source-class-id-for-end 0)
+                (goal gl-threat-source-class-id villager-class)
+                =>
+                (set-goal gl-threat-source-class-id skirmisher)
+                (set-goal gl-threat-hope-distance 10)
             )
 
             (defrule
@@ -132,6 +143,7 @@
                 (goal gl-threat-source-class-id 0)
                 =>
                 (set-goal gl-threat-source-class-id villager-class)
+                (set-goal gl-threat-hope-distance 6)
             )
 
             (defrule
@@ -142,16 +154,17 @@
                 (set-goal gl-threat-source-pos-x -1)
                 (set-goal gl-threat-target-pos-x -1)
                 ;(chat-to-all "hogehoge")
+                (set-goal gl-tmp-local-total 0)
                 (set-goal gl-tmp-remote-total 0)
             )
 
-            ; scout-cavalry
             ;; villager
             (defrule
                 (goal gl-avoid-attack-player-id-for-end 0)
                 (goal gl-threat-target-class-id-for-end 0)
                 (goal gl-threat-source-class-id-for-end 0)
 
+                (goal gl-threat-source-class-id villager-class)
                 (or
                     (and
                         (goal gl-threat-target-class-id scout-cavalry-line)
@@ -176,6 +189,25 @@
                 (up-get-search-state gl-tmp-local-total)
                 ;(up-chat-data-to-all "vil num: %d" g: gl-tmp-remote-total)
             )
+            ;; skirmisher
+            (defrule
+                (goal gl-avoid-attack-player-id-for-end 0)
+                (goal gl-threat-target-class-id-for-end 0)
+                (goal gl-threat-source-class-id-for-end 0)
+
+                (goal gl-threat-source-class-id skirmisher)
+                (and
+                    (goal gl-threat-target-class-id archer-line)
+                    (not(research-completed ri-crossbow))
+                )
+                =>
+                (up-full-reset-search)
+                (up-find-remote g: gl-threat-source-class-id c: 10)
+                (up-get-search-state gl-tmp-local-total)
+                (up-chat-data-to-all "skirm num: %d" g: gl-tmp-remote-total)
+            )
+
+            ; set source as target object and position
             (defrule
                 (goal gl-avoid-attack-player-id-for-end 0)
                 (goal gl-threat-target-class-id-for-end 0)
@@ -183,15 +215,25 @@
 
                 (up-compare-goal gl-tmp-remote-total > 0)
                 =>
+                (generate-random-number 100)
+                (up-get-fact random-number 0 gl-tmp)
+                (up-modify-goal gl-tmp c:- 1)
+                (up-modify-goal gl-tmp g:* gl-tmp-remote-total)
+                (up-modify-goal gl-tmp c:z/ 100)
+                (up-set-target-object search-remote g: gl-tmp)
                 ;(chat-to-all "attacked by vil!")
-                (up-set-target-object search-remote c: 0)
+                ;(up-set-target-object search-remote c: 0)
                 (up-get-point position-object gl-threat-source-pos-x)
                 (up-set-target-point gl-threat-source-pos-x)
             )
+
+            ;; villager
             (defrule
                 (goal gl-avoid-attack-player-id-for-end 0)
                 (goal gl-threat-target-class-id-for-end 0)
                 (goal gl-threat-source-class-id-for-end 0)
+
+                (goal gl-threat-source-class-id villager-class)
 
                 (up-compare-goal gl-threat-source-pos-x >= 0)
                 =>
@@ -200,17 +242,74 @@
                 (up-find-local g: gl-threat-target-class-id c: 5)
                 (up-get-search-state gl-tmp-local-total)
             )
+            (defrule ; to include only 1
+                (goal gl-avoid-attack-player-id-for-end 0)
+                (goal gl-threat-target-class-id-for-end 0)
+                (goal gl-threat-source-class-id-for-end 0)
+
+                (goal gl-threat-source-class-id villager-class)
+
+                (up-compare-goal gl-threat-source-pos-x >= 0)
+                (up-compare-goal gl-tmp-local-total > 1)
+                =>
+                (set-goal gl-tmp-local-total 0)
+            )
+            ;; skirmisher
+            (defrule
+                (goal gl-avoid-attack-player-id-for-end 0)
+                (goal gl-threat-target-class-id-for-end 0)
+                (goal gl-threat-source-class-id-for-end 0)
+
+                (goal gl-threat-source-class-id skirmisher)
+
+                (up-compare-goal gl-threat-source-pos-x >= 0)
+                =>
+                (up-full-reset-search)
+                (up-filter-distance c: -1 c: 9)
+                (up-find-remote g: gl-threat-source-class-id c: 50)
+                (up-get-search-state gl-tmp-local-total)
+                (up-modify-goal gl-tmp g:= gl-tmp-remote-total); gl-tmp (>=1) is now #skirmisher
+                (up-full-reset-search)
+                (up-filter-distance c: -1 c: 9)
+                (up-find-local g: gl-threat-target-class-id c: 50)
+                (up-get-search-state gl-tmp-local-total)
+                (up-modify-goal gl-tmp2 g:= gl-tmp-local-total); gl-tmp2 is now #archer-line
+                (up-modify-goal gl-tmp2 g:/ gl-tmp); gl-tmp-local-total is now #archer-line/#skirmisher
+                (up-chat-data-to-all "#archer-line/#skirm: %d" g: gl-tmp2)
+            )
+            (defrule ; to include only #archer-line/#skirmisher < 3
+                (goal gl-avoid-attack-player-id-for-end 0)
+                (goal gl-threat-target-class-id-for-end 0)
+                (goal gl-threat-source-class-id-for-end 0)
+
+                (goal gl-threat-source-class-id skirmisher)
+
+                (up-compare-goal gl-threat-source-pos-x >= 0)
+                (up-compare-goal gl-tmp2 >= 3)
+                =>
+                (set-goal gl-tmp-local-total 0)
+                (chat-to-all "ignore this skirm")
+            )
+
+            ; set target as target object and position
             (defrule
                 (goal gl-avoid-attack-player-id-for-end 0)
                 (goal gl-threat-target-class-id-for-end 0)
                 (goal gl-threat-source-class-id-for-end 0)
 
                 (up-compare-goal gl-threat-source-pos-x >= 0)
-                (up-compare-goal gl-tmp-local-total == 1)
+                (up-compare-goal gl-tmp-local-total > 0)
                 =>
-                (up-set-target-object search-local c: 0)
+                (generate-random-number 100)
+                (up-get-fact random-number 0 gl-tmp)
+                (up-modify-goal gl-tmp c:- 1)
+                (up-modify-goal gl-tmp g:* gl-tmp-local-total)
+                (up-modify-goal gl-tmp c:z/ 100)
+                (up-set-target-object search-local g: gl-tmp)
+                ;(up-set-target-object search-local c: 0)
                 (up-get-point position-object gl-threat-target-pos-x)
                 (up-set-target-point gl-threat-target-pos-x)
+                (chat-to-all "set target pos")
             )
 
             ;*** avoid ***
@@ -223,6 +322,7 @@
                 (up-compare-goal gl-threat-target-pos-x >= 0)
                 =>
                 (up-get-point-distance gl-threat-target-pos-x gl-threat-source-pos-x gl-enemy-tc-unit-dist)
+                (up-modify-goal gl-enemy-tc-unit-dist c:max 1)
                 (up-copy-point gl-avoiding-target-x gl-threat-target-pos-x)
                 ;(up-modify-goal gl-avoiding-target-x g:= gl-avoiding-unit-x)
                 ;(up-modify-goal gl-avoiding-target-y g:= gl-avoiding-unit-y)
@@ -237,7 +337,7 @@
                 (up-modify-goal gl-avoiding-target-x g:/ gl-enemy-tc-unit-dist)
                 (up-modify-goal gl-avoiding-target-y g:/ gl-enemy-tc-unit-dist)
                 ;(up-modify-goal gl-enemy-tc-unit-dist-minus c:= 14)
-                (up-modify-goal gl-enemy-tc-unit-dist-minus c:= 3)
+                (up-modify-goal gl-enemy-tc-unit-dist-minus g:= gl-threat-hope-distance)
                 (up-modify-goal gl-enemy-tc-unit-dist-minus g:- gl-enemy-tc-unit-dist)
                 (up-modify-goal gl-avoiding-target-x g:* gl-enemy-tc-unit-dist-minus)
                 (up-modify-goal gl-avoiding-target-y g:* gl-enemy-tc-unit-dist-minus)
@@ -273,7 +373,7 @@
                 (up-target-point gl-avoiding-target-x action-move -1 stance-no-attack)
                 ;(up-chat-data-to-all "gl-enemy-tc-remote-total: %d" g: gl-enemy-tc-remote-total)
                 ;(up-send-flare gl-avoiding-target-x)
-                ;(up-send-flare gl-avoiding-target-x)
+                (up-send-flare gl-avoiding-target-x)
             )
 
         (defrule

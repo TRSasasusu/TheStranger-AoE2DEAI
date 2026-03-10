@@ -142,13 +142,6 @@
 
 (defrule
     (current-age == castle-age)
-    (can-train archer-line)
-    =>
-    (train archer-line)
-)
-
-(defrule
-    (current-age == castle-age)
     (can-train mangonel-line)
     (up-object-type-count c: archer-line >= 10)
     (or
@@ -157,6 +150,17 @@
     )
     =>
     (train mangonel-line)
+)
+
+(defrule
+    (current-age == castle-age)
+    (can-train archer-line)
+    (or
+        (unit-type-count-total archer-line < 10)
+        (unit-type-count-total mangonel-line >= 1)
+    )
+    =>
+    (train archer-line)
 )
 
 (defrule
