@@ -53,11 +53,11 @@
     (generate-random-number 21);25
     (up-get-fact random-number 0 gl-attack-target-rnd)
     ;(up-chat-data-to-all "gl-attack-target-rnd: %d" g: gl-attack-target-rnd)
-    (enable-timer t-attack-timer 10)
+    (enable-timer t-attack-timer 5)
 )
 (defrule
     (up-compare-goal gl-attack-target-rnd > 0)
-    (up-compare-goal gl-attack-target-rnd < 5)
+    (up-compare-goal gl-attack-target-rnd < 6)
     (or
         (up-object-type-count g: gl-attacking-unit-type >= 2)
         (goal gl-attack-ignore-count-limit 1)
@@ -69,7 +69,7 @@
 )
 (defrule
     (up-compare-goal gl-attack-target-rnd > 0)
-    (up-compare-goal gl-attack-target-rnd < 5)
+    (up-compare-goal gl-attack-target-rnd < 6)
     (goal gl-attack-target-remote-total 0)
     (or
         (up-object-type-count g: gl-attacking-unit-type >= 2)
@@ -80,7 +80,7 @@
     (chat-to-all "attacking to NOT lumber-camp")
 )
 (defrule
-    (up-compare-goal gl-attack-target-rnd >= 5)
+    (up-compare-goal gl-attack-target-rnd >= 6)
     (up-compare-goal gl-attack-target-rnd < 8)
     (or
         (up-object-type-count g: gl-attacking-unit-type >= 2)
@@ -89,10 +89,10 @@
     =>
     (up-find-remote c: mill c: 5)
     (up-get-search-state gl-attack-target-local-total)
-    (chat-to-all "try attacking to lumber-camp")
+    (chat-to-all "try attacking to mill")
 )
 (defrule
-    (up-compare-goal gl-attack-target-rnd >= 5)
+    (up-compare-goal gl-attack-target-rnd >= 6)
     (up-compare-goal gl-attack-target-rnd < 8)
     (goal gl-attack-target-remote-total 0)
     (or
@@ -427,4 +427,12 @@
     (set-goal gl-attack-only-attack-move 0)
     (set-goal gl-attack-ignore-count-limit 0)
     (up-jump-rule -26)
+)
+(defrule
+    (goal gl-attacking-unit-type steppe-lancer-line)
+    =>
+    (set-goal gl-attacking-unit-type infantry-class)
+    (set-goal gl-attack-only-attack-move 0)
+    (set-goal gl-attack-ignore-count-limit 0)
+    (up-jump-rule -27)
 )

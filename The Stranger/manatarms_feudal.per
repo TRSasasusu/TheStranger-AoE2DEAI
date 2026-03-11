@@ -1,0 +1,162 @@
+(defrule
+    (can-research ri-loom)
+    (or
+        (civilian-population > 18)
+        (civ-selected mayan)
+    )
+    =>
+    (research ri-loom)
+)
+
+(defrule
+    (can-research feudal-age)
+    (civilian-population > 18)
+    =>
+    (set-goal gl-researching-feudal 1)
+    (research feudal-age)
+    (set-strategic-number sn-food-gatherer-percentage 40)
+    (set-strategic-number sn-wood-gatherer-percentage 60)
+    (set-strategic-number sn-gold-gatherer-percentage 0)
+    (set-strategic-number sn-stone-gatherer-percentage 0)
+)
+
+(defrule
+    (current-age >= feudal-age)
+    =>
+    (set-goal gl-researching-feudal 0)
+)
+
+
+(defrule
+    (or
+        (goal gl-researching-feudal 1)
+        (current-age >= feudal-age)
+    )
+    (can-build farm)
+    (building-type-count-total barracks > 0)
+    (building-type-count-total mining-camp >= 1)
+    (wood-amount >= 100)
+    (idle-farm-count <= 1)
+    =>
+    (build farm)
+)
+
+(defrule
+    (or
+        (goal gl-researching-feudal 1)
+        (current-age == feudal-age)
+    )
+    (can-build mining-camp)
+    (building-type-count-total mining-camp < 1)
+    =>
+    (build mining-camp)
+)
+
+(defrule
+    (building-type-count-total mining-camp >= 1)
+    (building-type-count-total barracks >= 1)
+    =>
+    (set-strategic-number sn-food-gatherer-percentage 60)
+    (set-strategic-number sn-wood-gatherer-percentage 25)
+    (set-strategic-number sn-gold-gatherer-percentage 15)
+    (set-strategic-number sn-stone-gatherer-percentage 0)
+    (disable-self)
+)
+
+(defrule
+    (current-age == feudal-age)
+    (food-amount > 200)
+    (building-type-count-total barracks >= 1)
+    (building-type-count-total mining-camp >= 1)
+    =>
+    (set-strategic-number sn-food-gatherer-percentage 53)
+    (set-strategic-number sn-wood-gatherer-percentage 32)
+    (set-strategic-number sn-gold-gatherer-percentage 15)
+    (set-strategic-number sn-stone-gatherer-percentage 0)
+    (disable-self)
+)
+
+
+(defrule
+    (can-research ri-double-bit-axe)
+    =>
+    (research ri-double-bit-axe)
+)
+
+(defrule
+    (or
+        (goal gl-researching-feudal 1)
+        (current-age >= feudal-age)
+    )
+    (can-build barracks)
+    (building-type-count-total barracks == 0)
+    =>
+    (build barracks)
+)
+
+(defrule
+    (current-age >= feudal-age)
+    (can-build blacksmith)
+    (building-type-count-total archery-range >= 2)
+    (building-type-count-total blacksmith == 0)
+    =>
+    (build blacksmith)
+)
+
+;(defrule
+;    (building-type-count-total blacksmith > 0)
+;    (food-amount >= 600)
+;    (building-type-count-total market == 0)
+;    =>
+;    (build market)
+;)
+
+
+
+(defrule
+    (building-type-count-total blacksmith == 0)
+    (building-type-count-total barracks > 0)
+    (can-build blacksmith)
+    (unit-type-count-total militiaman-line >= 2)
+    =>
+    (build blacksmith)
+)
+
+(defrule
+    (unit-type-count militiaman-line > 3)
+    (can-research ri-scale-mail)
+    =>
+    (research ri-scale-mail)
+)
+
+(defrule
+    (unit-type-count militiaman-line > 6)
+    (can-research ri-forging)
+    =>
+    (research ri-forging)
+)
+
+(defrule
+    (unit-type-count militiaman-line > 8)
+    (can-research ri-arson)
+    =>
+    (research ri-arson)
+)
+
+(defrule
+    (unit-type-count militiaman-line >= 2)
+    (can-research ri-man-at-arms)
+    =>
+    (research ri-man-at-arms)
+)
+
+
+(defrule
+    (or
+        (goal gl-researching-feudal 1)
+        (current-age == feudal-age)
+    )
+    (can-train militiaman-line)
+    =>
+    (train militiaman-line)
+)

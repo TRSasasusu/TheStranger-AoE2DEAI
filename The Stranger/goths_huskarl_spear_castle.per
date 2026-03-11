@@ -1,0 +1,131 @@
+(defrule
+    (can-research castle-age)
+    =>
+    (set-goal gl-researching-castle 1)
+    (research castle-age)
+    (set-strategic-number sn-food-gatherer-percentage 15)
+    (set-strategic-number sn-wood-gatherer-percentage 15)
+    (set-strategic-number sn-gold-gatherer-percentage 10)
+    (set-strategic-number sn-stone-gatherer-percentage 60)
+    (set-goal gl-trade-stop 1)
+)
+
+(defrule
+    (current-age >= castle-age)
+    =>
+    (set-goal gl-researching-castle 0)
+)
+
+(defrule
+    (building-type-count-total blacksmith > 0)
+    (food-amount >= 600)
+    (building-type-count-total market == 0)
+    =>
+    (build market)
+)
+
+;(defconst t-)
+(defrule
+    (or
+        (goal gl-researching-castle 1)
+        (current-age >= castle-age)
+    )
+    (can-build barracks)
+    (building-type-count-total barracks <= 1)
+    =>
+    (build barracks)
+)
+
+(defrule
+    (research-completed ri-anarchy)
+    (can-build barracks)
+    (building-type-count-total barracks <= 2)
+    =>
+    (build barracks)
+)
+
+(defrule
+    (can-research ri-bow-saw)
+    =>
+    (research ri-bow-saw)
+)
+
+(defrule
+    (or
+        (goal gl-researching-castle 1)
+        (current-age >= castle-age)
+    )
+    (can-research ri-horse-collar)
+    =>
+    (research ri-horse-collar)
+)
+
+;(defrule
+;    (unit-type-count archer-line > 10)
+;    (can-research ri-padded-archer-armor)
+;    =>
+;    (research ri-padded-archer-armor)
+;)
+
+
+(defrule
+    (can-build castle)
+    =>
+    (up-assign-builders c: castle c: 15)
+    (build castle)
+    (set-strategic-number sn-food-gatherer-percentage 50)
+    (set-strategic-number sn-wood-gatherer-percentage 20)
+    (set-strategic-number sn-gold-gatherer-percentage 25)
+    (set-strategic-number sn-stone-gatherer-percentage 5)
+)
+
+(defrule
+    (can-research ri-anarchy)
+    =>
+    (research ri-anarchy)
+    (set-goal gl-trade-stop 0)
+    (set-goal gl-attack-only-attack-move-whole 1)
+)
+
+(defrule
+    (can-research ri-pikeman)
+    =>
+    (research ri-pikeman)
+    (set-goal gl-attack-only-attack-move-whole 1)
+)
+
+(defrule
+    (current-age == castle-age)
+    (can-train huskarl-line)
+    =>
+    (train huskarl-line)
+)
+
+(defrule
+    (current-age == castle-age)
+    (can-train spearman-line)
+    =>
+    (train spearman-line)
+)
+
+(defrule
+    (current-age >= castle-age)
+    (game-time > 2100)
+    =>
+    (set-goal gl-trade-stop 0)
+    (set-goal gl-attack-only-attack-move-whole 1)
+)
+
+(defrule
+    (current-age == castle-age)
+    (unit-type-count huskarl-line > 10)
+    =>
+    (enable-timer t-tactics-timer 200)
+    (disable-self)
+)
+(defrule
+    (up-timer-status t-tactics-timer != timer-running)
+    =>
+    (enable-timer t-tactics-timer 200)
+    (up-modify-sn sn-focus-player-number c: any-enemy)
+)

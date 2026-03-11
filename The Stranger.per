@@ -12,6 +12,7 @@
 (defconst gl-tmp-local-last 47)
 (defconst gl-tmp-remote-total 48)
 (defconst gl-tmp-remote-last 49)
+
 (defconst action-attack-move 19)
 (defconst list-active 0)
 (defconst list-inactive 1)
@@ -23,9 +24,12 @@
 (defconst archery-class 900)
 (defconst infantry-class 906)
 (defconst scout-cavalry-class 947)
+(defconst ri-anarchy 16)
+
 (defconst gl-attack-stop 250)
 (defconst gl-attack-only-attack-move-whole 251)
 (defconst gl-trade-stop 221)
+(defconst t-tactics-timer 30)
 #load-if-defined MONGOL-CIV
 (defconst cav-line steppe-lancer-line) ; steppe-lancer-line
 #else
@@ -154,26 +158,37 @@
 
 
 ;(load "The Stranger/manatarms_w_tr")
-#load-if-defined UP-POCKET-POSITION
-    (load "The Stranger/sc_feudal")
-    (load "The Stranger/knt_castle")
-    (load "The Stranger/knt_imp")
+#load-if-defined GOTHIC-CIV
+    (load "The Stranger/manatarms_feudal")
+    (load "The Stranger/goths_huskarl_spear_castle")
     (defrule
         (true)
         =>
-        (chat-to-all "I am in pocket position!")
+        (chat-to-all "I am Goths!")
         (disable-self)
     )
 #else
-    (load "The Stranger/archer_feudal")
-    (load "The Stranger/archer_castle")
-    (load "The Stranger/archer_imp")
-    (defrule
-        (true)
-        =>
-        (chat-to-all "I am in flank position!")
-        (disable-self)
-    )
+    #load-if-defined UP-POCKET-POSITION
+        (load "The Stranger/sc_feudal")
+        (load "The Stranger/knt_castle")
+        (load "The Stranger/knt_imp")
+        (defrule
+            (true)
+            =>
+            (chat-to-all "I am in pocket position!")
+            (disable-self)
+        )
+    #else
+        (load "The Stranger/archer_feudal")
+        (load "The Stranger/archer_castle")
+        (load "The Stranger/archer_imp")
+        (defrule
+            (true)
+            =>
+            (chat-to-all "I am in flank position!")
+            (disable-self)
+        )
+    #end-if
 #end-if
 ;(load "The Stranger/fast_castle")
 ;(load "The Stranger/cavarcher_castle")
