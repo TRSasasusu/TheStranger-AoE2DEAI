@@ -1,0 +1,169 @@
+(defrule
+    (can-research imperial-age)
+    =>
+    (set-goal gl-researching-imp 1)
+    (research imperial-age)
+    (set-strategic-number sn-food-gatherer-percentage 58)
+    (set-strategic-number sn-wood-gatherer-percentage 20)
+    (set-strategic-number sn-gold-gatherer-percentage 20)
+    (set-strategic-number sn-stone-gatherer-percentage 2)
+)
+
+(defrule
+    (current-age >= imperial-age)
+    =>
+    (set-goal gl-researching-imp 0)
+)
+
+(defrule
+    (or
+        (goal gl-researching-imp 1)
+        (current-age >= imperial-age)
+    )
+    (research-completed ri-anarchy)
+    (building-type-count-total barracks < 5)
+    (can-build barracks)
+    =>
+    (build barracks)
+)
+
+(defrule
+    (can-research ri-bow-saw)
+    =>
+    (research ri-bow-saw)
+)
+
+(defrule
+    (civilian-population > 70)
+    (can-research ri-two-man-saw)
+    =>
+    (research ri-two-man-saw)
+)
+
+(defrule
+    (civilian-population > 45)
+    (can-research ri-heavy-plow)
+    =>
+    (research ri-heavy-plow)
+)
+
+(defrule
+    (civilian-population > 45)
+    (can-research ri-wheel-barrow)
+    =>
+    (research ri-wheel-barrow)
+)
+
+(defrule
+    (civilian-population > 75)
+    (can-research ri-hand-cart)
+    =>
+    (research ri-hand-cart)
+)
+
+(defrule
+    (or
+        (goal gl-researching-imp 1)
+        (current-age >= imperial-age)
+    )
+    (can-research ri-scale-mail)
+    (unit-type-count-total infantry-class > 10)
+    =>
+    (research ri-scale-mail)
+)
+
+(defrule
+    (or
+        (goal gl-researching-imp 1)
+        (current-age >= imperial-age)
+    )
+    (can-research ri-chain-mail)
+    (unit-type-count-total infantry-class > 10)
+    =>
+    (research ri-chain-mail)
+)
+
+(defrule
+    (or
+        (goal gl-researching-imp 1)
+        (current-age >= imperial-age)
+    )
+    (can-research ri-forging)
+    (unit-type-count-total infantry-class > 10)
+    =>
+    (research ri-forging)
+)
+
+(defrule
+    (or
+        (goal gl-researching-imp 1)
+        (current-age >= imperial-age)
+    )
+    (can-research ri-iron-casting)
+    (unit-type-count-total infantry-class > 10)
+    =>
+    (research ri-iron-casting)
+)
+
+(defrule
+    (can-research ri-blast-furnace)
+    (unit-type-count-total infantry-class > 20)
+    =>
+    (research ri-blast-furnace)
+)
+
+(defrule
+    (can-research ri-elite-huskarl)
+    (unit-type-count-total infantry-class > 20)
+    =>
+    (research ri-elite-huskarl)
+)
+
+(defrule
+    (can-research ri-perfusion)
+    (unit-type-count-total infantry-class > 30)
+    =>
+    (research ri-perfusion)
+)
+
+(defrule
+    (can-research ri-halberdier)
+    (unit-type-count-total infantry-class > 5)
+    =>
+    (research ri-halberdier)
+)
+
+(defrule
+    (or
+        (goal gl-researching-imp 1)
+        (current-age >= imperial-age)
+    )
+    (can-train huskarl-line)
+    =>
+    (train huskarl-line)
+)
+
+(defrule
+    (or
+        (goal gl-researching-imp 1)
+        (current-age >= imperial-age)
+    )
+    (can-train spearman-line)
+    =>
+    (train spearman-line)
+)
+
+(defrule
+    (current-age == imperial-age)
+    (unit-type-count huskarl-line > 10)
+    =>
+    (enable-timer t-tactics-timer 200)
+    (disable-self)
+)
+(defrule
+    (current-age == imperial-age)
+    (up-timer-status t-tactics-timer != timer-running)
+    =>
+    (enable-timer t-tactics-timer 200)
+    (up-modify-sn sn-focus-player-number c: any-enemy)
+)

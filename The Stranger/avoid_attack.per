@@ -204,7 +204,7 @@
                 (up-full-reset-search)
                 (up-find-remote g: gl-threat-source-class-id c: 10)
                 (up-get-search-state gl-tmp-local-total)
-                (up-chat-data-to-all "skirm num: %d" g: gl-tmp-remote-total)
+                ;(up-chat-data-to-all "skirm num: %d" g: gl-tmp-remote-total)
             )
 
             ; set source as target object and position
@@ -275,7 +275,7 @@
                 (up-get-search-state gl-tmp-local-total)
                 (up-modify-goal gl-tmp2 g:= gl-tmp-local-total); gl-tmp2 is now #archer-line
                 (up-modify-goal gl-tmp2 g:/ gl-tmp); gl-tmp-local-total is now #archer-line/#skirmisher
-                (up-chat-data-to-all "#archer-line/#skirm: %d" g: gl-tmp2)
+                ;(up-chat-data-to-all "#archer-line/#skirm: %d" g: gl-tmp2)
             )
             (defrule ; to include only #archer-line/#skirmisher < 3
                 (goal gl-avoid-attack-player-id-for-end 0)
@@ -288,7 +288,7 @@
                 (up-compare-goal gl-tmp2 >= 3)
                 =>
                 (set-goal gl-tmp-local-total 0)
-                (chat-to-all "ignore this skirm")
+                ;(chat-to-all "ignore this skirm")
             )
 
             ; set target as target object and position
@@ -309,7 +309,7 @@
                 ;(up-set-target-object search-local c: 0)
                 (up-get-point position-object gl-threat-target-pos-x)
                 (up-set-target-point gl-threat-target-pos-x)
-                (chat-to-all "set target pos")
+                ;(chat-to-all "set target pos")
             )
 
             ;*** avoid ***

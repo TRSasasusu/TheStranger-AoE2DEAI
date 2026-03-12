@@ -32,17 +32,19 @@
     )
     (can-build barracks)
     (building-type-count-total barracks <= 1)
+    (research-completed ri-anarchy)
     =>
     (build barracks)
 )
 
-(defrule
-    (research-completed ri-anarchy)
-    (can-build barracks)
-    (building-type-count-total barracks <= 2)
-    =>
-    (build barracks)
-)
+;(defrule
+;    (research-completed ri-anarchy)
+;    (can-build barracks)
+;    (building-type-count-total barracks <= 2)
+;    (civilian-population > 50)
+;    =>
+;    (build barracks)
+;)
 
 (defrule
     (can-research ri-bow-saw)
@@ -73,10 +75,10 @@
     =>
     (up-assign-builders c: castle c: 15)
     (build castle)
-    (set-strategic-number sn-food-gatherer-percentage 50)
-    (set-strategic-number sn-wood-gatherer-percentage 20)
-    (set-strategic-number sn-gold-gatherer-percentage 25)
-    (set-strategic-number sn-stone-gatherer-percentage 5)
+    (set-strategic-number sn-food-gatherer-percentage 58)
+    (set-strategic-number sn-wood-gatherer-percentage 25)
+    (set-strategic-number sn-gold-gatherer-percentage 15)
+    (set-strategic-number sn-stone-gatherer-percentage 2)
 )
 
 (defrule
@@ -92,6 +94,15 @@
     =>
     (research ri-pikeman)
     (set-goal gl-attack-only-attack-move-whole 1)
+)
+
+(defrule
+    (research-completed ri-anarchy)
+    (building-type-count-total town-center < 3)
+    (can-build town-center)
+    =>
+    (up-assign-builders c: town-center-foundation c: 4)
+    (build town-center)
 )
 
 (defrule
@@ -124,6 +135,7 @@
     (disable-self)
 )
 (defrule
+    (current-age == castle-age)
     (up-timer-status t-tactics-timer != timer-running)
     =>
     (enable-timer t-tactics-timer 200)
