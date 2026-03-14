@@ -32,6 +32,7 @@
 (defconst gl-attack-stop 250)
 (defconst gl-attack-only-attack-move-whole 251)
 (defconst gl-trade-stop 221)
+(defconst gl-vil-stop-making 260)
 (defconst t-tactics-timer 30)
 #load-if-defined MONGOL-CIV
 (defconst cav-line steppe-lancer-line) ; steppe-lancer-line
@@ -106,6 +107,7 @@
     (set-goal gl-researching-feudal 0)
     (set-goal gl-attack-stop 0)
     (set-goal gl-attack-only-attack-move-whole 0)
+    (set-goal gl-vil-stop-making 0)
     (disable-self)
 )
 
@@ -172,26 +174,37 @@
         (disable-self)
     )
 #else
-    #load-if-defined UP-POCKET-POSITION
-        (load "The Stranger/sc_feudal")
-        (load "The Stranger/knt_castle")
-        (load "The Stranger/knt_imp")
+    #load-if-defined KHMER-CIV
+        (load "The Stranger/khmers_fast_castle")
+        (load "The Stranger/khmers_scorpion_castle")
         (defrule
             (true)
             =>
-            (chat-to-all "I am in pocket position!")
+            (chat-to-all "I am Khmer!")
             (disable-self)
         )
     #else
-        (load "The Stranger/archer_feudal")
-        (load "The Stranger/archer_castle")
-        (load "The Stranger/archer_imp")
-        (defrule
-            (true)
-            =>
-            (chat-to-all "I am in flank position!")
-            (disable-self)
-        )
+        #load-if-defined UP-POCKET-POSITION
+            (load "The Stranger/sc_feudal")
+            (load "The Stranger/knt_castle")
+            (load "The Stranger/knt_imp")
+            (defrule
+                (true)
+                =>
+                (chat-to-all "I am in pocket position!")
+                (disable-self)
+            )
+        #else
+            (load "The Stranger/archer_feudal")
+            (load "The Stranger/archer_castle")
+            (load "The Stranger/archer_imp")
+            (defrule
+                (true)
+                =>
+                (chat-to-all "I am in flank position!")
+                (disable-self)
+            )
+        #end-if
     #end-if
 #end-if
 ;(load "The Stranger/fast_castle")
@@ -227,6 +240,7 @@
 
 #load-if-defined DIFFICULTY-EASIEST
 (defrule
+    (goal gl-vil-stop-making 0)
     (civilian-population < 7)
     (can-train villager)
     =>
@@ -235,6 +249,7 @@
 #end-if
 #load-if-defined DIFFICULTY-EASY
 (defrule
+    (goal gl-vil-stop-making 0)
     (civilian-population < 17)
     (can-train villager)
     =>
@@ -243,6 +258,7 @@
 #end-if
 #load-if-defined DIFFICULTY-MODERATE
 (defrule
+    (goal gl-vil-stop-making 0)
     (civilian-population < 35)
     (can-train villager)
     =>
@@ -251,6 +267,7 @@
 #end-if
 #load-if-defined DIFFICULTY-HARD
 (defrule
+    (goal gl-vil-stop-making 0)
     (civilian-population < 80)
     (can-train villager)
     =>
@@ -259,6 +276,7 @@
 #end-if
 #load-if-defined DIFFICULTY-HARDEST
 (defrule
+    (goal gl-vil-stop-making 0)
     (civilian-population < 120)
     (can-train villager)
     =>
@@ -267,6 +285,7 @@
 #end-if
 #load-if-defined DIFFICULTY-EXTREME
 (defrule
+    (goal gl-vil-stop-making 0)
     (civilian-population < 120)
     (can-train villager)
     =>

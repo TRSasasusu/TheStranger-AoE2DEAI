@@ -1,0 +1,116 @@
+(defrule
+    (can-research castle-age)
+    =>
+    (set-goal gl-researching-castle 1)
+    (research castle-age)
+    (set-strategic-number sn-food-gatherer-percentage 5)
+    (set-strategic-number sn-wood-gatherer-percentage 55)
+    (set-strategic-number sn-gold-gatherer-percentage 40)
+    (set-strategic-number sn-stone-gatherer-percentage 0)
+    (set-goal gl-attack-stop 1)
+    (set-goal gl-attack-only-attack-move-whole 1)
+    (set-goal gl-vil-stop-making 0)
+    (set-goal gl-trade-stop 1)
+)
+
+(defrule
+    (current-age >= castle-age)
+    =>
+    (set-goal gl-researching-castle 0)
+)
+
+(defrule
+    (current-age >= castle-age)
+    (can-build siege-workshop)
+    (building-type-count-total siege-workshop == 0)
+    =>
+    (build siege-workshop)
+)
+
+(defrule
+    (current-age >= castle-age)
+    (wood-amount > 400)
+    (can-build siege-workshop)
+    (building-type-count-total siege-workshop <= 1)
+    =>
+    (build siege-workshop)
+)
+
+(defrule
+    (unit-type-count-total scorpion-line > 10)
+    =>
+    (set-strategic-number sn-food-gatherer-percentage 10)
+    (set-strategic-number sn-wood-gatherer-percentage 50)
+    (set-strategic-number sn-gold-gatherer-percentage 40)
+    (set-strategic-number sn-stone-gatherer-percentage 0)
+)
+
+(defrule
+    (unit-type-count scorpion-line > 10)
+    (can-build university)
+    (building-type-count-total university == 0)
+    =>
+    (build university)
+)
+(defrule
+    (unit-type-count scorpion-line > 10)
+    (can-research ri-ballistics)
+    =>
+    (research ri-ballistics)
+)
+
+(defrule
+    (or
+        (goal gl-researching-castle 1)
+        (current-age >= castle-age)
+    )
+    (can-research ri-double-bit-axe)
+    =>
+    (research ri-double-bit-axe)
+)
+
+(defrule
+    (can-research ri-bow-saw)
+    =>
+    (research ri-bow-saw)
+)
+
+(defrule
+    (or
+        (goal gl-researching-castle 1)
+        (current-age >= castle-age)
+    )
+    (can-research ri-horse-collar)
+    =>
+    (research ri-horse-collar)
+)
+
+(defrule
+    (can-train scorpion-line)
+    =>
+    (train scorpion-line)
+)
+
+(defrule
+    (unit-type-count scorpion-line > 10)
+    (can-train mangonel-line)
+    =>
+    (train mangonel-line)
+    (set-goal gl-trade-stop 1)
+)
+
+(defrule
+    (current-age == castle-age)
+    =>
+    (up-get-point position-self gl-tmp-x)
+    (up-full-reset-search)
+    (up-find-local c: siege-workshop c: 2)
+    (up-target-point gl-tmp-x action-gather -1 -1)
+)
+
+(defrule
+    (military-population > 6)
+    =>
+    (set-goal gl-attack-stop 0)
+    (set-goal gl-attack-only-attack-move-whole 1)
+)

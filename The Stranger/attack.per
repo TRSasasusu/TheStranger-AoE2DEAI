@@ -439,3 +439,11 @@
     (set-goal gl-attack-ignore-count-limit 0)
     (up-jump-rule -27)
 )
+(defrule
+    (goal gl-attacking-unit-type infantry-class)
+    =>
+    (set-goal gl-attacking-unit-type scorpion-line)
+    (set-goal gl-attack-only-attack-move 0)
+    (set-goal gl-attack-ignore-count-limit 0)
+    (up-jump-rule -28)
+)
