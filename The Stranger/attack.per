@@ -76,7 +76,7 @@
         (goal gl-attack-ignore-count-limit 1)
     )
     =>
-    (set-goal gl-attack-target-rnd 5)
+    (set-goal gl-attack-target-rnd 6)
     (chat-to-all "attacking to NOT lumber-camp")
 )
 (defrule
@@ -168,9 +168,10 @@
     (up-modify-goal gl-tmp c:z/ 100)
     ;(up-chat-data-to-all "gl-tmp: %d" g: gl-tmp)
     (up-set-target-object search-remote g: gl-tmp)
-    (up-target-objects 1 action-default -1 stance-aggressive)
+    ;(up-target-objects 1 action-default -1 stance-aggressive)
     (up-get-point position-object gl-tmp-x)
     (up-copy-point gl-attack-target-x gl-tmp-x)
+    ;(up-send-flare gl-attack-target-x)
 )
 
 (defconst gl-enemy-tc-x 154)
@@ -194,6 +195,7 @@
     (up-modify-goal gl-tmp g:* gl-attack-target-remote-total)
     (up-modify-goal gl-tmp c:z/ 100)
     (up-set-target-object search-remote g: gl-tmp)
+    ;(up-set-target-object search-remote c: 0)
     (up-get-point position-object gl-enemy-tc-x)
     ;(up-full-reset-search)
     ;(up-find-local c: militiaman-line c: 8)
@@ -279,7 +281,7 @@
     (up-set-target-point gl-tmp-x)
     (up-reset-search 0 0 1 1)
     (up-reset-filters)
-    (up-filter-distance c: -1 c: 6)
+    (up-filter-distance c: -1 c: 3)
     (up-find-remote c: villager-class c: 10)
     (up-get-search-state gl-attacking-vil-local-total)
 )
@@ -306,9 +308,10 @@
     (up-get-fact random-number 0 gl-tmp)
     (up-modify-goal gl-tmp c:- 3)
     (up-modify-goal gl-attack-target-y g:+ gl-tmp)
+    ;(up-target-point gl-attack-target-x action-move -1 -1)
     (up-target-point gl-attack-target-x action-attack-move -1 -1)
     (chat-to-all "attack move!")
-    (up-send-flare gl-attack-target-x)
+    ;(up-send-flare gl-attack-target-x)
     (up-full-reset-search)
 )
 (defrule
@@ -328,7 +331,7 @@
     =>
     (up-target-point gl-attack-target-x action-move -1 -1)
     (chat-to-all "only moving!")
-    (up-send-flare gl-attack-target-x)
+    ;(up-send-flare gl-attack-target-x)
     (up-full-reset-search)
 )
 

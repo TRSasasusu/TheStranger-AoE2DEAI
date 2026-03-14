@@ -16,21 +16,31 @@
 
 
 (defrule
+    (true)
+    =>
+    (set-strategic-number sn-camp-max-distance 15)
+    (set-strategic-number sn-maximum-town-size 15)
+    (disable-self)
+)
+(defrule
     (game-time > 1200)
     =>
     (set-strategic-number sn-camp-max-distance 30)
+    (set-strategic-number sn-maximum-town-size 20)
     (disable-self)
 )
 (defrule
     (game-time > 1800)
     =>
     (set-strategic-number sn-camp-max-distance 80)
+    (set-strategic-number sn-maximum-town-size 30)
     (disable-self)
 )
 (defrule
     (game-time > 2400)
     =>
     (set-strategic-number sn-camp-max-distance 200)
+    (set-strategic-number sn-maximum-town-size 40)
     (disable-self)
 )
 
