@@ -154,6 +154,22 @@
 )
 
 (defrule
+    (or
+        (goal gl-researching-imp 1)
+        (current-age >= imperial-age)
+    )
+    (can-train huskarl-barracks)
+    =>
+    (train huskarl-barracks)
+)
+
+(defrule
+    (can-train elite-huskarl-barracks)
+    =>
+    (train elite-huskarl-barracks)
+)
+
+(defrule
     (current-age == imperial-age)
     (unit-type-count huskarl-line > 10)
     =>

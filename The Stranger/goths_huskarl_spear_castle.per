@@ -120,6 +120,13 @@
 )
 
 (defrule
+    (current-age == castle-age)
+    (can-train huskarl-barracks)
+    =>
+    (train huskarl-barracks)
+)
+
+(defrule
     (current-age >= castle-age)
     (game-time > 2100)
     =>
