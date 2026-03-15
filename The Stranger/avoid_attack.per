@@ -154,7 +154,7 @@
                 (goal gl-threat-source-class-id pikeman)
                 =>
                 (set-goal gl-threat-source-class-id halberdier)
-                (set-goal gl-threat-hope-distance 6)
+                (set-goal gl-threat-hope-distance 9)
             )
 
             (defrule
@@ -164,7 +164,7 @@
                 (goal gl-threat-source-class-id spearman)
                 =>
                 (set-goal gl-threat-source-class-id pikeman)
-                (set-goal gl-threat-hope-distance 6)
+                (set-goal gl-threat-hope-distance 9)
             )
 
             (defrule
@@ -174,7 +174,7 @@
                 (goal gl-threat-source-class-id all-units-class)
                 =>
                 (set-goal gl-threat-source-class-id spearman)
-                (set-goal gl-threat-hope-distance 6)
+                (set-goal gl-threat-hope-distance 9)
             )
 
             (defrule
@@ -194,7 +194,7 @@
                 (goal gl-threat-source-class-id skirmisher)
                 =>
                 (set-goal gl-threat-source-class-id elite-skirmisher)
-                (set-goal gl-threat-hope-distance 11)
+                (set-goal gl-threat-hope-distance 12)
             )
 
             (defrule
@@ -329,6 +329,7 @@
                 (up-full-reset-search)
                 (up-find-remote g: gl-threat-source-class-id c: 10)
                 (up-get-search-state gl-tmp-local-total)
+                ;(chat-to-all "found spearman!")
             )
             ;; pikeman
             (defrule
@@ -345,6 +346,7 @@
                 (up-full-reset-search)
                 (up-find-remote g: gl-threat-source-class-id c: 10)
                 (up-get-search-state gl-tmp-local-total)
+                ;(chat-to-all "pikeman found!")
             )
             ;; halberdier
             (defrule
@@ -407,13 +409,17 @@
                 =>
                 (set-goal gl-tmp-local-total 0)
             )
+
             ;; skirmisher or elite-skirmisher
             (defrule
                 (goal gl-avoid-attack-player-id-for-end 0)
                 (goal gl-threat-target-class-id-for-end 0)
                 (goal gl-threat-source-class-id-for-end 0)
 
-                (goal gl-threat-source-class-id skirmisher-line)
+                (or
+                    (goal gl-threat-source-class-id skirmisher)
+                    (goal gl-threat-source-class-id elite-skirmisher)
+                )
 
                 (up-compare-goal gl-threat-source-pos-x >= 0)
                 =>
@@ -435,7 +441,10 @@
                 (goal gl-threat-target-class-id-for-end 0)
                 (goal gl-threat-source-class-id-for-end 0)
 
-                (goal gl-threat-source-class-id skirmisher-line)
+                (or
+                    (goal gl-threat-source-class-id skirmisher)
+                    (goal gl-threat-source-class-id elite-skirmisher)
+                )
 
                 (up-compare-goal gl-threat-source-pos-x >= 0)
                 (up-compare-goal gl-tmp2 >= 3)
@@ -486,7 +495,13 @@
                 (goal gl-threat-target-class-id-for-end 0)
                 (goal gl-threat-source-class-id-for-end 0)
 
-                (goal gl-threat-source-class-id spearman-line)
+                (or
+                    (goal gl-threat-source-class-id spearman)
+                    (or
+                        (goal gl-threat-source-class-id pikeman)
+                        (goal gl-threat-source-class-id halberdier)
+                    )
+                )
 
                 (up-compare-goal gl-threat-source-pos-x >= 0)
                 =>
@@ -613,7 +628,7 @@
                 (up-target-point gl-avoiding-target-x action-move -1 stance-no-attack)
                 ;(up-chat-data-to-all "gl-enemy-tc-remote-total: %d" g: gl-enemy-tc-remote-total)
                 ;(up-send-flare gl-avoiding-target-x)
-                (up-send-flare gl-avoiding-target-x)
+                ;(up-send-flare gl-avoiding-target-x)
             )
 
         (defrule
