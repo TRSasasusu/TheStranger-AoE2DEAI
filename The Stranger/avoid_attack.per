@@ -75,9 +75,23 @@
         (defrule
             (goal gl-avoid-attack-player-id-for-end 0)
             (goal gl-threat-target-class-id-for-end 0)
-            (goal gl-threat-target-class-id archer-line)
+            (goal gl-threat-target-class-id cavalry-archer-class)
             =>
             (set-goal gl-threat-target-class-id-for-end 1); endfor flag
+        )
+        (defrule
+            (goal gl-avoid-attack-player-id-for-end 0)
+            (goal gl-threat-target-class-id-for-end 0)
+            (goal gl-threat-target-class-id militia)
+            =>
+            (set-goal gl-threat-target-class-id cavalry-archer-class)
+        )
+        (defrule
+            (goal gl-avoid-attack-player-id-for-end 0)
+            (goal gl-threat-target-class-id-for-end 0)
+            (goal gl-threat-target-class-id archer-line)
+            =>
+            (set-goal gl-threat-target-class-id militia)
         )
         (defrule
             (goal gl-avoid-attack-player-id-for-end 0)
@@ -121,9 +135,19 @@
                 (goal gl-avoid-attack-player-id-for-end 0)
                 (goal gl-threat-target-class-id-for-end 0)
                 (goal gl-threat-source-class-id-for-end 0)
-                (goal gl-threat-source-class-id skirmisher)
+                (goal gl-threat-source-class-id all-units-class)
                 =>
                 (set-goal gl-threat-source-class-id-for-end 1) ; endfor flag
+            )
+
+            (defrule
+                (goal gl-avoid-attack-player-id-for-end 0)
+                (goal gl-threat-target-class-id-for-end 0)
+                (goal gl-threat-source-class-id-for-end 0)
+                (goal gl-threat-source-class-id skirmisher)
+                =>
+                (set-goal gl-threat-source-class-id all-units-class)
+                (set-goal gl-threat-hope-distance 11)
             )
 
             (defrule
@@ -175,9 +199,12 @@
                             (goal gl-threat-target-class-id eagle-warrior-line)
                             (not(research-completed ri-scale-mail))
                         )
-                        (and
-                            (goal gl-threat-target-class-id archer-line)
-                            (not(research-completed ri-crossbow))
+                        (or
+                            (and
+                                (goal gl-threat-target-class-id archer-line)
+                                (not(research-completed ri-crossbow))
+                            )
+                            (goal gl-threat-target-class-id militia)
                         )
                     )
                 )
@@ -205,6 +232,20 @@
                 (up-find-remote g: gl-threat-source-class-id c: 10)
                 (up-get-search-state gl-tmp-local-total)
                 ;(up-chat-data-to-all "skirm num: %d" g: gl-tmp-remote-total)
+            )
+            ;; military
+            (defrule
+                (goal gl-avoid-attack-player-id-for-end 0)
+                (goal gl-threat-target-class-id-for-end 0)
+                (goal gl-threat-source-class-id-for-end 0)
+
+                (goal gl-threat-source-class-id all-units-class)
+                (goal gl-threat-target-class-id cavalry-archer-class)
+                =>
+                (up-full-reset-search)
+                (up-filter-include cmdid-military -1 -1 -1)
+                (up-find-remote c: all-units-class c: 50)
+                (up-get-search-state gl-tmp-local-total)
             )
 
             ; set source as target object and position
@@ -289,6 +330,43 @@
                 =>
                 (set-goal gl-tmp-local-total 0)
                 ;(chat-to-all "ignore this skirm")
+            )
+            ;; military
+            (defrule
+                (goal gl-avoid-attack-player-id-for-end 0)
+                (goal gl-threat-target-class-id-for-end 0)
+                (goal gl-threat-source-class-id-for-end 0)
+
+                (goal gl-threat-source-class-id all-units-class)
+
+                (up-compare-goal gl-threat-source-pos-x >= 0)
+                =>
+                (up-full-reset-search)
+                (up-filter-include cmdid-military -1 -1 -1)
+                (up-filter-distance c: -1 c: 9)
+                (up-find-remote g: gl-threat-source-class-id c: 50)
+                (up-get-search-state gl-tmp-local-total)
+                (up-modify-goal gl-tmp g:= gl-tmp-remote-total); gl-tmp (>=1) is now #military
+                (up-full-reset-search)
+                (up-filter-distance c: -1 c: 9)
+                (up-find-local g: gl-threat-target-class-id c: 50)
+                (up-get-search-state gl-tmp-local-total)
+                (up-modify-goal gl-tmp2 g:= gl-tmp-local-total); gl-tmp2 is now #cavalry-archer-class
+                (up-modify-goal gl-tmp2 g:/ gl-tmp); gl-tmp-local-total is now #cavalry-archer-class/#military
+                ;(up-chat-data-to-all "#cavalry-archer-class/#military: %d" g: gl-tmp2)
+            )
+            (defrule ; to include only #cavalry-archer-class/#military < 3
+                (goal gl-avoid-attack-player-id-for-end 0)
+                (goal gl-threat-target-class-id-for-end 0)
+                (goal gl-threat-source-class-id-for-end 0)
+
+                (goal gl-threat-source-class-id all-units-class)
+
+                (up-compare-goal gl-threat-source-pos-x >= 0)
+                (up-compare-goal gl-tmp2 >= 3)
+                =>
+                (set-goal gl-tmp-local-total 0)
+                ;(chat-to-all "ignore this military")
             )
 
             ; set target as target object and position

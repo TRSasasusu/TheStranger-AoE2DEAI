@@ -97,6 +97,13 @@
 )
 
 (defrule
+    (military-population > 10)
+    (can-research ri-squires)
+    =>
+    (research ri-squires)
+)
+
+(defrule
     (research-completed ri-anarchy)
     (building-type-count-total town-center < 3)
     (can-build town-center)

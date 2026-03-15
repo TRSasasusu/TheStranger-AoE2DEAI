@@ -1,0 +1,156 @@
+(defrule
+    (can-research imperial-age)
+    =>
+    (set-goal gl-researching-imp 1)
+    (research imperial-age)
+    (set-strategic-number sn-food-gatherer-percentage 30)
+    (set-strategic-number sn-wood-gatherer-percentage 25)
+    (set-strategic-number sn-gold-gatherer-percentage 40)
+    (set-strategic-number sn-stone-gatherer-percentage 5)
+    (set-goal gl-trade-stop 0)
+)
+
+(defrule
+    (current-age >= imperial-age)
+    =>
+    (set-goal gl-researching-imp 0)
+)
+
+(defrule
+    (can-research ri-heavy-scorpion)
+    =>
+    (research ri-heavy-scorpion)
+)
+
+(defrule
+    (can-research ri-siege-engineers)
+    =>
+    (research ri-siege-engineers)
+)
+
+(defrule
+    (can-research ri-double-crossbow)
+    =>
+    (research ri-double-crossbow)
+)
+
+(defrule
+    (can-train scorpion-line)
+    =>
+    (train scorpion-line)
+)
+
+(defrule
+    (current-age >= imperial-age)
+    (research-completed ri-heavy-scorpion)
+    (building-type-count-total siege-workshop < 3)
+    (can-build siege-workshop)
+    =>
+    (build siege-workshop)
+)
+
+(defrule
+    (can-build castle)
+    =>
+    (build castle)
+)
+
+(defrule
+    (can-train trebuchet)
+    =>
+    (train trebuchet)
+)
+
+(defrule
+    (or
+        (goal gl-researching-imp 1)
+        (current-age >= imperial-age)
+    )
+    (research-completed ri-heavy-scorpion)
+    (can-research ri-bloodlines)
+    =>
+    (research ri-bloodlines)
+)
+
+(defrule
+    (or
+        (goal gl-researching-imp 1)
+        (current-age >= imperial-age)
+    )
+    (research-completed ri-heavy-scorpion)
+    (can-research ri-husbandry)
+    =>
+    (research ri-husbandry)
+)
+
+(defrule
+    (research-completed ri-heavy-scorpion)
+    (can-research ri-light-cavalry)
+    =>
+    (research ri-light-cavalry)
+)
+
+(defrule
+    (research-completed ri-heavy-scorpion)
+    (can-research ri-hussar)
+    =>
+    (research ri-hussar)
+)
+
+(defrule
+    (research-completed ri-heavy-scorpion)
+    (can-research ri-scale-barding)
+    =>
+    (research ri-scale-barding)
+)
+
+(defrule
+    (research-completed ri-heavy-scorpion)
+    (can-research ri-chain-barding)
+    =>
+    (research ri-chain-barding)
+)
+
+(defrule
+    (research-completed ri-heavy-scorpion)
+    (can-research ri-plate-barding)
+    =>
+    (research ri-plate-barding)
+)
+
+(defrule
+    (research-completed ri-heavy-scorpion)
+    (can-research ri-forging)
+    =>
+    (research ri-forging)
+)
+
+(defrule
+    (research-completed ri-heavy-scorpion)
+    (can-research ri-iron-casting)
+    =>
+    (research ri-iron-casting)
+)
+
+(defrule
+    (research-completed ri-heavy-scorpion)
+    (can-research ri-blast-furnace)
+    =>
+    (research ri-blast-furnace)
+)
+
+(defrule
+    (research-completed ri-heavy-scorpion)
+    (building-type-count-total stable < 2)
+    (can-build stable)
+    =>
+    (build stable)
+)
+
+(defrule
+    (research-completed ri-heavy-scorpion)
+    (research-completed ri-chain-barding)
+    (can-train scout-cavalry-line)
+    =>
+    (train scout-cavalry-line)
+)

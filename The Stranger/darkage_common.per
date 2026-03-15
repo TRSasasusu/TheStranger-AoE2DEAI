@@ -14,6 +14,14 @@
     (set-strategic-number sn-food-gatherer-percentage 80)
     (set-strategic-number sn-wood-gatherer-percentage 20)
 )
+(defrule ; for some special cases like persian's drush
+    (civilian-population > 6)
+    (not(can-build lumber-camp))
+    (building-type-count-total lumber-camp == 0)
+    =>
+    (set-strategic-number sn-food-gatherer-percentage 75)
+    (set-strategic-number sn-wood-gatherer-percentage 25)
+)
 
 (defrule
     (civilian-population > 11)

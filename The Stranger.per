@@ -131,6 +131,7 @@
     )
     (up-timer-status t-scout-timer != timer-running)
     =>
+    (enable-timer t-scout-timer 120)
     (up-send-scout group-type-land-explore scout-opposite)
     (disable-self)
 )
@@ -142,6 +143,7 @@
     )
     (up-timer-status t-scout-timer != timer-running)
     =>
+    (enable-timer t-scout-timer 120)
     (up-send-scout group-type-land-explore scout-flank)
     (disable-self)
 )
@@ -177,6 +179,7 @@
     #load-if-defined KHMER-CIV
         (load "The Stranger/khmers_fast_castle")
         (load "The Stranger/khmers_scorpion_castle")
+        (load "The Stranger/khmers_scorpion_hussar_imp")
         (defrule
             (true)
             =>
@@ -184,26 +187,39 @@
             (disable-self)
         )
     #else
-        #load-if-defined UP-POCKET-POSITION
-            (load "The Stranger/sc_feudal")
-            (load "The Stranger/knt_castle")
-            (load "The Stranger/knt_imp")
+        #load-if-defined PERSIAN-CIV
+            (load "The Stranger/persians_drush")
+            (load "The Stranger/fast_castle")
+            (load "The Stranger/cavarcher_castle")
+            (load "The Stranger/cavarcher_hussar_imp")
             (defrule
                 (true)
                 =>
-                (chat-to-all "I am in pocket position!")
+                (chat-to-all "I am Persians!")
                 (disable-self)
             )
         #else
-            (load "The Stranger/archer_feudal")
-            (load "The Stranger/archer_castle")
-            (load "The Stranger/archer_imp")
-            (defrule
-                (true)
-                =>
-                (chat-to-all "I am in flank position!")
-                (disable-self)
-            )
+            #load-if-defined UP-POCKET-POSITION
+                (load "The Stranger/sc_feudal")
+                (load "The Stranger/knt_castle")
+                (load "The Stranger/knt_imp")
+                (defrule
+                    (true)
+                    =>
+                    (chat-to-all "I am in pocket position!")
+                    (disable-self)
+                )
+            #else
+                (load "The Stranger/archer_feudal")
+                (load "The Stranger/archer_castle")
+                (load "The Stranger/archer_imp")
+                (defrule
+                    (true)
+                    =>
+                    (chat-to-all "I am in flank position!")
+                    (disable-self)
+                )
+            #end-if
         #end-if
     #end-if
 #end-if

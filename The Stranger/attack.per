@@ -9,6 +9,7 @@
 (defconst gl-attacking-unit-type 138)
 (defconst gl-attack-only-attack-move 139)
 (defconst gl-attack-ignore-count-limit 140)
+(defconst gl-attack-move-detection-range 141)
 (defrule
     (true)
     =>
@@ -17,6 +18,7 @@
     (set-goal gl-attacking-unit-type archer-line)
     (set-goal gl-attack-only-attack-move 0)
     (set-goal gl-attack-ignore-count-limit 0)
+    (set-goal gl-attack-move-detection-range 3)
 )
 ;(defrule
 ;    (unit-type-count militiaman-line >= 2)
@@ -281,7 +283,7 @@
     (up-set-target-point gl-tmp-x)
     (up-reset-search 0 0 1 1)
     (up-reset-filters)
-    (up-filter-distance c: -1 c: 3)
+    (up-filter-distance c: -1 g: gl-attack-move-detection-range)
     (up-find-remote c: villager-class c: 10)
     (up-get-search-state gl-attacking-vil-local-total)
 )
@@ -358,36 +360,42 @@
     (goal gl-attacking-unit-type archer-line)
     =>
     (set-goal gl-attacking-unit-type cavalry-archer-line)
+    (set-goal gl-attack-move-detection-range 4)
     (up-jump-rule -16)
 )
 (defrule
     (goal gl-attacking-unit-type cavalry-archer-line)
     =>
     (set-goal gl-attacking-unit-type skirmisher-line)
+    (set-goal gl-attack-move-detection-range 4)
     (up-jump-rule -17)
 )
 (defrule
     (goal gl-attacking-unit-type skirmisher-line)
     =>
     (set-goal gl-attacking-unit-type militiaman-line)
+    (set-goal gl-attack-move-detection-range 3)
     (up-jump-rule -18)
 )
 (defrule
     (goal gl-attacking-unit-type militiaman-line)
     =>
     (set-goal gl-attacking-unit-type spearman-line)
+    (set-goal gl-attack-move-detection-range 3)
     (up-jump-rule -19)
 )
 (defrule
     (goal gl-attacking-unit-type spearman-line)
     =>
     (set-goal gl-attacking-unit-type scout-cavalry-line)
+    (set-goal gl-attack-move-detection-range 3)
     (up-jump-rule -20)
 )
 (defrule
     (goal gl-attacking-unit-type scout-cavalry-line)
     =>
     (set-goal gl-attacking-unit-type eagle-warrior-line)
+    (set-goal gl-attack-move-detection-range 3)
     (up-jump-rule -21)
 )
 (defrule
@@ -397,6 +405,7 @@
     ;(chat-to-all "mangonel go!!")
     (set-goal gl-attack-only-attack-move 1)
     (set-goal gl-attack-ignore-count-limit 1)
+    (set-goal gl-attack-move-detection-range 3)
     (up-jump-rule -22)
 )
 (defrule
@@ -405,6 +414,7 @@
     (set-goal gl-attacking-unit-type knight-line)
     (set-goal gl-attack-only-attack-move 0)
     (set-goal gl-attack-ignore-count-limit 0)
+    (set-goal gl-attack-move-detection-range 3)
     (up-jump-rule -23)
 )
 (defrule
@@ -413,6 +423,7 @@
     (set-goal gl-attacking-unit-type bombard-cannon-line)
     (set-goal gl-attack-only-attack-move 1)
     (set-goal gl-attack-ignore-count-limit 1)
+    (set-goal gl-attack-move-detection-range 3)
     (up-jump-rule -24)
 )
 (defrule
@@ -421,6 +432,7 @@
     (set-goal gl-attacking-unit-type trebuchet)
     (set-goal gl-attack-only-attack-move 1)
     (set-goal gl-attack-ignore-count-limit 1)
+    (set-goal gl-attack-move-detection-range 3)
     (up-jump-rule -25)
 )
 (defrule
@@ -429,6 +441,7 @@
     (set-goal gl-attacking-unit-type steppe-lancer-line)
     (set-goal gl-attack-only-attack-move 0)
     (set-goal gl-attack-ignore-count-limit 0)
+    (set-goal gl-attack-move-detection-range 3)
     (up-jump-rule -26)
 )
 (defrule
@@ -437,6 +450,7 @@
     (set-goal gl-attacking-unit-type infantry-class)
     (set-goal gl-attack-only-attack-move 0)
     (set-goal gl-attack-ignore-count-limit 0)
+    (set-goal gl-attack-move-detection-range 3)
     (up-jump-rule -27)
 )
 (defrule
@@ -445,5 +459,6 @@
     (set-goal gl-attacking-unit-type scorpion-line)
     (set-goal gl-attack-only-attack-move 0)
     (set-goal gl-attack-ignore-count-limit 0)
+    (set-goal gl-attack-move-detection-range 3)
     (up-jump-rule -28)
 )

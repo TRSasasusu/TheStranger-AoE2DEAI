@@ -46,6 +46,15 @@
 )
 
 (defrule
+    (unit-type-count-total scorpion-line > 20)
+    =>
+    (set-strategic-number sn-food-gatherer-percentage 30)
+    (set-strategic-number sn-wood-gatherer-percentage 30)
+    (set-strategic-number sn-gold-gatherer-percentage 40)
+    (set-strategic-number sn-stone-gatherer-percentage 0)
+)
+
+(defrule
     (unit-type-count scorpion-line > 10)
     (can-build university)
     (building-type-count-total university == 0)
@@ -92,6 +101,7 @@
 )
 
 (defrule
+    (current-age == castle-age)
     (unit-type-count scorpion-line > 10)
     (can-train mangonel-line)
     =>

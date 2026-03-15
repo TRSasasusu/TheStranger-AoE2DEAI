@@ -1,0 +1,321 @@
+(defrule
+    (can-research imperial-age)
+    =>
+    (set-goal gl-researching-imp 1)
+    (research imperial-age)
+    (set-strategic-number sn-food-gatherer-percentage 30)
+    (set-strategic-number sn-wood-gatherer-percentage 25)
+    (set-strategic-number sn-gold-gatherer-percentage 40)
+    (set-strategic-number sn-stone-gatherer-percentage 5)
+)
+
+(defrule
+    (current-age >= imperial-age)
+    =>
+    (set-goal gl-researching-imp 0)
+)
+
+(defrule
+    (or
+        (goal gl-researching-imp 1)
+        (current-age >= imperial-age)
+    )
+    (can-build archery-range)
+    (building-type-count-total archery-range < 2)
+    (building-type-count-total blacksmith >= 1)
+    (building-type-count-total university >= 1)
+    =>
+    (build archery-range)
+)
+
+(defrule
+    (or
+        (goal gl-researching-imp 1)
+        (current-age >= imperial-age)
+    )
+    (can-build archery-range)
+    (building-type-count-total archery-range < 5)
+    (building-type-count-total blacksmith >= 1)
+    (building-type-count-total university >= 1)
+    (or
+        (research-completed ri-bracer)
+        (not(research-available ri-bracer))
+    )
+    (research-completed ri-chemistry)
+    (research-completed ri-heavy-cavalry-archer)
+    =>
+    (set-strategic-number sn-food-gatherer-percentage 20)
+    (set-strategic-number sn-wood-gatherer-percentage 35)
+    (set-strategic-number sn-gold-gatherer-percentage 40)
+    (set-strategic-number sn-stone-gatherer-percentage 5)
+)
+
+(defrule
+    (current-age >= castle-age)
+    (can-build university)
+    (building-type-count-total archery-range >= 2)
+    (building-type-count-total blacksmith >= 1)
+    (building-type-count-total university == 0)
+    =>
+    (build university)
+)
+
+(defrule
+    (or
+        (goal gl-researching-imp 1)
+        (current-age >= imperial-age)
+    )
+    (unit-type-count cavalry-archer-line > 0)
+    (can-research ri-fletching)
+    =>
+    (research ri-fletching)
+)
+
+(defrule
+    (or
+        (goal gl-researching-imp 1)
+        (current-age >= imperial-age)
+    )
+    (unit-type-count cavalry-archer-line > 0)
+    (can-research ri-bodkin-arrow)
+    =>
+    (research ri-bodkin-arrow)
+)
+
+(defrule
+    (or
+        (goal gl-researching-imp 1)
+        (current-age >= imperial-age)
+    )
+    (unit-type-count cavalry-archer-line > 0)
+    (can-research ri-bracer)
+    =>
+    (research ri-bracer)
+)
+
+(defrule
+    (or
+        (goal gl-researching-imp 1)
+        (current-age >= imperial-age)
+    )
+    (unit-type-count cavalry-archer-line > 0)
+    (can-research ri-ballistics)
+    =>
+    (research ri-ballistics)
+)
+
+(defrule
+    (or
+        (goal gl-researching-imp 1)
+        (current-age >= imperial-age)
+    )
+    (unit-type-count cavalry-archer-line > 0)
+    (can-research ri-chemistry)
+    =>
+    (research ri-chemistry)
+)
+
+(defrule
+    (or
+        (goal gl-researching-imp 1)
+        (current-age >= imperial-age)
+    )
+    (unit-type-count cavalry-archer-line > 5)
+    (can-research ri-bloodlines)
+    =>
+    (research ri-bloodlines)
+)
+
+(defrule
+    (or
+        (goal gl-researching-imp 1)
+        (current-age >= imperial-age)
+    )
+    (unit-type-count cavalry-archer-line > 5)
+    (can-research ri-husbandry)
+    =>
+    (research ri-husbandry)
+)
+
+(defrule
+    (or
+        (goal gl-researching-imp 1)
+        (current-age >= imperial-age)
+    )
+    (unit-type-count cavalry-archer-line > 5)
+    (can-research ri-padded-archer-armor)
+    =>
+    (research ri-padded-archer-armor)
+)
+
+(defrule
+    (or
+        (goal gl-researching-imp 1)
+        (current-age >= imperial-age)
+    )
+    (unit-type-count cavalry-archer-line > 5)
+    (can-research ri-leather-archer-armor)
+    =>
+    (research ri-leather-archer-armor)
+)
+
+(defrule
+    (or
+        (goal gl-researching-imp 1)
+        (current-age >= imperial-age)
+    )
+    (unit-type-count cavalry-archer-line > 5)
+    (can-research ri-ring-archer-armor)
+    =>
+    (research ri-ring-archer-armor)
+)
+
+(defrule
+    (or
+        (goal gl-researching-imp 1)
+        (current-age >= imperial-age)
+    )
+    (unit-type-count cavalry-archer-line > 5)
+    (can-research ri-parthian-tactics)
+    =>
+    (research ri-parthian-tactics)
+)
+
+(defrule
+    (or
+        (goal gl-researching-imp 1)
+        (current-age >= imperial-age)
+    )
+    (unit-type-count cavalry-archer-line > 5)
+    (can-research ri-thumb-ring)
+    =>
+    (research ri-thumb-ring)
+)
+
+(defrule
+    (or
+        (goal gl-researching-imp 1)
+        (current-age >= imperial-age)
+    )
+    (unit-type-count cavalry-archer-line > 5)
+    (can-research ri-heavy-cavalry-archer)
+    =>
+    (research ri-heavy-cavalry-archer)
+)
+
+(defrule
+    (or
+        (goal gl-researching-imp 1)
+        (current-age >= imperial-age)
+    )
+    (can-train cavalry-archer-line)
+    =>
+    (train cavalry-archer-line)
+)
+
+
+(defrule
+    (research-completed ri-heavy-cavalry-archer)
+    (can-research ri-light-cavalry)
+    =>
+    (research ri-light-cavalry)
+)
+
+(defrule
+    (research-completed ri-heavy-cavalry-archer)
+    (can-research ri-hussar)
+    =>
+    (research ri-hussar)
+)
+
+(defrule
+    (research-completed ri-heavy-cavalry-archer)
+    (can-research ri-scale-barding)
+    =>
+    (research ri-scale-barding)
+)
+
+(defrule
+    (research-completed ri-heavy-cavalry-archer)
+    (can-research ri-chain-barding)
+    =>
+    (research ri-chain-barding)
+)
+
+(defrule
+    (research-completed ri-heavy-cavalry-archer)
+    (can-research ri-plate-barding)
+    =>
+    (research ri-plate-barding)
+)
+
+(defrule
+    (research-completed ri-heavy-cavalry-archer)
+    (can-research ri-forging)
+    =>
+    (research ri-forging)
+)
+
+(defrule
+    (research-completed ri-heavy-cavalry-archer)
+    (can-research ri-iron-casting)
+    =>
+    (research ri-iron-casting)
+)
+
+(defrule
+    (research-completed ri-heavy-cavalry-archer)
+    (can-research ri-blast-furnace)
+    =>
+    (research ri-blast-furnace)
+)
+
+(defrule
+    (research-completed ri-heavy-cavalry-archer)
+    (building-type-count-total stable < 2)
+    (can-build stable)
+    =>
+    (build stable)
+)
+
+(defrule
+    (research-completed ri-heavy-cavalry-archer)
+    (research-completed ri-chain-barding)
+    (can-train scout-cavalry-line)
+    =>
+    (train scout-cavalry-line)
+)
+
+(defrule
+    (can-build castle)
+    =>
+    (build castle)
+)
+
+(defrule
+    (can-train trebuchet)
+    =>
+    (train trebuchet)
+)
+
+(defrule
+    (can-train bombard-cannon-line)
+    =>
+    (train bombard-cannon-line)
+)
+
+
+(defrule
+    (current-age == imperial-age)
+    (unit-type-count cavalry-archer-class > 5)
+    =>
+    (enable-timer t-tactics-timer 180)
+    (disable-self)
+)
+(defrule
+    (current-age == imperial-age)
+    (up-timer-status t-tactics-timer != timer-running)
+    =>
+    (enable-timer t-tactics-timer 180)
+    (up-modify-sn sn-focus-player-number c: any-enemy)
+)

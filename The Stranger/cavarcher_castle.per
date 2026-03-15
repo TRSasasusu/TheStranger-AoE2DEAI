@@ -109,15 +109,16 @@
     (build farm)
 )
 
-;(defrule
-;    (current-age >= castle-age)
-;    (can-build siege-workshop)
-;    (building-type-count-total archery-range >= 2)
-;    (building-type-count-total blacksmith >= 1)
-;    (building-type-count-total siege-workshop == 0)
-;    =>
-;    (build siege-workshop)
-;)
+(defrule
+    (current-age >= castle-age)
+    (can-build siege-workshop)
+    (building-type-count-total archery-range >= 2)
+    (building-type-count-total blacksmith >= 1)
+    (building-type-count-total siege-workshop == 0)
+    (research-completed ri-ballistics)
+    =>
+    (build siege-workshop)
+)
 
 (defrule
     (or
@@ -160,17 +161,33 @@
 )
 
 (defrule
-    (unit-type-count archer-line > 10)
+    (unit-type-count cavalry-archer-line > 4)
+    (can-research ri-parthian-tactics)
+    =>
+    (research ri-parthian-tactics)
+)
+
+(defrule
+    (unit-type-count cavalry-archer-line > 10)
     (can-research ri-thumb-ring)
     =>
     (research ri-thumb-ring)
 )
 
 (defrule
-    (unit-type-count archer-line > 10)
+    (unit-type-count cavalry-archer-line > 10)
     (can-research ri-bloodlines)
     =>
     (research ri-bloodlines)
+)
+
+(defrule
+    (unit-type-count cavalry-archer-line > 15)
+    =>
+    (set-strategic-number sn-food-gatherer-percentage 35)
+    (set-strategic-number sn-wood-gatherer-percentage 30)
+    (set-strategic-number sn-gold-gatherer-percentage 35)
+    (set-strategic-number sn-stone-gatherer-percentage 0)
 )
 
 ;(defrule
@@ -198,3 +215,18 @@
 ;    =>
 ;    (train mangonel-line)
 ;)
+
+(defrule
+    (current-age == castle-age)
+    (unit-type-count cavalry-archer-class > 5)
+    =>
+    (enable-timer t-tactics-timer 180)
+    (disable-self)
+)
+(defrule
+    (current-age == castle-age)
+    (up-timer-status t-tactics-timer != timer-running)
+    =>
+    (enable-timer t-tactics-timer 180)
+    (up-modify-sn sn-focus-player-number c: any-enemy)
+)

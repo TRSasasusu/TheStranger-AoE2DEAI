@@ -1,0 +1,53 @@
+(defrule
+    (can-build barracks)
+    (building-type-count-total barracks == 0)
+    =>
+    (build barracks)
+)
+
+(defrule
+    (current-age == dark-age)
+    (can-train militia)
+    (unit-type-count-total militia < 2)
+    =>
+    (train militia)
+)
+
+
+(defrule
+    (game-time > 60)
+    =>
+    (enable-timer t-scout-timer 120)
+    (up-send-scout group-type-land-explore scout-enemy)
+    (disable-self)
+)
+
+(defrule
+    (up-timer-status t-scout-timer != timer-running)
+    =>
+    (enable-timer t-scout-timer 120)
+    (up-send-scout group-type-land-explore scout-opposite)
+    (disable-self)
+)
+
+(defrule
+    (up-timer-status t-scout-timer != timer-running)
+    =>
+    (enable-timer t-scout-timer 120)
+    (up-send-scout group-type-land-explore scout-flank)
+    (disable-self)
+)
+
+(defrule
+    (true)
+    =>
+    (set-strategic-number sn-number-explore-groups 3)
+    (set-strategic-number sn-total-number-explorers 3)
+    (disable-self)
+)
+(defrule
+    (players-building-count focus-player > 0)
+    =>
+    (set-strategic-number sn-number-explore-groups 1)
+    (set-strategic-number sn-total-number-explorers 1)
+)

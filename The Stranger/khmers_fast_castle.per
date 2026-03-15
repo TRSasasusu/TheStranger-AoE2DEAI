@@ -21,7 +21,7 @@
 (defrule
     (or
         (goal gl-researching-feudal 1)
-        (current-age == feudal-age)
+        (current-age >= feudal-age)
     )
     (can-build farm)
     (building-type-count-total mining-camp >= 1)
