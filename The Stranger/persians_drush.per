@@ -17,7 +17,15 @@
 (defrule
     (game-time > 60)
     =>
-    (enable-timer t-scout-timer 120)
+    (enable-timer t-scout-timer 60)
+    (up-send-scout group-type-land-explore scout-flank)
+    (disable-self)
+)
+
+(defrule
+    (up-timer-status t-scout-timer != timer-running)
+    =>
+    (enable-timer t-scout-timer 60)
     (up-send-scout group-type-land-explore scout-enemy)
     (disable-self)
 )
@@ -25,7 +33,15 @@
 (defrule
     (up-timer-status t-scout-timer != timer-running)
     =>
-    (enable-timer t-scout-timer 120)
+    (enable-timer t-scout-timer 60)
+    (up-send-scout group-type-land-explore scout-flank)
+    (disable-self)
+)
+
+(defrule
+    (up-timer-status t-scout-timer != timer-running)
+    =>
+    (enable-timer t-scout-timer 60)
     (up-send-scout group-type-land-explore scout-opposite)
     (disable-self)
 )
@@ -33,7 +49,7 @@
 (defrule
     (up-timer-status t-scout-timer != timer-running)
     =>
-    (enable-timer t-scout-timer 120)
+    (enable-timer t-scout-timer 60)
     (up-send-scout group-type-land-explore scout-flank)
     (disable-self)
 )

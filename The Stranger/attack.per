@@ -375,6 +375,7 @@
     =>
     (set-goal gl-attacking-unit-type militiaman-line)
     (set-goal gl-attack-move-detection-range 3)
+    (set-goal gl-attack-ignore-count-limit 1)
     (up-jump-rule -18)
 )
 (defrule
@@ -382,6 +383,7 @@
     =>
     (set-goal gl-attacking-unit-type spearman-line)
     (set-goal gl-attack-move-detection-range 3)
+    (set-goal gl-attack-ignore-count-limit 0)
     (up-jump-rule -19)
 )
 (defrule
