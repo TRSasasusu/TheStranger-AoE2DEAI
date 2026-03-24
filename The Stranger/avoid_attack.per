@@ -75,9 +75,16 @@
         (defrule
             (goal gl-avoid-attack-player-id-for-end 0)
             (goal gl-threat-target-class-id-for-end 0)
-            (goal gl-threat-target-class-id knight-line)
+            (goal gl-threat-target-class-id villager-class)
             =>
             (set-goal gl-threat-target-class-id-for-end 1); endfor flag
+        )
+        (defrule
+            (goal gl-avoid-attack-player-id-for-end 0)
+            (goal gl-threat-target-class-id-for-end 0)
+            (goal gl-threat-target-class-id knight-line)
+            =>
+            (set-goal gl-threat-target-class-id villager-class)
         )
         (defrule
             (goal gl-avoid-attack-player-id-for-end 0)
@@ -297,7 +304,22 @@
                 (up-get-search-state gl-tmp-local-total)
                 ;(up-chat-data-to-all "skirm num: %d" g: gl-tmp-remote-total)
             )
-            ;; military
+            ;; military (target: villager)
+            (defrule
+                (goal gl-avoid-attack-player-id-for-end 0)
+                (goal gl-threat-target-class-id-for-end 0)
+                (goal gl-threat-source-class-id-for-end 0)
+
+                (goal gl-threat-source-class-id all-units-class)
+                (goal gl-threat-target-class-id villager-class)
+                =>
+                (up-full-reset-search)
+                (up-find-remote c: archery-class c: 50)
+                (up-find-remote c: cavalry-archer-class c: 50)
+                (up-get-search-state gl-tmp-local-total)
+                (up-chat-data-to-all "archer or cavalry archer num: %d" g: gl-tmp-remote-total)
+            )
+            ;; military (target: cavalry archer)
             (defrule
                 (goal gl-avoid-attack-player-id-for-end 0)
                 (goal gl-threat-target-class-id-for-end 0)
@@ -310,7 +332,7 @@
                 (up-filter-include cmdid-military -1 -1 -1)
                 (up-find-remote c: all-units-class c: 50)
                 (up-get-search-state gl-tmp-local-total)
-                ;(chat-to-all "all military!")
+                (chat-to-all "all military!")
             )
             ;; spearman
             (defrule
@@ -453,13 +475,14 @@
                 (set-goal gl-tmp-local-total 0)
                 ;(chat-to-all "ignore this skirm")
             )
-            ;; military
+            ;; military (target: cavalry archer)
             (defrule
                 (goal gl-avoid-attack-player-id-for-end 0)
                 (goal gl-threat-target-class-id-for-end 0)
                 (goal gl-threat-source-class-id-for-end 0)
 
                 (goal gl-threat-source-class-id all-units-class)
+                (goal gl-threat-target-class-id cavalry-archer-class)
 
                 (up-compare-goal gl-threat-source-pos-x >= 0)
                 =>
@@ -483,6 +506,7 @@
                 (goal gl-threat-source-class-id-for-end 0)
 
                 (goal gl-threat-source-class-id all-units-class)
+                (goal gl-threat-target-class-id cavalry-archer-class)
 
                 (up-compare-goal gl-threat-source-pos-x >= 0)
                 (up-compare-goal gl-tmp2 >= 2)
@@ -546,6 +570,24 @@
                 =>
                 (set-goal gl-tmp-local-total 0)
             )
+            ;; military (target: villager)
+            (defrule
+                (goal gl-avoid-attack-player-id-for-end 0)
+                (goal gl-threat-target-class-id-for-end 0)
+                (goal gl-threat-source-class-id-for-end 0)
+
+                (goal gl-threat-source-class-id all-units-class)
+                (goal gl-threat-target-class-id villager-class)
+
+                (up-compare-goal gl-threat-source-pos-x >= 0)
+                =>
+                (up-full-reset-search)
+                (up-filter-distance c: -1 c: 6)
+                (up-find-local g: gl-threat-target-class-id c: 5)
+                (up-get-search-state gl-tmp-local-total)
+                (up-chat-data-to-all "vil num around: %d" g: gl-tmp-local-total)
+            )
+
 
             ; set target as target object and position
             (defrule
@@ -566,6 +608,89 @@
                 (up-get-point position-object gl-threat-target-pos-x)
                 (up-set-target-point gl-threat-target-pos-x)
                 ;(chat-to-all "set target pos")
+            )
+
+            ;*** avoid for vils ***
+            (defrule
+                (goal gl-avoid-attack-player-id-for-end 0)
+                (goal gl-threat-target-class-id-for-end 0)
+                (goal gl-threat-source-class-id-for-end 0)
+
+                (up-compare-goal gl-threat-source-pos-x >= 0)
+                (up-compare-goal gl-threat-target-pos-x >= 0)
+
+                (goal gl-threat-target-class-id villager-class)
+                =>
+                (up-full-reset-search)
+                (up-filter-distance c: -1 c: 20)
+                (up-find-local c: town-center c: 10)
+                (up-find-local c: watch-tower c: 10)
+                (up-find-local c: castle c: 10)
+            )
+            (defrule
+                (goal gl-avoid-attack-player-id-for-end 0)
+                (goal gl-threat-target-class-id-for-end 0)
+                (goal gl-threat-source-class-id-for-end 0)
+
+                (up-compare-goal gl-threat-source-pos-x >= 0)
+                (up-compare-goal gl-threat-target-pos-x >= 0)
+
+                (goal gl-threat-target-class-id villager-class)
+                (civ-selected khmer)
+                =>
+                ;(up-find-local c: house c: 10)
+                (do-nothing)
+            )
+            (defrule
+                (goal gl-avoid-attack-player-id-for-end 0)
+                (goal gl-threat-target-class-id-for-end 0)
+                (goal gl-threat-source-class-id-for-end 0)
+
+                (up-compare-goal gl-threat-source-pos-x >= 0)
+                (up-compare-goal gl-threat-target-pos-x >= 0)
+
+                (goal gl-threat-target-class-id villager-class)
+                =>
+                (up-get-search-state gl-tmp-local-total)
+                (up-chat-data-to-all "building num around: %d" g: gl-tmp-local-total)
+            )
+            (defrule
+                (goal gl-avoid-attack-player-id-for-end 0)
+                (goal gl-threat-target-class-id-for-end 0)
+                (goal gl-threat-source-class-id-for-end 0)
+
+                (up-compare-goal gl-threat-source-pos-x >= 0)
+                (up-compare-goal gl-threat-target-pos-x >= 0)
+
+                (goal gl-threat-target-class-id villager-class)
+                (up-compare-goal gl-tmp-local-total > 0)
+                =>
+                (up-clean-search search-local object-data-distance search-order-asc)
+                (up-set-target-object search-local c: 0)
+
+                (up-full-reset-search)
+                (up-set-target-point gl-threat-source-pos-x)
+                (up-filter-distance c: -1 c: 6) ; caution in its distance
+                (up-find-local g: gl-threat-target-class-id c: 5)
+                (up-get-search-state gl-tmp-local-total)
+                (up-chat-data-to-all "vil num around for garrison: %d" g: gl-tmp-local-total)
+
+                (up-target-objects 1 action-garrison -1 -1)
+                (up-jump-direct g: gl-threat-source-class-id-for-id) ; continue
+                (chat-to-all "garrison to building!")
+            )
+            (defrule
+                (goal gl-avoid-attack-player-id-for-end 0)
+                (goal gl-threat-target-class-id-for-end 0)
+                (goal gl-threat-source-class-id-for-end 0)
+
+                (up-compare-goal gl-threat-source-pos-x >= 0)
+                (up-compare-goal gl-threat-target-pos-x >= 0)
+
+                (goal gl-threat-source-class-id villager-class)
+                (up-compare-goal gl-tmp-local-total == 0)
+                =>
+                (up-jump-direct g: gl-threat-source-class-id-for-id) ; continue
             )
 
             ;*** avoid ***
