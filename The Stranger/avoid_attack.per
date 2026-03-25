@@ -15,6 +15,7 @@
 (defconst gl-threat-source-class-id-for-id 195)
 (defconst gl-threat-source-class-id-for-end 196)
 (defconst gl-threat-hope-distance 197)
+(defconst gl-avoid-vil-detecting-distance 198)
 
 ; initialize
 (defrule
@@ -317,7 +318,27 @@
                 (up-find-remote c: archery-class c: 50)
                 (up-find-remote c: cavalry-archer-class c: 50)
                 (up-get-search-state gl-tmp-local-total)
+                (set-goal gl-avoid-vil-detecting-distance 10)
                 (up-chat-data-to-all "archer or cavalry archer num: %d" g: gl-tmp-remote-total)
+            )
+            (defrule
+                (goal gl-avoid-attack-player-id-for-end 0)
+                (goal gl-threat-target-class-id-for-end 0)
+                (goal gl-threat-source-class-id-for-end 0)
+
+                (goal gl-threat-source-class-id all-units-class)
+                (goal gl-threat-target-class-id villager-class)
+                (goal gl-tmp-remote-total 0)
+                =>
+                (up-full-reset-search)
+                (up-filter-include cmdid-military -1 -1 -1)
+                (up-filter-exclude -1 -1 -1 archery-class)
+                (up-filter-exclude -1 -1 -1 cavalry-archer-class)
+                (up-filter-exclude -1 -1 -1 scout-cavalry-class)
+                (up-find-remote c: all-units-class c: 50)
+                (up-get-search-state gl-tmp-local-total)
+                (set-goal gl-avoid-vil-detecting-distance 6)
+                (up-chat-data-to-all "NOT archer and NOT cavalry archer num: %d" g: gl-tmp-remote-total)
             )
             ;; military (target: cavalry archer)
             (defrule
@@ -582,8 +603,8 @@
                 (up-compare-goal gl-threat-source-pos-x >= 0)
                 =>
                 (up-full-reset-search)
-                (up-filter-distance c: -1 c: 6)
-                (up-find-local g: gl-threat-target-class-id c: 5)
+                (up-filter-distance c: -1 g: gl-avoid-vil-detecting-distance)
+                (up-find-local g: gl-threat-target-class-id c: 20)
                 (up-get-search-state gl-tmp-local-total)
                 (up-chat-data-to-all "vil num around: %d" g: gl-tmp-local-total)
             )
@@ -670,7 +691,7 @@
 
                 (up-full-reset-search)
                 (up-set-target-point gl-threat-source-pos-x)
-                (up-filter-distance c: -1 c: 6) ; caution in its distance
+                (up-filter-distance c: -1 g: gl-avoid-vil-detecting-distance)
                 (up-find-local g: gl-threat-target-class-id c: 5)
                 (up-get-search-state gl-tmp-local-total)
                 (up-chat-data-to-all "vil num around for garrison: %d" g: gl-tmp-local-total)
