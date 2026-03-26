@@ -319,7 +319,7 @@
                 (up-find-remote c: cavalry-archer-class c: 50)
                 (up-get-search-state gl-tmp-local-total)
                 (set-goal gl-avoid-vil-detecting-distance 10)
-                (up-chat-data-to-all "archer or cavalry archer num: %d" g: gl-tmp-remote-total)
+                ;(up-chat-data-to-all "archer or cavalry archer num: %d" g: gl-tmp-remote-total)
             )
             (defrule
                 (goal gl-avoid-attack-player-id-for-end 0)
@@ -338,7 +338,7 @@
                 (up-find-remote c: all-units-class c: 50)
                 (up-get-search-state gl-tmp-local-total)
                 (set-goal gl-avoid-vil-detecting-distance 6)
-                (up-chat-data-to-all "NOT archer and NOT cavalry archer num: %d" g: gl-tmp-remote-total)
+                ;(up-chat-data-to-all "NOT archer and NOT cavalry archer num: %d" g: gl-tmp-remote-total)
             )
             ;; military (target: cavalry archer)
             (defrule
@@ -353,7 +353,7 @@
                 (up-filter-include cmdid-military -1 -1 -1)
                 (up-find-remote c: all-units-class c: 50)
                 (up-get-search-state gl-tmp-local-total)
-                (chat-to-all "all military!")
+                ;(chat-to-all "all military!")
             )
             ;; spearman
             (defrule
@@ -519,7 +519,7 @@
                 (up-get-search-state gl-tmp-local-total)
                 (up-modify-goal gl-tmp2 g:= gl-tmp-local-total); gl-tmp2 is now #cavalry-archer-class
                 (up-modify-goal gl-tmp2 g:z/ gl-tmp); gl-tmp-local-total is now #cavalry-archer-class/#military
-                (up-chat-data-to-all "#cavalry-archer-class/#military: %d" g: gl-tmp2)
+                ;(up-chat-data-to-all "#cavalry-archer-class/#military: %d" g: gl-tmp2)
             )
             (defrule ; to include only #cavalry-archer-class/#military < 2
                 (goal gl-avoid-attack-player-id-for-end 0)
@@ -606,7 +606,7 @@
                 (up-filter-distance c: -1 g: gl-avoid-vil-detecting-distance)
                 (up-find-local g: gl-threat-target-class-id c: 20)
                 (up-get-search-state gl-tmp-local-total)
-                (up-chat-data-to-all "vil num around: %d" g: gl-tmp-local-total)
+                ;(up-chat-data-to-all "vil num around: %d" g: gl-tmp-local-total)
             )
 
 
@@ -673,7 +673,7 @@
                 (goal gl-threat-target-class-id villager-class)
                 =>
                 (up-get-search-state gl-tmp-local-total)
-                (up-chat-data-to-all "building num around: %d" g: gl-tmp-local-total)
+                ;(up-chat-data-to-all "building num around: %d" g: gl-tmp-local-total)
             )
             (defrule
                 (goal gl-avoid-attack-player-id-for-end 0)
@@ -694,11 +694,11 @@
                 (up-filter-distance c: -1 g: gl-avoid-vil-detecting-distance)
                 (up-find-local g: gl-threat-target-class-id c: 5)
                 (up-get-search-state gl-tmp-local-total)
-                (up-chat-data-to-all "vil num around for garrison: %d" g: gl-tmp-local-total)
+                ;(up-chat-data-to-all "vil num around for garrison: %d" g: gl-tmp-local-total)
 
                 (up-target-objects 1 action-garrison -1 -1)
                 (up-jump-direct g: gl-threat-source-class-id-for-id) ; continue
-                (chat-to-all "garrison to building!")
+                ;(chat-to-all "garrison to building!")
             )
             (defrule
                 (goal gl-avoid-attack-player-id-for-end 0)

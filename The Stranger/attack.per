@@ -10,6 +10,39 @@
 (defconst gl-attack-only-attack-move 139)
 (defconst gl-attack-ignore-count-limit 140)
 (defconst gl-attack-move-detection-range 141)
+(defconst gl-attack-focus-player-bak 142)
+(defconst gl-attack-random-id 143)
+
+(defrule
+    (goal gl-attack-random 1)
+    =>
+    (up-modify-goal gl-attack-focus-player-bak s:= sn-focus-player-number)
+    (set-goal gl-tmp2 10)
+)
+(defrule
+    (goal gl-attack-random 1)
+    (up-compare-goal gl-tmp2 > 0)
+    =>
+    (up-get-rule-id gl-attack-random-id)
+    (up-modify-goal gl-tmp2 c:- 1)
+    (generate-random-number 8)
+    (up-get-fact random-number 0 gl-tmp)
+    (up-modify-sn sn-focus-player-number g:= gl-tmp)
+    ;(up-chat-data-to-all "focus player: %d" s: sn-focus-player-number)
+)
+(defrule
+    (goal gl-attack-random 1)
+    (not(and
+        (player-valid focus-player)
+        (players-stance focus-player enemy)
+    ))
+    (up-compare-goal gl-tmp2 > 0)
+    =>
+    ;(chat-to-all "is invalid, pick another one")
+    (up-jump-direct g: gl-attack-random-id)
+)
+
+
 (defrule
     (true)
     =>
@@ -463,4 +496,12 @@
     (set-goal gl-attack-ignore-count-limit 0)
     (set-goal gl-attack-move-detection-range 3)
     (up-jump-rule -28)
+)
+
+
+
+(defrule
+    (goal gl-attack-random 1)
+    =>
+    (up-modify-sn sn-focus-player-number g:= gl-attack-focus-player-bak)
 )

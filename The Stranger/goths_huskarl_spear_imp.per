@@ -176,10 +176,27 @@
     (enable-timer t-tactics-timer 200)
     (disable-self)
 )
+;(defrule
+;    (current-age == imperial-age)
+;    (up-timer-status t-tactics-timer != timer-running)
+;    =>
+;    (enable-timer t-tactics-timer 200)
+;    (up-modify-sn sn-focus-player-number c: any-enemy)
+;)
 (defrule
     (current-age == imperial-age)
     (up-timer-status t-tactics-timer != timer-running)
+    (goal gl-attack-random 1)
     =>
-    (enable-timer t-tactics-timer 200)
-    (up-modify-sn sn-focus-player-number c: any-enemy)
+    (enable-timer t-tactics-timer 180)
+    (set-goal gl-attack-random 0)
+)
+(defrule
+    (current-age == imperial-age)
+    (up-timer-status t-tactics-timer != timer-running)
+    (goal gl-attack-random 0)
+    =>
+    (enable-timer t-tactics-timer 300)
+    ;(up-modify-sn sn-focus-player-number c: any-enemy)
+    (set-goal gl-attack-random 1)
 )
