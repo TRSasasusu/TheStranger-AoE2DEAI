@@ -1,17 +1,32 @@
 (defconst t-attack-timer 13)
-(defconst gl-attack-target-rnd 131)
-(defconst gl-attack-target-local-total 132)
-(defconst gl-attack-target-local-last 133)
-(defconst gl-attack-target-remote-total 134)
-(defconst gl-attack-target-remote-last 135)
-(defconst gl-attack-target-x 136)
-(defconst gl-attack-target-y 137)
-(defconst gl-attacking-unit-type 138)
-(defconst gl-attack-only-attack-move 139)
-(defconst gl-attack-ignore-count-limit 140)
-(defconst gl-attack-move-detection-range 141)
-(defconst gl-attack-focus-player-bak 142)
-(defconst gl-attack-random-id 143)
+(defconst gl-attack-target-rnd 331)
+(defconst gl-attack-target-local-total 332)
+(defconst gl-attack-target-local-last 333)
+(defconst gl-attack-target-remote-total 334)
+(defconst gl-attack-target-remote-last 335)
+(defconst gl-attack-target-x 336)
+(defconst gl-attack-target-y 337)
+(defconst gl-attacking-unit-type 338)
+(defconst gl-attack-only-attack-move 339)
+(defconst gl-attack-ignore-count-limit 340)
+(defconst gl-attack-move-detection-range 341)
+(defconst gl-attack-focus-player-bak 342)
+(defconst gl-attack-random-id 343)
+(defconst gl-enemy-tc-x 354)
+(defconst gl-enemy-tc-y 355)
+(defconst gl-position-self-x 362)
+(defconst gl-position-self-y 363)
+(defconst gl-deep-point-x 364)
+(defconst gl-deep-point-y 365)
+(defconst gl-self-to-enemy-dist 366)
+(defconst gl-attack-unit-local-total 367)
+(defconst gl-attack-unit-local-last 368)
+(defconst gl-attack-unit-remote-total 369)
+(defconst gl-attack-unit-remote-last 370)
+(defconst gl-attacking-vil-local-total 371)
+(defconst gl-attacking-vil-local-last 372)
+(defconst gl-attacking-vil-remote-total 373)
+(defconst gl-attacking-vil-remote-last 374)
 
 (defrule
     (goal gl-attack-random 1)
@@ -70,6 +85,58 @@
 ;    (up-get-fact random-number 0 gl-attack-go-deep)
 ;    ;(up-chat-data-to-all "start attacking!")
 ;)
+
+; detect near villagers
+(defrule
+    (true)
+    =>
+    (set-goal gl-tmp-local-total 0)
+    (set-goal gl-tmp-remote-total 0)
+
+    (up-full-reset-search)
+    (up-find-remote c: villager-class c: 50)
+    (up-get-search-state gl-tmp-local-total)
+)
+(defrule
+    (up-compare-goal gl-tmp-remote-total > 0)
+    =>
+    (generate-random-number 100)
+    (up-get-fact random-number 0 gl-tmp)
+    (up-modify-goal gl-tmp c:/ gl-tmp-remote-total)
+    (up-modify-goal gl-tmp c:* 100)
+    (up-set-target-object search-remote g: gl-tmp)
+    (up-get-point position-object gl-tmp-x)
+    (up-set-target-point gl-tmp-x)
+
+    (up-filter-distance c: -1 c: 3)
+    (up-filter-include cmdid-military -1 -1 -1)
+    (up-find-local c: all-units-class c: 20)
+    (up-get-search-state gl-tmp-local-total)
+)
+(defrule
+    (up-compare-goal gl-tmp-local-total > 0)
+    =>
+    (generate-random-number 100)
+    (up-get-fact random-number 0 gl-tmp2)
+    (up-modify-goal gl-tmp2 c:/ gl-tmp-local-total)
+    (up-modify-goal gl-tmp2 c:* 100)
+    (up-set-target-object search-local g: gl-tmp2)
+    (up-get-point position-object gl-tmp2-x) ; gl-tmp-x preserves the position of the detected remote villager
+    (up-set-target-point gl-tmp2-x)
+)
+(defrule
+    (up-compare-goal gl-tmp-local-total > 0)
+    =>
+    (up-reset-search 1 1 0 0)
+    (up-reset-filters)
+    (up-filter-distance c: -1 c: 3)
+    (up-filter-include cmdid-military -1 -1 -1)
+    (up-find-local c: all-units-class c: 50)
+
+    (up-target-point gl-tmp-x action-attack-move -1 -1)
+    (chat-to-all "attack move to nearby villager!")
+)
+
 (defrule
     ;(or
         ;(unit-type-count archer-line >= 2)
@@ -209,13 +276,6 @@
     ;(up-send-flare gl-attack-target-x)
 )
 
-(defconst gl-enemy-tc-x 154)
-(defconst gl-enemy-tc-y 155)
-(defconst gl-position-self-x 162)
-(defconst gl-position-self-y 163)
-(defconst gl-deep-point-x 164)
-(defconst gl-deep-point-y 165)
-(defconst gl-self-to-enemy-dist 166)
 (defrule
     (up-compare-goal gl-attack-target-rnd >= 13)
     (up-compare-goal gl-attack-target-rnd < 22)
@@ -264,14 +324,6 @@
     ;(up-send-flare gl-deep-point-x)
 )
 
-(defconst gl-attack-unit-local-total 167)
-(defconst gl-attack-unit-local-last 168)
-(defconst gl-attack-unit-remote-total 169)
-(defconst gl-attack-unit-remote-last 170)
-(defconst gl-attacking-vil-local-total 171)
-(defconst gl-attacking-vil-local-last 172)
-(defconst gl-attacking-vil-remote-total 173)
-(defconst gl-attacking-vil-remote-last 174)
 ;(defrule
 ;    (up-compare-goal gl-attack-target-rnd > 0)
 ;    (up-compare-goal gl-attack-target-rnd < 22)
