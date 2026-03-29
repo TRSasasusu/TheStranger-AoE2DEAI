@@ -74,7 +74,10 @@
     (can-build castle)
     =>
     (up-assign-builders c: castle c: 15)
-    (build castle)
+    ;(build castle)
+    (up-set-placement-data my-player-number town-center c: 1)
+    (up-build place-control 0 c: castle)
+
     (set-strategic-number sn-food-gatherer-percentage 58)
     (set-strategic-number sn-wood-gatherer-percentage 25)
     (set-strategic-number sn-gold-gatherer-percentage 15)
@@ -120,8 +123,19 @@
 )
 
 (defrule
+    (true)
+    =>
+    (up-get-fact unit-type-count-total huskarl-set gl-tmp)
+    (up-get-fact unit-type-count-total spearman-line gl-tmp2)
+    (up-modify-goal gl-tmp g:- gl-tmp2)
+)
+(defrule
     (current-age == castle-age)
     (can-train spearman-line)
+    (or
+        (unit-type-count-total spearman-line < 10)
+        (up-compare-goal gl-tmp > 0)
+    )
     =>
     (train spearman-line)
 )

@@ -143,15 +143,36 @@
     (train huskarl-line)
 )
 
+
+(defrule
+    (true)
+    =>
+    (up-get-fact unit-type-count-total huskarl-set gl-tmp)
+    (up-get-fact unit-type-count-total spearman-line gl-tmp2)
+    (up-modify-goal gl-tmp g:- gl-tmp2)
+)
 (defrule
     (or
         (goal gl-researching-imp 1)
         (current-age >= imperial-age)
     )
     (can-train spearman-line)
+    (or
+        (unit-type-count-total spearman-line < 10)
+        (up-compare-goal gl-tmp > 0)
+    )
     =>
     (train spearman-line)
 )
+;(defrule
+;    (or
+;        (goal gl-researching-imp 1)
+;        (current-age >= imperial-age)
+;    )
+;    (can-train spearman-line)
+;    =>
+;    (train spearman-line)
+;)
 
 (defrule
     (or
