@@ -39,6 +39,9 @@
 (defconst gl-trade-stop 221)
 (defconst gl-vil-stop-making 260)
 (defconst t-tactics-timer 30)
+(defconst build-castle-defensive-first 230)
+(defconst build-castle-defensive-first-complete 231)
+
 #load-if-defined MONGOL-CIV
 (defconst cav-line steppe-lancer-line) ; steppe-lancer-line
 #else
@@ -125,11 +128,10 @@
         (current-age == feudal-age)
     )
     =>
-    (enable-timer t-scout-timer 120)
-    (up-send-scout group-type-land-explore scout-enemy)
+    (enable-timer t-scout-timer 80)
+    (up-send-scout group-type-land-explore scout-flank)
     (disable-self)
 )
-
 (defrule
     (or
         (goal gl-researching-feudal 1)
@@ -137,11 +139,10 @@
     )
     (up-timer-status t-scout-timer != timer-running)
     =>
-    (enable-timer t-scout-timer 120)
+    (enable-timer t-scout-timer 40)
     (up-send-scout group-type-land-explore scout-opposite)
     (disable-self)
 )
-
 (defrule
     (or
         (goal gl-researching-feudal 1)
@@ -149,7 +150,51 @@
     )
     (up-timer-status t-scout-timer != timer-running)
     =>
-    (enable-timer t-scout-timer 120)
+    (enable-timer t-scout-timer 40)
+    (up-send-scout group-type-land-explore scout-enemy)
+    (disable-self)
+)
+(defrule
+    (or
+        (goal gl-researching-feudal 1)
+        (current-age == feudal-age)
+    )
+    (up-timer-status t-scout-timer != timer-running)
+    =>
+    (enable-timer t-scout-timer 80)
+    (up-send-scout group-type-land-explore scout-flank)
+    (disable-self)
+)
+(defrule
+    (or
+        (goal gl-researching-feudal 1)
+        (current-age == feudal-age)
+    )
+    (up-timer-status t-scout-timer != timer-running)
+    =>
+    (enable-timer t-scout-timer 60)
+    (up-send-scout group-type-land-explore scout-opposite)
+    (disable-self)
+)
+(defrule
+    (or
+        (goal gl-researching-feudal 1)
+        (current-age == feudal-age)
+    )
+    (up-timer-status t-scout-timer != timer-running)
+    =>
+    (enable-timer t-scout-timer 60)
+    (up-send-scout group-type-land-explore scout-enemy)
+    (disable-self)
+)
+(defrule
+    (or
+        (goal gl-researching-feudal 1)
+        (current-age == feudal-age)
+    )
+    (up-timer-status t-scout-timer != timer-running)
+    =>
+    (enable-timer t-scout-timer 60)
     (up-send-scout group-type-land-explore scout-flank)
     (disable-self)
 )
@@ -245,6 +290,8 @@
 (load "The Stranger/darkage_common")
 
 (load "The Stranger/add_camps")
+
+(load "The Stranger/build_castle")
 
 (load "The Stranger/attack")
 

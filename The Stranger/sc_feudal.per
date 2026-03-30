@@ -143,7 +143,7 @@
 (defrule
     (current-age == feudal-age)
     (can-train scout-cavalry-line)
-    (unit-type-count scout-cavalry-line < 10)
+    (unit-type-count scout-cavalry-line < 5)
     (not(and
         (players-current-age focus-player >= castle-age)
         (and

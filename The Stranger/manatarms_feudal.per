@@ -69,8 +69,8 @@
     (building-type-count-total barracks >= 1)
     (building-type-count-total mining-camp >= 1)
     =>
-    (set-strategic-number sn-food-gatherer-percentage 55)
-    (set-strategic-number sn-wood-gatherer-percentage 35)
+    (set-strategic-number sn-food-gatherer-percentage 50)
+    (set-strategic-number sn-wood-gatherer-percentage 40)
     (set-strategic-number sn-gold-gatherer-percentage 10)
     (set-strategic-number sn-stone-gatherer-percentage 0)
     (disable-self)
@@ -129,19 +129,19 @@
     (research ri-scale-mail)
 )
 
-(defrule
-    (unit-type-count militiaman-line > 6)
-    (can-research ri-forging)
-    =>
-    (research ri-forging)
-)
+;(defrule
+;    (unit-type-count militiaman-line > 6)
+;    (can-research ri-forging)
+;    =>
+;    (research ri-forging)
+;)
 
-(defrule
-    (unit-type-count militiaman-line > 8)
-    (can-research ri-arson)
-    =>
-    (research ri-arson)
-)
+;(defrule
+;    (unit-type-count militiaman-line > 8)
+;    (can-research ri-arson)
+;    =>
+;    (research ri-arson)
+;)
 
 (defrule
     (unit-type-count militiaman-line >= 2)
@@ -156,7 +156,7 @@
         (goal gl-researching-feudal 1)
         (current-age == feudal-age)
     )
-    (military-population < 10)
+    (military-population < 6)
     (can-train militiaman-line)
     =>
     (train militiaman-line)

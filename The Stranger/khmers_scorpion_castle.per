@@ -95,15 +95,22 @@
 )
 
 (defrule
+    (current-age == castle-age)
     (can-train scorpion-line)
+    (or
+        (unit-type-count-total scorpion-line < 10)
+        (unit-type-count-total mangonel-line >= 2)
+    )
+    (unit-type-count-total scorpion-line < 25)
     =>
     (train scorpion-line)
 )
 
 (defrule
     (current-age == castle-age)
-    (unit-type-count scorpion-line > 10)
+    (unit-type-count-total scorpion-line > 8)
     (can-train mangonel-line)
+    (unit-type-count-total mangonel-line < 4)
     =>
     (train mangonel-line)
     (set-goal gl-trade-stop 1)

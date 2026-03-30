@@ -65,6 +65,13 @@
 
 (defrule
     (unit-type-count cav-line > 10)
+    (can-research ri-forging)
+    =>
+    (research ri-forging)
+)
+
+(defrule
+    (unit-type-count cav-line > 10)
     (can-research ri-iron-casting)
     =>
     (research ri-iron-casting)

@@ -1,0 +1,89 @@
+
+(defrule
+    (true)
+    =>
+    (set-goal build-castle-defensive-first 0)
+    (set-goal build-castle-defensive-first-complete 0)
+    (disable-self)
+)
+(defrule
+    (goal build-castle-defensive-first 1)
+    (goal build-castle-defensive-first-complete 1)
+    (building-type-count-total castle > 0)
+    =>
+    (set-strategic-number sn-placement-zone-size 20) ; reset the placement zone size after building the castle
+    (disable-self)
+)
+
+(defrule
+    (goal build-castle-defensive-first 1)
+    (goal build-castle-defensive-first-complete 0)
+    (can-build castle)
+    =>
+    (up-full-reset-search)
+    (up-find-local c: town-center c: 10)
+    (up-get-search-state gl-tmp-local-total)
+    (chat-to-all "start finding castle location")
+)
+(defrule
+    (goal build-castle-defensive-first 1)
+    (goal build-castle-defensive-first-complete 0)
+    (can-build castle)
+
+    (up-compare-goal gl-tmp-local-total > 0)
+    =>
+    (up-set-target-object search-local c: 0)
+    (up-get-point position-object gl-tmp-x) ; get the position of the town center
+
+    (up-full-reset-search)
+    (up-find-local c: mining-camp c: 2)
+    (up-get-search-state gl-tmp-local-total)
+)
+(defrule
+    (goal build-castle-defensive-first 1)
+    (goal build-castle-defensive-first-complete 0)
+    (can-build castle)
+
+    (up-compare-goal gl-tmp-local-total > 0)
+    =>
+    (up-set-target-object search-local c: 0)
+    (up-get-point position-object gl-tmp2-x) ; get the position of the mining camp
+    ;(up-send-flare gl-tmp-x)
+    ;(up-send-flare gl-tmp2-x)
+
+    (up-add-point gl-tmp-x gl-tmp2-x c: 1)
+    (up-modify-goal gl-tmp-x c:/ 2)
+    (up-modify-goal gl-tmp-y c:/ 2) ; get the middle point between the town center and the mining camp
+
+    (up-set-target-point gl-tmp-x)
+    (up-send-flare gl-tmp-x)
+    (chat-to-all "castle location found")
+)
+(defrule
+    (goal build-castle-defensive-first 1)
+    (goal build-castle-defensive-first-complete 0)
+    (can-build castle)
+
+    (up-compare-goal gl-tmp-local-total > 0)
+    =>
+    (up-full-reset-search)
+    (up-filter-distance c: -1 c: 7)
+    (up-find-local c: house c: 20)
+    (up-find-local c: farm-class c: 20)
+    ;(up-find-local c: mining-camp c: 20)
+    (up-target-objects 1 action-delete -1 -1)
+    (chat-to-all "cleared area for castle")
+)
+(defrule
+    (goal build-castle-defensive-first 1)
+    (goal build-castle-defensive-first-complete 0)
+    (can-build castle)
+
+    (up-compare-goal gl-tmp-local-total > 0)
+    =>
+    (set-strategic-number sn-placement-zone-size 0)
+    (up-build place-point 0 c: castle)
+    ;(up-build-line gl-tmp-x gl-tmp2-x c: castle)
+    (set-goal build-castle-defensive-first-complete 1)
+    ;(set-strategic-number sn-placement-zone-size 20)
+)

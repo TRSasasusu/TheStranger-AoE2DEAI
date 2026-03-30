@@ -21,6 +21,7 @@
     (food-amount >= 600)
     (building-type-count-total market == 0)
     =>
+    (up-assign-builders c: market c: 2)
     (build market)
 )
 
@@ -75,8 +76,9 @@
     =>
     (up-assign-builders c: castle c: 15)
     ;(build castle)
-    (up-set-placement-data my-player-number town-center c: 1)
-    (up-build place-control 0 c: castle)
+    ;(up-set-placement-data my-player-number town-center c: 1)
+    ;(up-build place-control 0 c: castle)
+    (set-goal build-castle-defensive-first 1)
 
     (set-strategic-number sn-food-gatherer-percentage 58)
     (set-strategic-number sn-wood-gatherer-percentage 25)

@@ -35,7 +35,18 @@
 )
 
 (defrule
+    (or
+        (goal gl-researching-imp 1)
+        (current-age >= imperial-age)
+    )
     (can-train scorpion-line)
+    (or
+        (unit-type-count-total scorpion-line < 20)
+        (and
+            (research-completed ri-heavy-scorpion)
+            (research-completed ri-siege-engineers)
+        )
+    )
     =>
     (train scorpion-line)
 )
