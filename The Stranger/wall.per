@@ -1,0 +1,343 @@
+(defconst gl-wall-north-has-tree 400)
+(defconst gl-wall-north-east-has-tree 401)
+(defconst gl-wall-east-has-tree 402)
+(defconst gl-wall-south-east-has-tree 403)
+(defconst gl-wall-south-has-tree 404)
+(defconst gl-wall-south-west-has-tree 405)
+(defconst gl-wall-west-has-tree 406)
+(defconst gl-wall-north-west-has-tree 407)
+(defconst gl-wall-north-pos-x 408)
+(defconst gl-wall-north-pos-y 409)
+(defconst gl-wall-north-east-pos-x 410)
+(defconst gl-wall-north-east-pos-y 411)
+(defconst gl-wall-east-pos-x 412)
+(defconst gl-wall-east-pos-y 413)
+(defconst gl-wall-south-east-pos-x 414)
+(defconst gl-wall-south-east-pos-y 415)
+(defconst gl-wall-south-pos-x 416)
+(defconst gl-wall-south-pos-y 417)
+(defconst gl-wall-south-west-pos-x 418)
+(defconst gl-wall-south-west-pos-y 419)
+(defconst gl-wall-west-pos-x 420)
+(defconst gl-wall-west-pos-y 421)
+(defconst gl-wall-north-west-pos-x 422)
+(defconst gl-wall-north-west-pos-y 423)
+(defconst gl-wall-tc-pos-x 424)
+(defconst gl-wall-tc-pos-y 425)
+(defconst gl-wall-distance-from-tc 427)
+(defconst gl-wall-distance-to-tree 428)
+
+(defrule
+    (true)
+    =>
+    (set-goal gl-wall-start 0) ; test now
+    (set-goal gl-wall-tc-pos-x -1)
+    (set-goal gl-wall-distance-from-tc 15)
+    (set-goal gl-wall-distance-to-tree 10)
+    (disable-self)
+)
+
+(defrule
+    (game-time > 5)
+    =>
+    (set-goal gl-wall-start 1)
+    (disable-self)
+)
+
+(defrule
+    (goal gl-wall-start 1)
+    =>
+    (up-full-reset-search)
+    (up-find-local c: town-center c: 5)
+    (up-get-search-state gl-tmp-local-total)
+)
+(defrule
+    (goal gl-wall-start 1)
+    (up-compare-goal gl-tmp-local-total > 0)
+    =>
+    (up-set-target-object search-local c: 0)
+    (up-get-point position-object gl-wall-tc-pos-x)
+)
+
+(defrule
+    (goal gl-wall-start 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+    =>
+    (up-copy-point gl-wall-north-pos-x gl-wall-tc-pos-x)
+    (up-modify-goal gl-wall-north-pos-x g:+ gl-wall-distance-from-tc)
+    (up-modify-goal gl-wall-north-pos-y g:- gl-wall-distance-from-tc)
+)
+(defrule
+    (goal gl-wall-start 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+    =>
+    (up-copy-point gl-wall-north-east-pos-x gl-wall-tc-pos-x)
+    (up-modify-goal gl-wall-north-east-pos-x g:+ gl-wall-distance-from-tc)
+)
+(defrule
+    (goal gl-wall-start 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+    =>
+    (up-copy-point gl-wall-east-pos-x gl-wall-tc-pos-x)
+    (up-modify-goal gl-wall-east-pos-x g:+ gl-wall-distance-from-tc)
+    (up-modify-goal gl-wall-east-pos-y g:+ gl-wall-distance-from-tc)
+)
+(defrule
+    (goal gl-wall-start 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+    =>
+    (up-copy-point gl-wall-south-east-pos-x gl-wall-tc-pos-x)
+    (up-modify-goal gl-wall-south-east-pos-y g:+ gl-wall-distance-from-tc)
+)
+(defrule
+    (goal gl-wall-start 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+    =>
+    (up-copy-point gl-wall-south-pos-x gl-wall-tc-pos-x)
+    (up-modify-goal gl-wall-south-pos-x g:- gl-wall-distance-from-tc)
+    (up-modify-goal gl-wall-south-pos-y g:+ gl-wall-distance-from-tc)
+)
+(defrule
+    (goal gl-wall-start 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+    =>
+    (up-copy-point gl-wall-south-west-pos-x gl-wall-tc-pos-x)
+    (up-modify-goal gl-wall-south-west-pos-x g:- gl-wall-distance-from-tc)
+)
+(defrule
+    (goal gl-wall-start 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+    =>
+    (up-copy-point gl-wall-west-pos-x gl-wall-tc-pos-x)
+    (up-modify-goal gl-wall-west-pos-x g:- gl-wall-distance-from-tc)
+    (up-modify-goal gl-wall-west-pos-y g:- gl-wall-distance-from-tc)
+)
+(defrule
+    (goal gl-wall-start 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+    =>
+    (up-copy-point gl-wall-north-west-pos-x gl-wall-tc-pos-x)
+    (up-modify-goal gl-wall-north-west-pos-y g:- gl-wall-distance-from-tc)
+)
+
+(defrule
+    (goal gl-wall-start 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+    =>
+    (up-set-target-point gl-wall-north-pos-x)
+    (up-full-reset-search)
+
+    (up-filter-status c: status-ready c: list-active)
+    (up-filter-distance c: -1 g: gl-wall-distance-to-tree)
+    (up-find-resource c: wood c: 50)
+    (up-get-search-state gl-tmp-local-total)
+    (up-chat-data-to-all "number of trees: %d in north" g: gl-tmp-remote-total)
+)
+(defrule
+    (goal gl-wall-start 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+    (up-compare-goal gl-tmp-remote-total > 0)
+    =>
+    (up-clean-search search-remote object-data-distance search-order-asc)
+    (up-set-target-object search-remote c: 0)
+
+    (up-get-point position-object gl-wall-north-pos-x)
+    (set-goal gl-wall-north-has-tree 1)
+    (chat-to-all "north tree found")
+)
+(defrule
+    (goal gl-wall-start 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+    =>
+    (up-set-target-point gl-wall-north-east-pos-x)
+    (up-full-reset-search)
+
+    (up-filter-status c: status-ready c: list-active)
+    (up-filter-distance c: -1 g: gl-wall-distance-to-tree)
+    (up-find-resource c: wood c: 50)
+    (up-get-search-state gl-tmp-local-total)
+)
+(defrule
+    (goal gl-wall-start 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+    (up-compare-goal gl-tmp-remote-total > 0)
+    =>
+    (up-clean-search search-remote object-data-distance search-order-asc)
+    (up-set-target-object search-remote c: 0)
+
+    (up-get-point position-object gl-wall-north-east-pos-x)
+    (set-goal gl-wall-north-east-has-tree 1)
+    (chat-to-all "north-east tree found")
+)
+(defrule
+    (goal gl-wall-start 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+    =>
+    (up-set-target-point gl-wall-east-pos-x)
+    (up-full-reset-search)
+
+    (up-filter-status c: status-ready c: list-active)
+    (up-filter-distance c: -1 g: gl-wall-distance-to-tree)
+    (up-find-resource c: wood c: 50)
+    (up-get-search-state gl-tmp-local-total)
+)
+(defrule
+    (goal gl-wall-start 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+    (up-compare-goal gl-tmp-remote-total > 0)
+    =>
+    (up-clean-search search-remote object-data-distance search-order-asc)
+    (up-set-target-object search-remote c: 0)
+
+    (up-get-point position-object gl-wall-east-pos-x)
+    (set-goal gl-wall-east-has-tree 1)
+    (chat-to-all "east tree found")
+)
+(defrule
+    (goal gl-wall-start 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+    =>
+    (up-set-target-point gl-wall-south-east-pos-x)
+    (up-full-reset-search)
+
+    (up-filter-status c: status-ready c: list-active)
+    (up-filter-distance c: -1 g: gl-wall-distance-to-tree)
+    (up-find-resource c: wood c: 50)
+    (up-get-search-state gl-tmp-local-total)
+)
+(defrule
+    (goal gl-wall-start 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+    (up-compare-goal gl-tmp-remote-total > 0)
+    =>
+    (up-clean-search search-remote object-data-distance search-order-asc)
+    (up-set-target-object search-remote c: 0)
+
+    (up-get-point position-object gl-wall-south-east-pos-x)
+    (set-goal gl-wall-south-east-has-tree 1)
+    (chat-to-all "south-east tree found")
+)
+(defrule
+    (goal gl-wall-start 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+    =>
+    (up-set-target-point gl-wall-south-pos-x)
+    (up-full-reset-search)
+
+    (up-filter-status c: status-ready c: list-active)
+    (up-filter-distance c: -1 g: gl-wall-distance-to-tree)
+    (up-find-resource c: wood c: 50)
+    (up-get-search-state gl-tmp-local-total)
+)
+(defrule
+    (goal gl-wall-start 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+    (up-compare-goal gl-tmp-remote-total > 0)
+    =>
+    (up-clean-search search-remote object-data-distance search-order-asc)
+    (up-set-target-object search-remote c: 0)
+
+    (up-get-point position-object gl-wall-south-pos-x)
+    (set-goal gl-wall-south-has-tree 1)
+    (chat-to-all "south tree found")
+)
+(defrule
+    (goal gl-wall-start 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+    =>
+    (up-set-target-point gl-wall-south-west-pos-x)
+    (up-full-reset-search)
+
+    (up-filter-status c: status-ready c: list-active)
+    (up-filter-distance c: -1 g: gl-wall-distance-to-tree)
+    (up-find-resource c: wood c: 50)
+    (up-get-search-state gl-tmp-local-total)
+)
+(defrule
+    (goal gl-wall-start 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+    (up-compare-goal gl-tmp-remote-total > 0)
+    =>
+    (up-clean-search search-remote object-data-distance search-order-asc)
+    (up-set-target-object search-remote c: 0)
+
+    (up-get-point position-object gl-wall-south-west-pos-x)
+    (set-goal gl-wall-south-west-has-tree 1)
+    (chat-to-all "south-west tree found")
+)
+(defrule
+    (goal gl-wall-start 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+    =>
+    (up-set-target-point gl-wall-west-pos-x)
+    (up-full-reset-search)
+
+    (up-filter-status c: status-ready c: list-active)
+    (up-filter-distance c: -1 g: gl-wall-distance-to-tree)
+    (up-find-resource c: wood c: 50)
+    (up-get-search-state gl-tmp-local-total)
+)
+(defrule
+    (goal gl-wall-start 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+    (up-compare-goal gl-tmp-remote-total > 0)
+    =>
+    (up-clean-search search-remote object-data-distance search-order-asc)
+    (up-set-target-object search-remote c: 0)
+
+    (up-get-point position-object gl-wall-west-pos-x)
+    (set-goal gl-wall-west-has-tree 1)
+    (chat-to-all "west tree found")
+)
+(defrule
+    (goal gl-wall-start 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+    =>
+    (up-set-target-point gl-wall-north-west-pos-x)
+    (up-full-reset-search)
+
+    (up-filter-status c: status-ready c: list-active)
+    (up-filter-distance c: -1 g: gl-wall-distance-to-tree)
+    (up-find-resource c: wood c: 50)
+    (up-get-search-state gl-tmp-local-total)
+)
+(defrule
+    (goal gl-wall-start 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+    (up-compare-goal gl-tmp-remote-total > 0)
+    =>
+    (up-clean-search search-remote object-data-distance search-order-asc)
+    (up-set-target-object search-remote c: 0)
+
+    (up-get-point position-object gl-wall-north-west-pos-x)
+    (set-goal gl-wall-north-west-has-tree 1)
+    (chat-to-all "north-west tree found")
+)
+
+(defrule
+    (goal gl-wall-start 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+
+    (wood-amount > 200)
+    =>
+    (set-strategic-number sn-placement-zone-size 0)
+    (up-build-line gl-wall-north-pos-x gl-wall-north-east-pos-x c: palisade-wall)
+    (up-build-line gl-wall-north-east-pos-x gl-wall-east-pos-x c: palisade-wall)
+    (up-build-line gl-wall-east-pos-x gl-wall-south-east-pos-x c: palisade-wall)
+    (up-build-line gl-wall-south-east-pos-x gl-wall-south-pos-x c: palisade-wall)
+    (up-build-line gl-wall-south-pos-x gl-wall-south-west-pos-x c: palisade-wall)
+    (up-build-line gl-wall-south-west-pos-x gl-wall-west-pos-x c: palisade-wall)
+    (up-build-line gl-wall-west-pos-x gl-wall-north-west-pos-x c: palisade-wall)
+    (up-build-line gl-wall-north-west-pos-x gl-wall-north-pos-x c: palisade-wall)
+    (up-send-flare gl-wall-north-pos-x)
+    (up-send-flare gl-wall-north-east-pos-x)
+    (up-send-flare gl-wall-east-pos-x)
+    (up-send-flare gl-wall-south-east-pos-x)
+    (up-send-flare gl-wall-south-pos-x)
+    (up-send-flare gl-wall-south-west-pos-x)
+    (up-send-flare gl-wall-west-pos-x)
+    (up-send-flare gl-wall-north-west-pos-x)
+    (set-goal gl-wall-start 0)
+    (up-chat-data-to-all "gl-wall-north-pos-x: %d" g: gl-wall-north-pos-x)
+    (disable-self)
+)
