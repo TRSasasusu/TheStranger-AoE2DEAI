@@ -26,14 +26,40 @@
 (defconst gl-wall-tc-pos-y 425)
 (defconst gl-wall-distance-from-tc 427)
 (defconst gl-wall-distance-to-tree 428)
+(defconst gl-wall-north-has-edge 430)
+(defconst gl-wall-north-east-has-edge 431)
+(defconst gl-wall-east-has-edge 432)
+(defconst gl-wall-south-east-has-edge 433)
+(defconst gl-wall-south-has-edge 434)
+(defconst gl-wall-south-west-has-edge 435)
+(defconst gl-wall-west-has-edge 436)
+(defconst gl-wall-north-west-has-edge 437)
 
 (defrule
     (true)
     =>
     (set-goal gl-wall-start 0) ; test now
     (set-goal gl-wall-tc-pos-x -1)
-    (set-goal gl-wall-distance-from-tc 15)
+    (set-goal gl-wall-distance-from-tc 18)
     (set-goal gl-wall-distance-to-tree 10)
+
+    (set-goal gl-wall-north-has-tree 0)
+    (set-goal gl-wall-north-east-has-tree 0)
+    (set-goal gl-wall-east-has-tree 0)
+    (set-goal gl-wall-south-east-has-tree 0)
+    (set-goal gl-wall-south-has-tree 0)
+    (set-goal gl-wall-south-west-has-tree 0)
+    (set-goal gl-wall-west-has-tree 0)
+    (set-goal gl-wall-north-west-has-tree 0)
+
+    (set-goal gl-wall-north-has-edge 0)
+    (set-goal gl-wall-north-east-has-edge 0)
+    (set-goal gl-wall-east-has-edge 0)
+    (set-goal gl-wall-south-east-has-edge 0)
+    (set-goal gl-wall-south-has-edge 0)
+    (set-goal gl-wall-south-west-has-edge 0)
+    (set-goal gl-wall-west-has-edge 0)
+    (set-goal gl-wall-north-west-has-edge 0)
     (disable-self)
 )
 
@@ -312,6 +338,112 @@
     (up-get-point position-object gl-wall-north-west-pos-x)
     (set-goal gl-wall-north-west-has-tree 1)
     (chat-to-all "north-west tree found")
+)
+
+(defrule
+    (goal gl-wall-start 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+
+    (goal gl-wall-north-has-tree 1)
+    (goal gl-wall-north-east-has-tree 0)
+    (goal gl-wall-east-has-tree 1)
+    =>
+    (up-copy-point gl-wall-north-east-pos-x gl-wall-north-pos-x)
+    (up-add-point gl-wall-north-east-pos-x gl-wall-east-pos-x c: 1)
+    (up-modify-goal gl-wall-north-east-pos-x c:/ 2)
+    (up-modify-goal gl-wall-north-east-pos-y c:/ 2)
+)
+(defrule
+    (goal gl-wall-start 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+
+    (goal gl-wall-north-east-has-tree 1)
+    (goal gl-wall-east-has-tree 0)
+    (goal gl-wall-south-east-has-tree 1)
+    =>
+    (up-copy-point gl-wall-east-pos-x gl-wall-north-east-pos-x)
+    (up-add-point gl-wall-east-pos-x gl-wall-south-east-pos-x c: 1)
+    (up-modify-goal gl-wall-east-pos-x c:/ 2)
+    (up-modify-goal gl-wall-east-pos-y c:/ 2)
+    (chat-to-all "east tree position recalculated!")
+)
+(defrule
+    (goal gl-wall-start 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+
+    (goal gl-wall-east-has-tree 1)
+    (goal gl-wall-south-east-has-tree 0)
+    (goal gl-wall-south-has-tree 1)
+    =>
+    (up-copy-point gl-wall-south-east-pos-x gl-wall-east-pos-x)
+    (up-add-point gl-wall-south-east-pos-x gl-wall-south-pos-x c: 1)
+    (up-modify-goal gl-wall-south-east-pos-x c:/ 2)
+    (up-modify-goal gl-wall-south-east-pos-y c:/ 2)
+)
+(defrule
+    (goal gl-wall-start 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+
+    (goal gl-wall-south-east-has-tree 1)
+    (goal gl-wall-south-has-tree 0)
+    (goal gl-wall-south-west-has-tree 1)
+    =>
+    (up-copy-point gl-wall-south-pos-x gl-wall-south-east-pos-x)
+    (up-add-point gl-wall-south-pos-x gl-wall-south-west-pos-x c: 1)
+    (up-modify-goal gl-wall-south-pos-x c:/ 2)
+    (up-modify-goal gl-wall-south-pos-y c:/ 2)
+)
+(defrule
+    (goal gl-wall-start 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+
+    (goal gl-wall-south-has-tree 1)
+    (goal gl-wall-south-west-has-tree 0)
+    (goal gl-wall-west-has-tree 1)
+    =>
+    (up-copy-point gl-wall-south-west-pos-x gl-wall-south-pos-x)
+    (up-add-point gl-wall-south-west-pos-x gl-wall-west-pos-x c: 1)
+    (up-modify-goal gl-wall-south-west-pos-x c:/ 2)
+    (up-modify-goal gl-wall-south-west-pos-y c:/ 2)
+)
+(defrule
+    (goal gl-wall-start 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+
+    (goal gl-wall-south-west-has-tree 1)
+    (goal gl-wall-west-has-tree 0)
+    (goal gl-wall-north-west-has-tree 1)
+    =>
+    (up-copy-point gl-wall-west-pos-x gl-wall-south-west-pos-x)
+    (up-add-point gl-wall-west-pos-x gl-wall-north-west-pos-x c: 1)
+    (up-modify-goal gl-wall-west-pos-x c:/ 2)
+    (up-modify-goal gl-wall-west-pos-y c:/ 2)
+)
+(defrule
+    (goal gl-wall-start 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+
+    (goal gl-wall-west-has-tree 1)
+    (goal gl-wall-north-west-has-tree 0)
+    (goal gl-wall-north-has-tree 1)
+    =>
+    (up-copy-point gl-wall-north-west-pos-x gl-wall-west-pos-x)
+    (up-add-point gl-wall-north-west-pos-x gl-wall-north-pos-x c: 1)
+    (up-modify-goal gl-wall-north-west-pos-x c:/ 2)
+    (up-modify-goal gl-wall-north-west-pos-y c:/ 2)
+)
+(defrule
+    (goal gl-wall-start 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+
+    (goal gl-wall-north-west-has-tree 1)
+    (goal gl-wall-north-has-tree 0)
+    (goal gl-wall-north-east-has-tree 1)
+    =>
+    (up-copy-point gl-wall-north-pos-x gl-wall-north-west-pos-x)
+    (up-add-point gl-wall-north-pos-x gl-wall-north-east-pos-x c: 1)
+    (up-modify-goal gl-wall-north-pos-x c:/ 2)
+    (up-modify-goal gl-wall-north-pos-y c:/ 2)
 )
 
 (defrule
