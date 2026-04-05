@@ -26,14 +26,18 @@
 (defconst gl-wall-tc-pos-y 425)
 (defconst gl-wall-distance-from-tc 427)
 (defconst gl-wall-distance-to-tree 428)
-(defconst gl-wall-north-has-edge 430)
-(defconst gl-wall-north-east-has-edge 431)
-(defconst gl-wall-east-has-edge 432)
-(defconst gl-wall-south-east-has-edge 433)
-(defconst gl-wall-south-has-edge 434)
-(defconst gl-wall-south-west-has-edge 435)
-(defconst gl-wall-west-has-edge 436)
-(defconst gl-wall-north-west-has-edge 437)
+(defconst gl-wall-north-not-used 430)
+(defconst gl-wall-north-east-not-used 431)
+(defconst gl-wall-east-not-used 432)
+(defconst gl-wall-south-east-not-used 433)
+(defconst gl-wall-south-not-used 434)
+(defconst gl-wall-south-west-not-used 435)
+(defconst gl-wall-west-not-used 436)
+(defconst gl-wall-north-west-not-used 437)
+(defconst gl-wall-distance-to-edge 438)
+(defconst gl-wall-right-corner-pos-x 439)
+(defconst gl-wall-right-corner-pos-y 440)
+(defconst gl-wall-has-edge 441)
 
 (defrule
     (true)
@@ -42,6 +46,7 @@
     (set-goal gl-wall-tc-pos-x -1)
     (set-goal gl-wall-distance-from-tc 18)
     (set-goal gl-wall-distance-to-tree 10)
+    (set-goal gl-wall-distance-to-edge 30)
 
     (set-goal gl-wall-north-has-tree 0)
     (set-goal gl-wall-north-east-has-tree 0)
@@ -52,14 +57,18 @@
     (set-goal gl-wall-west-has-tree 0)
     (set-goal gl-wall-north-west-has-tree 0)
 
-    (set-goal gl-wall-north-has-edge 0)
-    (set-goal gl-wall-north-east-has-edge 0)
-    (set-goal gl-wall-east-has-edge 0)
-    (set-goal gl-wall-south-east-has-edge 0)
-    (set-goal gl-wall-south-has-edge 0)
-    (set-goal gl-wall-south-west-has-edge 0)
-    (set-goal gl-wall-west-has-edge 0)
-    (set-goal gl-wall-north-west-has-edge 0)
+    (set-goal gl-wall-north-not-used 0)
+    (set-goal gl-wall-north-east-not-used 0)
+    (set-goal gl-wall-east-not-used 0)
+    (set-goal gl-wall-south-east-not-used 0)
+    (set-goal gl-wall-south-not-used 0)
+    (set-goal gl-wall-south-west-not-used 0)
+    (set-goal gl-wall-west-not-used 0)
+    (set-goal gl-wall-north-west-not-used 0)
+
+    (set-goal gl-wall-has-edge 0)
+
+    (up-get-point position-map-size gl-wall-right-corner-pos-x)
     (disable-self)
 )
 
@@ -446,21 +455,339 @@
     (up-modify-goal gl-wall-north-pos-y c:/ 2)
 )
 
+;(defrule
+;    (goal gl-wall-start 1)
+;    (up-compare-goal gl-wall-tc-pos-x >= 0)
+;    =>
+;    (up-bound-point gl-tmp-x gl-wall-north-pos-x)
+;    (up-get-point-distance gl-tmp-x gl-wall-north-pos-x gl-tmp)
+;    (up-modify-goal gl-tmp g:- gl-wall-distance-to-edge)
+;)
+;(defrule
+;    (goal gl-wall-start 1)
+;    (up-compare-goal gl-wall-tc-pos-x >= 0)
+;    (up-compare-goal gl-tmp <= 0)
+;    =>
+;)
+
+; west corner check
 (defrule
     (goal gl-wall-start 1)
     (up-compare-goal gl-wall-tc-pos-x >= 0)
+    (goal gl-wall-has-edge 0)
+    =>
+    (up-copy-point gl-tmp-x gl-wall-tc-pos-x)
+    (up-modify-goal gl-tmp-x g:- gl-wall-distance-to-edge)
+    (up-modify-goal gl-tmp-y g:- gl-wall-distance-to-edge)
+)
+(defrule
+    (goal gl-wall-start 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+    (goal gl-wall-has-edge 0)
+
+    (up-compare-goal gl-tmp-x <= 0)
+    (up-compare-goal gl-tmp-y <= 0)
+    =>
+    (set-goal gl-wall-has-edge 1)
+    (set-goal gl-wall-west-not-used 1)
+    (set-goal gl-wall-north-west-pos-y 0)
+    (set-goal gl-wall-south-west-pos-y 0)
+)
+; north corner check
+(defrule
+    (goal gl-wall-start 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+    (goal gl-wall-has-edge 0)
+    =>
+    (up-modify-goal gl-tmp-x g:= gl-wall-right-corner-pos-x)
+    (up-modify-goal gl-tmp-x g:- gl-wall-tc-pos-x)
+    (up-modify-goal gl-tmp-x g:- gl-wall-distance-to-edge)
+
+    (up-modify-goal gl-tmp-y g:= gl-wall-tc-pos-y)
+    (up-modify-goal gl-tmp-y g:- gl-wall-distance-to-edge)
+)
+(defrule
+    (goal gl-wall-start 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+    (goal gl-wall-has-edge 0)
+
+    (up-compare-goal gl-tmp-x <= 0)
+    (up-compare-goal gl-tmp-y <= 0)
+    =>
+    (set-goal gl-wall-has-edge 1)
+    (set-goal gl-wall-north-not-used 1)
+    (up-modify-goal gl-wall-north-east-pos-x g:= gl-wall-right-corner-pos-x)
+    (set-goal gl-wall-north-west-pos-y 0)
+)
+; south corner check
+(defrule
+    (goal gl-wall-start 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+    (goal gl-wall-has-edge 0)
+    =>
+    (up-modify-goal gl-tmp-x g:= gl-wall-tc-pos-x)
+    (up-modify-goal gl-tmp-x g:- gl-wall-distance-to-edge)
+
+    (up-modify-goal gl-tmp-y g:= gl-wall-right-corner-pos-y)
+    (up-modify-goal gl-tmp-y g:- gl-wall-tc-pos-y)
+    (up-modify-goal gl-tmp-y g:- gl-wall-distance-to-edge)
+)
+(defrule
+    (goal gl-wall-start 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+    (goal gl-wall-has-edge 0)
+
+    (up-compare-goal gl-tmp-x <= 0)
+    (up-compare-goal gl-tmp-y <= 0)
+    =>
+    (set-goal gl-wall-has-edge 1)
+    (set-goal gl-wall-south-not-used 1)
+    (up-modify-goal gl-wall-south-east-pos-y g:= gl-wall-right-corner-pos-y)
+    (set-goal gl-wall-south-west-pos-x 0)
+)
+; east corner check
+(defrule
+    (goal gl-wall-start 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+    (goal gl-wall-has-edge 0)
+    =>
+    (up-modify-goal gl-tmp-x g:= gl-wall-right-corner-pos-x)
+    (up-modify-goal gl-tmp-x g:- gl-wall-tc-pos-x)
+    (up-modify-goal gl-tmp-x g:- gl-wall-distance-to-edge)
+
+    (up-modify-goal gl-tmp-y g:= gl-wall-right-corner-pos-y)
+    (up-modify-goal gl-tmp-y g:- gl-wall-tc-pos-y)
+    (up-modify-goal gl-tmp-y g:- gl-wall-distance-to-edge)
+)
+(defrule
+    (goal gl-wall-start 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+    (goal gl-wall-has-edge 0)
+
+    (up-compare-goal gl-tmp-x <= 0)
+    (up-compare-goal gl-tmp-y <= 0)
+    =>
+    (set-goal gl-wall-has-edge 1)
+    (set-goal gl-wall-east-not-used 1)
+    (up-modify-goal gl-wall-north-east-pos-x g:= gl-wall-right-corner-pos-x)
+    (up-modify-goal gl-wall-south-east-pos-y g:= gl-wall-right-corner-pos-y)
+)
+; south west corner check
+(defrule
+    (goal gl-wall-start 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+    (goal gl-wall-has-edge 0)
+    =>
+    (up-modify-goal gl-tmp-x g:= gl-wall-tc-pos-x)
+    (up-modify-goal gl-tmp-x g:- gl-wall-distance-to-edge)
+)
+(defrule
+    (goal gl-wall-start 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+    (goal gl-wall-has-edge 0)
+
+    (up-compare-goal gl-tmp-x <= 0)
+    =>
+    (set-goal gl-wall-has-edge 1)
+    (set-goal gl-wall-south-west-not-used 1)
+    (set-goal gl-wall-west-pos-x 0)
+    (set-goal gl-wall-south-pos-x 0)
+)
+; north west corner check
+(defrule
+    (goal gl-wall-start 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+    (goal gl-wall-has-edge 0)
+    =>
+    (up-modify-goal gl-tmp-y g:= gl-wall-tc-pos-y)
+    (up-modify-goal gl-tmp-y g:- gl-wall-distance-to-edge)
+)
+(defrule
+    (goal gl-wall-start 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+    (goal gl-wall-has-edge 0)
+
+    (up-compare-goal gl-tmp-y <= 0)
+    =>
+    (set-goal gl-wall-has-edge 1)
+    (set-goal gl-wall-north-west-not-used 1)
+    (set-goal gl-wall-north-pos-y 0)
+    (set-goal gl-wall-west-pos-y 0)
+)
+; north east corner check
+(defrule
+    (goal gl-wall-start 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+    (goal gl-wall-has-edge 0)
+    =>
+    (up-modify-goal gl-tmp-x g:= gl-wall-right-corner-pos-x)
+    (up-modify-goal gl-tmp-x g:- gl-wall-tc-pos-x)
+    (up-modify-goal gl-tmp-x g:- gl-wall-distance-to-edge)
+)
+(defrule
+    (goal gl-wall-start 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+    (goal gl-wall-has-edge 0)
+
+    (up-compare-goal gl-tmp-x <= 0)
+    =>
+    (set-goal gl-wall-has-edge 1)
+    (set-goal gl-wall-north-east-not-used 1)
+    (up-modify-goal gl-wall-north-pos-x g:= gl-wall-right-corner-pos-x)
+    (up-modify-goal gl-wall-east-pos-x g:= gl-wall-right-corner-pos-x)
+)
+; south east corner check
+(defrule
+    (goal gl-wall-start 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+    (goal gl-wall-has-edge 0)
+    =>
+    (up-modify-goal gl-tmp-y g:= gl-wall-right-corner-pos-y)
+    (up-modify-goal gl-tmp-y g:- gl-wall-tc-pos-y)
+    (up-modify-goal gl-tmp-y g:- gl-wall-distance-to-edge)
+)
+(defrule
+    (goal gl-wall-start 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+    (goal gl-wall-has-edge 0)
+
+    (up-compare-goal gl-tmp-y <= 0)
+    =>
+    (set-goal gl-wall-has-edge 1)
+    (set-goal gl-wall-south-east-not-used 1)
+    (up-modify-goal gl-wall-south-pos-y g:= gl-wall-right-corner-pos-y)
+    (up-modify-goal gl-wall-east-pos-y g:= gl-wall-right-corner-pos-y)
+)
+
+
+;(defrule
+;    (goal gl-wall-start 1)
+;    (up-compare-goal gl-wall-tc-pos-x >= 0)
+;
+;    (wood-amount > 200)
+;    =>
+;    (set-strategic-number sn-placement-zone-size 0)
+;    (up-build-line gl-wall-north-pos-x gl-wall-north-east-pos-x c: palisade-wall)
+;    (up-build-line gl-wall-north-east-pos-x gl-wall-east-pos-x c: palisade-wall)
+;    (up-build-line gl-wall-east-pos-x gl-wall-south-east-pos-x c: palisade-wall)
+;    (up-build-line gl-wall-south-east-pos-x gl-wall-south-pos-x c: palisade-wall)
+;    (up-build-line gl-wall-south-pos-x gl-wall-south-west-pos-x c: palisade-wall)
+;    (up-build-line gl-wall-south-west-pos-x gl-wall-west-pos-x c: palisade-wall)
+;    (up-build-line gl-wall-west-pos-x gl-wall-north-west-pos-x c: palisade-wall)
+;    (up-build-line gl-wall-north-west-pos-x gl-wall-north-pos-x c: palisade-wall)
+;    (up-send-flare gl-wall-north-pos-x)
+;    (up-send-flare gl-wall-north-east-pos-x)
+;    (up-send-flare gl-wall-east-pos-x)
+;    (up-send-flare gl-wall-south-east-pos-x)
+;    (up-send-flare gl-wall-south-pos-x)
+;    (up-send-flare gl-wall-south-west-pos-x)
+;    (up-send-flare gl-wall-west-pos-x)
+;    (up-send-flare gl-wall-north-west-pos-x)
+;    (set-goal gl-wall-start 0)
+;    (up-chat-data-to-all "gl-wall-north-pos-x: %d" g: gl-wall-north-pos-x)
+;    (disable-self)
+;)
+(defrule
+    (goal gl-wall-start 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+
+    (goal gl-wall-north-not-used 0)
+    (goal gl-wall-north-east-not-used 0)
 
     (wood-amount > 200)
     =>
     (set-strategic-number sn-placement-zone-size 0)
     (up-build-line gl-wall-north-pos-x gl-wall-north-east-pos-x c: palisade-wall)
+)
+(defrule
+    (goal gl-wall-start 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+
+    (goal gl-wall-north-east-not-used 0)
+    (goal gl-wall-east-not-used 0)
+
+    (wood-amount > 200)
+    =>
+    (set-strategic-number sn-placement-zone-size 0)
     (up-build-line gl-wall-north-east-pos-x gl-wall-east-pos-x c: palisade-wall)
+)
+(defrule
+    (goal gl-wall-start 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+
+    (goal gl-wall-east-not-used 0)
+    (goal gl-wall-south-east-not-used 0)
+
+    (wood-amount > 200)
+    =>
+    (set-strategic-number sn-placement-zone-size 0)
     (up-build-line gl-wall-east-pos-x gl-wall-south-east-pos-x c: palisade-wall)
+)
+(defrule
+    (goal gl-wall-start 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+
+    (goal gl-wall-south-east-not-used 0)
+    (goal gl-wall-south-not-used 0)
+
+    (wood-amount > 200)
+    =>
+    (set-strategic-number sn-placement-zone-size 0)
     (up-build-line gl-wall-south-east-pos-x gl-wall-south-pos-x c: palisade-wall)
+)
+(defrule
+    (goal gl-wall-start 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+
+    (goal gl-wall-south-not-used 0)
+    (goal gl-wall-south-west-not-used 0)
+
+    (wood-amount > 200)
+    =>
+    (set-strategic-number sn-placement-zone-size 0)
     (up-build-line gl-wall-south-pos-x gl-wall-south-west-pos-x c: palisade-wall)
+)
+(defrule
+    (goal gl-wall-start 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+
+    (goal gl-wall-south-west-not-used 0)
+    (goal gl-wall-west-not-used 0)
+
+    (wood-amount > 200)
+    =>
+    (set-strategic-number sn-placement-zone-size 0)
     (up-build-line gl-wall-south-west-pos-x gl-wall-west-pos-x c: palisade-wall)
+)
+(defrule
+    (goal gl-wall-start 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+
+    (goal gl-wall-west-not-used 0)
+    (goal gl-wall-north-west-not-used 0)
+
+    (wood-amount > 200)
+    =>
+    (set-strategic-number sn-placement-zone-size 0)
     (up-build-line gl-wall-west-pos-x gl-wall-north-west-pos-x c: palisade-wall)
+)
+(defrule
+    (goal gl-wall-start 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+
+    (goal gl-wall-north-west-not-used 0)
+    (goal gl-wall-north-not-used 0)
+
+    (wood-amount > 200)
+    =>
+    (set-strategic-number sn-placement-zone-size 0)
     (up-build-line gl-wall-north-west-pos-x gl-wall-north-pos-x c: palisade-wall)
+)
+
+(defrule
+    (goal gl-wall-start 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+    =>
     (up-send-flare gl-wall-north-pos-x)
     (up-send-flare gl-wall-north-east-pos-x)
     (up-send-flare gl-wall-east-pos-x)
@@ -469,7 +796,4 @@
     (up-send-flare gl-wall-south-west-pos-x)
     (up-send-flare gl-wall-west-pos-x)
     (up-send-flare gl-wall-north-west-pos-x)
-    (set-goal gl-wall-start 0)
-    (up-chat-data-to-all "gl-wall-north-pos-x: %d" g: gl-wall-north-pos-x)
-    (disable-self)
 )
