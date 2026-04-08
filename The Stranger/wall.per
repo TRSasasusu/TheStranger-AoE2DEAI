@@ -39,6 +39,9 @@
 (defconst gl-wall-right-corner-pos-y 440)
 (defconst gl-wall-has-edge 441)
 (defconst gl-wall-calculated 446)
+(defconst gl-wall-gate-pos-x 447)
+(defconst gl-wall-gate-pos-y 448)
+(defconst gl-wall-gate-type 450)
 
 (defrule
     (true)
@@ -847,16 +850,43 @@
     (up-build-line gl-wall-north-west-pos-x gl-wall-north-pos-x c: palisade-wall)
 )
 
+;(defrule
+;    (goal gl-wall-calculated 1)
+;    (up-compare-goal gl-wall-tc-pos-x >= 0)
+;    =>
+;    (up-send-flare gl-wall-north-pos-x)
+;    (up-send-flare gl-wall-north-east-pos-x)
+;    (up-send-flare gl-wall-east-pos-x)
+;    (up-send-flare gl-wall-south-east-pos-x)
+;    (up-send-flare gl-wall-south-pos-x)
+;    (up-send-flare gl-wall-south-west-pos-x)
+;    (up-send-flare gl-wall-west-pos-x)
+;    (up-send-flare gl-wall-north-west-pos-x)
+;)
+
 (defrule
     (goal gl-wall-calculated 1)
     (up-compare-goal gl-wall-tc-pos-x >= 0)
+
+    (goal gl-wall-north-not-used 0)
+    (goal gl-wall-north-west-not-used 0)
+
+    (building-type-count-total 789 == 0)
+    (building-type-count-total 790 == 0)
+    (building-type-count-total 791 == 0)
+    (building-type-count-total 792 == 0)
+
+    (can-build 792)
     =>
+    (set-strategic-number sn-placement-zone-size 0)
+    (up-copy-point gl-tmp-x gl-wall-north-pos-x)
+    (up-lerp-tiles gl-tmp-x gl-wall-north-west-pos-x c: 15)
+    (up-modify-goal gl-tmp-y c:- 2)
+    ;(up-modify-goal gl-tmp-x c:+ 1)
+    (up-set-target-point gl-tmp-x)
     (up-send-flare gl-wall-north-pos-x)
-    (up-send-flare gl-wall-north-east-pos-x)
-    (up-send-flare gl-wall-east-pos-x)
-    (up-send-flare gl-wall-south-east-pos-x)
-    (up-send-flare gl-wall-south-pos-x)
-    (up-send-flare gl-wall-south-west-pos-x)
-    (up-send-flare gl-wall-west-pos-x)
     (up-send-flare gl-wall-north-west-pos-x)
+    (up-send-flare gl-tmp-x)
+    (up-build place-point 0 c: 792)
+    ;(up-build place-point 0 c: house)
 )
