@@ -23,6 +23,7 @@
 (defconst status-gather 5)
 (defconst archery-class 900)
 (defconst infantry-class 906)
+(defconst tree-class 915)
 (defconst scout-cavalry-class 947)
 (defconst ri-anarchy 16)
 (defconst ri-perfusion 457)
@@ -32,6 +33,9 @@
 (defconst search-order-none 0)
 (defconst search-order-asc 1)
 (defconst search-order-desc 2)
+(defconst explored-no 0)
+(defconst explored-active 15)
+(defconst explored-yes 128)
 
 (defconst gl-attack-stop 250)
 (defconst gl-attack-only-attack-move-whole 251)
@@ -45,6 +49,10 @@
 (defconst gl-wall-building-pos-x 442)
 (defconst gl-wall-building-pos-y 443)
 (defconst gl-wall-start-walling 445)
+(defconst gl-wall-calculated 446)
+(defconst gl-wall-building-pending 455)
+(defconst gl-wall-building-unavailable 464)
+(defconst gl-wall-building-range 465)
 
 #load-if-defined MONGOL-CIV
 (defconst cav-line steppe-lancer-line) ; steppe-lancer-line
@@ -103,6 +111,23 @@
     (disable-self)
 )
 
+
+(defrule
+    (can-build house)
+    (housing-headroom < 3)
+    (population-headroom > 0)
+    (up-pending-objects c: house < 2)
+
+    (goal gl-wall-calculated 1)
+    (goal gl-wall-building-pending 0)
+    (goal gl-wall-building-unavailable 0)
+    (goal gl-wall-start-walling 0)
+    =>
+    (up-set-target-point gl-wall-building-pos-x)
+    (up-build place-point 0 c: house)
+    (set-goal gl-wall-building-pending 1)
+    (up-jump-rule 1) ; skip normally building houses
+)
 (defrule
     (can-build house)
     (housing-headroom < 3)

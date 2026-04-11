@@ -83,6 +83,44 @@
     (research ri-double-bit-axe)
 )
 
+; build barrack in wall
+(defrule
+    (or
+        (goal gl-researching-feudal 1)
+        (current-age >= feudal-age)
+    )
+    (can-build barracks)
+    (building-type-count-total barracks == 0)
+
+    (goal gl-wall-calculated 1)
+    (goal gl-wall-building-pending 0)
+    (goal gl-wall-building-unavailable 0)
+    (goal gl-wall-start-walling 0)
+    (up-compare-goal gl-wall-building-range < 4)
+    =>
+    (set-goal gl-wall-building-pending 1)
+    (set-goal gl-wall-building-range 5)
+    (up-jump-rule 2)
+)
+(defrule
+    (or
+        (goal gl-researching-feudal 1)
+        (current-age >= feudal-age)
+    )
+    (can-build barracks)
+    (building-type-count-total barracks == 0)
+
+    (goal gl-wall-calculated 1)
+    (goal gl-wall-building-pending 0)
+    (goal gl-wall-building-unavailable 0)
+    (goal gl-wall-start-walling 0)
+    (up-compare-goal gl-wall-building-range >= 5)
+    =>
+    (up-set-target-point gl-wall-building-pos-x)
+    (up-build place-point 0 c: barracks)
+    (set-goal gl-wall-building-pending 1)
+    (up-jump-rule 1)
+)
 (defrule
     (or
         (goal gl-researching-feudal 1)
@@ -92,13 +130,31 @@
     (building-type-count-total barracks == 0)
     =>
     (build barracks)
+    (chat-to-all "building barracks normally!?")
 )
 
+; build blacksmith in wall
 (defrule
-    (current-age >= feudal-age)
     (can-build blacksmith)
-    (building-type-count-total archery-range >= 2)
     (building-type-count-total blacksmith == 0)
+    (building-type-count-total barracks > 0)
+    (unit-type-count-total militiaman-line >= 2)
+
+    (goal gl-wall-calculated 1)
+    (goal gl-wall-building-pending 0)
+    (goal gl-wall-building-unavailable 0)
+    (goal gl-wall-start-walling 0)
+    =>
+    (up-set-target-point gl-wall-building-pos-x)
+    (up-build place-point 0 c: blacksmith)
+    (set-goal gl-wall-building-pending 1)
+    (up-jump-rule 1)
+)
+(defrule
+    (can-build blacksmith)
+    (building-type-count-total blacksmith == 0)
+    (building-type-count-total barracks > 0)
+    (unit-type-count-total militiaman-line >= 2)
     =>
     (build blacksmith)
 )
@@ -113,14 +169,6 @@
 
 
 
-(defrule
-    (building-type-count-total blacksmith == 0)
-    (building-type-count-total barracks > 0)
-    (can-build blacksmith)
-    (unit-type-count-total militiaman-line >= 2)
-    =>
-    (build blacksmith)
-)
 
 (defrule
     (unit-type-count militiaman-line > 3)

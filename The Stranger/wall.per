@@ -38,10 +38,32 @@
 (defconst gl-wall-right-corner-pos-x 439)
 (defconst gl-wall-right-corner-pos-y 440)
 (defconst gl-wall-has-edge 441)
-(defconst gl-wall-calculated 446)
 (defconst gl-wall-gate-pos-x 447)
 (defconst gl-wall-gate-pos-y 448)
 (defconst gl-wall-gate-type 450)
+;(defconst gl-wall-flank-start-pos-x 451)
+;(defconst gl-wall-flank-start-pos-y 452)
+;(defconst gl-wall-flank-end-pos-x 453)
+;(defconst gl-wall-flank-end-pos-y 454)
+(defconst gl-wall-building-criterion 456); 0: north, 1: north-east, 2: east, 3: south-east, 4: south, 5: south-west, 6: west, 7: north-west
+(defconst wall-north 0)
+(defconst wall-north-east 1)
+(defconst wall-east 2)
+(defconst wall-south-east 3)
+(defconst wall-south 4)
+(defconst wall-south-west 5)
+(defconst wall-west 6)
+(defconst wall-north-west 7)
+(defconst gl-wall-building-direction 457); 1: clockwise, -1: counter-clockwise
+(defconst gl-wall-deciding-building-position-for-end 458)
+(defconst gl-wall-deciding-building-position-for-id 459)
+(defconst gl-wall-building-tile-from-criterion 460)
+(defconst gl-wall-building-tile-from-criterion-for-end 461)
+(defconst gl-wall-building-tile-from-criterion-for-id 462)
+(defconst gl-wall-building-criterion-before-changing 463)
+(defconst gl-wall-gate-decided 466)
+(defconst gl-wall-gate-pos-x 467)
+(defconst gl-wall-gate-pos-y 468)
 
 (defrule
     (true)
@@ -54,6 +76,12 @@
     (set-goal gl-wall-distance-from-tc 18)
     (set-goal gl-wall-distance-to-tree 10)
     (set-goal gl-wall-distance-to-edge 30)
+
+    (set-goal gl-wall-building-tile-from-criterion 0)
+    (set-goal gl-wall-building-pending 0)
+    (set-goal gl-wall-building-unavailable 0)
+    (set-goal gl-wall-building-range 3)
+    (set-goal gl-wall-gate-decided 0)
 
     (set-goal gl-wall-north-has-tree 0)
     (set-goal gl-wall-north-east-has-tree 0)
@@ -80,9 +108,25 @@
 )
 
 (defrule
-    (game-time > 5)
+    (game-time > 220)
     =>
     (set-goal gl-wall-start 1)
+    (disable-self)
+)
+(defrule
+    (game-time > 400)
+    =>
+    (set-goal gl-wall-start 1)
+    (set-goal gl-wall-calculated 0)
+    (set-goal gl-wall-building-tile-from-criterion 0)
+    (set-goal gl-wall-building-pending 0)
+    (set-goal gl-wall-has-edge 0)
+    (disable-self)
+)
+(defrule
+    (game-time > 840)
+    =>
+    (set-goal gl-wall-start-walling 1)
     (disable-self)
 )
 
@@ -409,7 +453,7 @@
     (up-add-point gl-wall-east-pos-x gl-wall-south-east-pos-x c: 1)
     (up-modify-goal gl-wall-east-pos-x c:/ 2)
     (up-modify-goal gl-wall-east-pos-y c:/ 2)
-    (chat-to-all "east tree position recalculated!")
+    ;(chat-to-all "east tree position recalculated!")
 )
 (defrule
     (goal gl-wall-start 1)
@@ -714,7 +758,165 @@
     (set-goal gl-wall-south-east-not-used 1)
     (up-modify-goal gl-wall-south-pos-y g:= gl-wall-right-corner-pos-y)
     (up-modify-goal gl-wall-east-pos-y g:= gl-wall-right-corner-pos-y)
+    ;(chat-to-all "south-east corner detected")
 )
+
+; set building criterion and directions
+(defrule
+    (goal gl-wall-start 1)
+    (goal gl-wall-calculated 0)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+    =>
+    (up-copy-point gl-tmp-x gl-wall-right-corner-pos-x)
+    (up-modify-goal gl-tmp-x c:/ 2)
+    (up-modify-goal gl-tmp-y c:/ 2)
+    (up-send-flare gl-tmp-x)
+    (up-add-point gl-tmp-x gl-wall-tc-pos-x c: -1)
+    (up-chat-data-to-all "gl-tmp-x: %d" g: gl-tmp-x)
+    (up-chat-data-to-all "gl-tmp-y: %d" g: gl-tmp-y)
+)
+(defrule
+    (goal gl-wall-start 1)
+    (goal gl-wall-calculated 0)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+
+    (up-compare-goal gl-tmp-x >= 20)
+    (up-compare-goal gl-tmp-y >= 20)
+    =>
+    (set-goal gl-wall-building-criterion wall-north-east)
+    (set-goal gl-wall-building-direction 1)
+)
+(defrule
+    (goal gl-wall-start 1)
+    (goal gl-wall-calculated 0)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+
+    (up-compare-goal gl-tmp-x > -20)
+    (up-compare-goal gl-tmp-x < 20)
+    (up-compare-goal gl-tmp-y >= 20)
+    =>
+    (set-goal gl-wall-building-criterion wall-east)
+    (set-goal gl-wall-building-direction 1)
+)
+(defrule
+    (goal gl-wall-start 1)
+    (goal gl-wall-calculated 0)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+
+    (up-compare-goal gl-tmp-x <= -20)
+    (up-compare-goal gl-tmp-y >= 20)
+    =>
+    (set-goal gl-wall-building-criterion wall-south-east)
+    (set-goal gl-wall-building-direction 1)
+)
+(defrule
+    (goal gl-wall-start 1)
+    (goal gl-wall-calculated 0)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+
+    (up-compare-goal gl-tmp-x <= -20)
+    (up-compare-goal gl-tmp-y > -20)
+    (up-compare-goal gl-tmp-y < 20)
+    =>
+    (set-goal gl-wall-building-criterion wall-south)
+    (set-goal gl-wall-building-direction 1)
+)
+(defrule
+    (goal gl-wall-start 1)
+    (goal gl-wall-calculated 0)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+
+    (up-compare-goal gl-tmp-x <= -20)
+    (up-compare-goal gl-tmp-y <= -20)
+    =>
+    (set-goal gl-wall-building-criterion wall-south-west)
+    (set-goal gl-wall-building-direction 1)
+)
+(defrule
+    (goal gl-wall-start 1)
+    (goal gl-wall-calculated 0)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+
+    (up-compare-goal gl-tmp-x < 20)
+    (up-compare-goal gl-tmp-x > -20)
+    (up-compare-goal gl-tmp-y <= -20)
+    =>
+    (set-goal gl-wall-building-criterion wall-north)
+    (set-goal gl-wall-building-direction -1)
+)
+(defrule
+    (goal gl-wall-start 1)
+    (goal gl-wall-calculated 0)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+
+    (up-compare-goal gl-tmp-x >= 20)
+    (up-compare-goal gl-tmp-y <= -20)
+    =>
+    (set-goal gl-wall-building-criterion wall-north)
+    (set-goal gl-wall-building-direction -1)
+)
+(defrule
+    (goal gl-wall-start 1)
+    (goal gl-wall-calculated 0)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+
+    (up-compare-goal gl-tmp-x >= 20)
+    (up-compare-goal gl-tmp-y < 20)
+    (up-compare-goal gl-tmp-y > -20)
+    =>
+    (set-goal gl-wall-building-criterion wall-north)
+    (set-goal gl-wall-building-direction 1)
+)
+;(defrule
+;    (goal gl-wall-start 1)
+;    (goal gl-wall-calculated 0)
+;    (up-compare-goal gl-wall-tc-pos-x >= 0)
+;
+;    (up-compare-goal gl-tmp-x >= 0)
+;    (up-compare-goal gl-tmp-y < 0)
+;    =>
+;    (set-goal gl-wall-building-criterion wall-north-east)
+;    (set-goal gl-wall-building-direction -1)
+;)
+;(defrule
+;    (goal gl-wall-start 1)
+;    (goal gl-wall-calculated 0)
+;    (up-compare-goal gl-wall-tc-pos-x >= 0)
+;
+;    (up-compare-goal gl-tmp-x < 0)
+;    (up-compare-goal gl-tmp-y >= 0)
+;    =>
+;    (set-goal gl-wall-building-criterion wall-south-west)
+;    (set-goal gl-wall-building-direction -1)
+;)
+;(defrule
+;    (goal gl-wall-start 1)
+;    (goal gl-wall-calculated 0)
+;    (up-compare-goal gl-wall-tc-pos-x >= 0)
+;
+;    (up-compare-goal gl-tmp-x < 0)
+;    (up-compare-goal gl-tmp-y < 0)
+;    =>
+;    (set-goal gl-wall-building-criterion wall-south-east)
+;    (set-goal gl-wall-building-direction 1)
+;    (chat-to-all "building criterion: south-east")
+;)
+
+(defrule
+    (goal gl-wall-start 1)
+    ;(goal gl-wall-calculated 0)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+    =>
+    (up-send-flare gl-wall-north-pos-x)
+    (up-send-flare gl-wall-north-east-pos-x)
+    (up-send-flare gl-wall-east-pos-x)
+    (up-send-flare gl-wall-south-east-pos-x)
+    (up-send-flare gl-wall-south-pos-x)
+    (up-send-flare gl-wall-south-west-pos-x)
+    (up-send-flare gl-wall-west-pos-x)
+    (up-send-flare gl-wall-north-west-pos-x)
+)
+
 
 (defrule
     (goal gl-wall-start 1)
@@ -722,7 +924,11 @@
     (up-compare-goal gl-wall-tc-pos-x >= 0)
     =>
     (set-goal gl-wall-calculated 1)
+    (set-goal gl-wall-building-pending 1)
     (chat-to-all "wall calculated")
+    (up-chat-data-to-all "gl-wall-has-edge: %d" g: gl-wall-has-edge)
+    (up-chat-data-to-all "gl-wall-building-criterion: %d" g: gl-wall-building-criterion)
+    (up-chat-data-to-all "gl-wall-building-direction: %d" g: gl-wall-building-direction)
 )
 
 
@@ -753,98 +959,109 @@
 ;    (up-chat-data-to-all "gl-wall-north-pos-x: %d" g: gl-wall-north-pos-x)
 ;    (disable-self)
 ;)
+
+
+
 (defrule
     (goal gl-wall-calculated 1)
+    (goal gl-wall-start-walling 1)
     (up-compare-goal gl-wall-tc-pos-x >= 0)
 
     (goal gl-wall-north-not-used 0)
     (goal gl-wall-north-east-not-used 0)
 
-    (wood-amount > 200)
+    (wood-amount > 100)
     =>
     (set-strategic-number sn-placement-zone-size 0)
     (up-build-line gl-wall-north-pos-x gl-wall-north-east-pos-x c: palisade-wall)
 )
 (defrule
     (goal gl-wall-calculated 1)
+    (goal gl-wall-start-walling 1)
     (up-compare-goal gl-wall-tc-pos-x >= 0)
 
     (goal gl-wall-north-east-not-used 0)
     (goal gl-wall-east-not-used 0)
 
-    (wood-amount > 200)
+    (wood-amount > 100)
     =>
     (set-strategic-number sn-placement-zone-size 0)
     (up-build-line gl-wall-north-east-pos-x gl-wall-east-pos-x c: palisade-wall)
 )
 (defrule
     (goal gl-wall-calculated 1)
+    (goal gl-wall-start-walling 1)
     (up-compare-goal gl-wall-tc-pos-x >= 0)
 
     (goal gl-wall-east-not-used 0)
     (goal gl-wall-south-east-not-used 0)
 
-    (wood-amount > 200)
+    (wood-amount > 100)
     =>
     (set-strategic-number sn-placement-zone-size 0)
     (up-build-line gl-wall-east-pos-x gl-wall-south-east-pos-x c: palisade-wall)
 )
 (defrule
     (goal gl-wall-calculated 1)
+    (goal gl-wall-start-walling 1)
     (up-compare-goal gl-wall-tc-pos-x >= 0)
 
     (goal gl-wall-south-east-not-used 0)
     (goal gl-wall-south-not-used 0)
 
-    (wood-amount > 200)
+    (wood-amount > 100)
     =>
     (set-strategic-number sn-placement-zone-size 0)
     (up-build-line gl-wall-south-east-pos-x gl-wall-south-pos-x c: palisade-wall)
 )
 (defrule
     (goal gl-wall-calculated 1)
+    (goal gl-wall-start-walling 1)
     (up-compare-goal gl-wall-tc-pos-x >= 0)
 
     (goal gl-wall-south-not-used 0)
     (goal gl-wall-south-west-not-used 0)
 
-    (wood-amount > 200)
+    (wood-amount > 100)
     =>
     (set-strategic-number sn-placement-zone-size 0)
     (up-build-line gl-wall-south-pos-x gl-wall-south-west-pos-x c: palisade-wall)
 )
 (defrule
     (goal gl-wall-calculated 1)
+    (goal gl-wall-start-walling 1)
     (up-compare-goal gl-wall-tc-pos-x >= 0)
 
     (goal gl-wall-south-west-not-used 0)
     (goal gl-wall-west-not-used 0)
 
-    (wood-amount > 200)
+    (wood-amount > 100)
     =>
     (set-strategic-number sn-placement-zone-size 0)
     (up-build-line gl-wall-south-west-pos-x gl-wall-west-pos-x c: palisade-wall)
 )
 (defrule
     (goal gl-wall-calculated 1)
+    (goal gl-wall-start-walling 1)
     (up-compare-goal gl-wall-tc-pos-x >= 0)
 
     (goal gl-wall-west-not-used 0)
     (goal gl-wall-north-west-not-used 0)
 
-    (wood-amount > 200)
+    (wood-amount > 100)
     =>
     (set-strategic-number sn-placement-zone-size 0)
     (up-build-line gl-wall-west-pos-x gl-wall-north-west-pos-x c: palisade-wall)
 )
 (defrule
     (goal gl-wall-calculated 1)
+    (goal gl-wall-start-walling 1)
     (up-compare-goal gl-wall-tc-pos-x >= 0)
 
     (goal gl-wall-north-west-not-used 0)
     (goal gl-wall-north-not-used 0)
 
-    (wood-amount > 200)
+    (wood-amount > 100)
     =>
     (set-strategic-number sn-placement-zone-size 0)
     (up-build-line gl-wall-north-west-pos-x gl-wall-north-pos-x c: palisade-wall)
@@ -889,4 +1106,440 @@
     (up-send-flare gl-tmp-x)
     (up-build place-point 0 c: 792)
     ;(up-build place-point 0 c: house)
+)
+
+
+; set building position as a part of the wall
+; we need to check if the position is valid and if not, we need to find a new one
+; this is done by making the for loop
+(defrule
+    (goal gl-wall-calculated 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+    (goal gl-wall-building-pending 1)
+    =>
+    (set-goal gl-wall-deciding-building-position-for-end 0)
+    (up-modify-goal gl-wall-building-criterion-before-changing g:= gl-wall-building-criterion)
+)
+(defrule
+    (goal gl-wall-calculated 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+    (goal gl-wall-building-pending 1)
+    (goal gl-wall-deciding-building-position-for-end 0)
+    =>
+    (up-get-rule-id gl-wall-deciding-building-position-for-id)
+)
+    ; from the criterion and the direction we can get the two points between which we will check for the building position
+    (defrule
+        (goal gl-wall-calculated 1)
+        (up-compare-goal gl-wall-tc-pos-x >= 0)
+        (goal gl-wall-building-pending 1)
+        (goal gl-wall-deciding-building-position-for-end 0)
+
+        (goal gl-wall-building-criterion wall-north)
+        (goal gl-wall-building-direction 1)
+        =>
+        (up-copy-point gl-tmp-x gl-wall-north-pos-x)
+        (up-copy-point gl-tmp2-x gl-wall-north-east-pos-x)
+    )
+    (defrule
+        (goal gl-wall-calculated 1)
+        (up-compare-goal gl-wall-tc-pos-x >= 0)
+        (goal gl-wall-building-pending 1)
+        (goal gl-wall-deciding-building-position-for-end 0)
+
+        (goal gl-wall-building-criterion wall-north-east)
+        (goal gl-wall-building-direction 1)
+        =>
+        (up-copy-point gl-tmp-x gl-wall-north-east-pos-x)
+        (up-copy-point gl-tmp2-x gl-wall-east-pos-x)
+    )
+    (defrule
+        (goal gl-wall-calculated 1)
+        (up-compare-goal gl-wall-tc-pos-x >= 0)
+        (goal gl-wall-building-pending 1)
+        (goal gl-wall-deciding-building-position-for-end 0)
+
+        (goal gl-wall-building-criterion wall-east)
+        (goal gl-wall-building-direction 1)
+        =>
+        (up-copy-point gl-tmp-x gl-wall-east-pos-x)
+        (up-copy-point gl-tmp2-x gl-wall-south-east-pos-x)
+    )
+    (defrule
+        (goal gl-wall-calculated 1)
+        (up-compare-goal gl-wall-tc-pos-x >= 0)
+        (goal gl-wall-building-pending 1)
+        (goal gl-wall-deciding-building-position-for-end 0)
+
+        (goal gl-wall-building-criterion wall-south-east)
+        (goal gl-wall-building-direction 1)
+        =>
+        (up-copy-point gl-tmp-x gl-wall-south-east-pos-x)
+        (up-copy-point gl-tmp2-x gl-wall-south-pos-x)
+    )
+    (defrule
+        (goal gl-wall-calculated 1)
+        (up-compare-goal gl-wall-tc-pos-x >= 0)
+        (goal gl-wall-building-pending 1)
+        (goal gl-wall-deciding-building-position-for-end 0)
+
+        (goal gl-wall-building-criterion wall-south)
+        (goal gl-wall-building-direction 1)
+        =>
+        (up-copy-point gl-tmp-x gl-wall-south-pos-x)
+        (up-copy-point gl-tmp2-x gl-wall-south-west-pos-x)
+    )
+    (defrule
+        (goal gl-wall-calculated 1)
+        (up-compare-goal gl-wall-tc-pos-x >= 0)
+        (goal gl-wall-building-pending 1)
+        (goal gl-wall-deciding-building-position-for-end 0)
+
+        (goal gl-wall-building-criterion wall-south-west)
+        (goal gl-wall-building-direction 1)
+        =>
+        (up-copy-point gl-tmp-x gl-wall-south-west-pos-x)
+        (up-copy-point gl-tmp2-x gl-wall-west-pos-x)
+    )
+    (defrule
+        (goal gl-wall-calculated 1)
+        (up-compare-goal gl-wall-tc-pos-x >= 0)
+        (goal gl-wall-building-pending 1)
+        (goal gl-wall-deciding-building-position-for-end 0)
+
+        (goal gl-wall-building-criterion wall-west)
+        (goal gl-wall-building-direction 1)
+        =>
+        (up-copy-point gl-tmp-x gl-wall-west-pos-x)
+        (up-copy-point gl-tmp2-x gl-wall-north-west-pos-x)
+    )
+    (defrule
+        (goal gl-wall-calculated 1)
+        (up-compare-goal gl-wall-tc-pos-x >= 0)
+        (goal gl-wall-building-pending 1)
+        (goal gl-wall-deciding-building-position-for-end 0)
+
+        (goal gl-wall-building-criterion wall-north-west)
+        (goal gl-wall-building-direction 1)
+        =>
+        (up-copy-point gl-tmp-x gl-wall-north-west-pos-x)
+        (up-copy-point gl-tmp2-x gl-wall-north-pos-x)
+    )
+    (defrule
+        (goal gl-wall-calculated 1)
+        (up-compare-goal gl-wall-tc-pos-x >= 0)
+        (goal gl-wall-building-pending 1)
+        (goal gl-wall-deciding-building-position-for-end 0)
+
+        (goal gl-wall-building-criterion wall-north)
+        (goal gl-wall-building-direction -1)
+        =>
+        (up-copy-point gl-tmp-x gl-wall-north-pos-x)
+        (up-copy-point gl-tmp2-x gl-wall-north-west-pos-x)
+    )
+    (defrule
+        (goal gl-wall-calculated 1)
+        (up-compare-goal gl-wall-tc-pos-x >= 0)
+        (goal gl-wall-building-pending 1)
+        (goal gl-wall-deciding-building-position-for-end 0)
+
+        (goal gl-wall-building-criterion wall-north-east)
+        (goal gl-wall-building-direction -1)
+        =>
+        (up-copy-point gl-tmp-x gl-wall-north-east-pos-x)
+        (up-copy-point gl-tmp2-x gl-wall-north-pos-x)
+    )
+    (defrule
+        (goal gl-wall-calculated 1)
+        (up-compare-goal gl-wall-tc-pos-x >= 0)
+        (goal gl-wall-building-pending 1)
+        (goal gl-wall-deciding-building-position-for-end 0)
+
+        (goal gl-wall-building-criterion wall-east)
+        (goal gl-wall-building-direction -1)
+        =>
+        (up-copy-point gl-tmp-x gl-wall-east-pos-x)
+        (up-copy-point gl-tmp2-x gl-wall-north-east-pos-x)
+    )
+    (defrule
+        (goal gl-wall-calculated 1)
+        (up-compare-goal gl-wall-tc-pos-x >= 0)
+        (goal gl-wall-building-pending 1)
+        (goal gl-wall-deciding-building-position-for-end 0)
+
+        (goal gl-wall-building-criterion wall-south-east)
+        (goal gl-wall-building-direction -1)
+        =>
+        (up-copy-point gl-tmp-x gl-wall-south-east-pos-x)
+        (up-copy-point gl-tmp2-x gl-wall-east-pos-x)
+    )
+    (defrule
+        (goal gl-wall-calculated 1)
+        (up-compare-goal gl-wall-tc-pos-x >= 0)
+        (goal gl-wall-building-pending 1)
+        (goal gl-wall-deciding-building-position-for-end 0)
+
+        (goal gl-wall-building-criterion wall-south)
+        (goal gl-wall-building-direction -1)
+        =>
+        (up-copy-point gl-tmp-x gl-wall-south-pos-x)
+        (up-copy-point gl-tmp2-x gl-wall-south-east-pos-x)
+    )
+    (defrule
+        (goal gl-wall-calculated 1)
+        (up-compare-goal gl-wall-tc-pos-x >= 0)
+        (goal gl-wall-building-pending 1)
+        (goal gl-wall-deciding-building-position-for-end 0)
+
+        (goal gl-wall-building-criterion wall-south-west)
+        (goal gl-wall-building-direction -1)
+        =>
+        (up-copy-point gl-tmp-x gl-wall-south-west-pos-x)
+        (up-copy-point gl-tmp2-x gl-wall-south-pos-x)
+    )
+    (defrule
+        (goal gl-wall-calculated 1)
+        (up-compare-goal gl-wall-tc-pos-x >= 0)
+        (goal gl-wall-building-pending 1)
+        (goal gl-wall-deciding-building-position-for-end 0)
+
+        (goal gl-wall-building-criterion wall-west)
+        (goal gl-wall-building-direction -1)
+        =>
+        (up-copy-point gl-tmp-x gl-wall-west-pos-x)
+        (up-copy-point gl-tmp2-x gl-wall-south-west-pos-x)
+    )
+    (defrule
+        (goal gl-wall-calculated 1)
+        (up-compare-goal gl-wall-tc-pos-x >= 0)
+        (goal gl-wall-building-pending 1)
+        (goal gl-wall-deciding-building-position-for-end 0)
+
+        (goal gl-wall-building-criterion wall-north-west)
+        (goal gl-wall-building-direction -1)
+        =>
+        (up-copy-point gl-tmp-x gl-wall-north-west-pos-x)
+        (up-copy-point gl-tmp2-x gl-wall-west-pos-x)
+    )
+
+
+    (defrule
+        (goal gl-wall-calculated 1)
+        (up-compare-goal gl-wall-tc-pos-x >= 0)
+        (goal gl-wall-building-pending 1)
+        (goal gl-wall-deciding-building-position-for-end 0)
+        =>
+        (set-goal gl-wall-building-tile-from-criterion-for-end 0)
+    )
+    (defrule
+        (goal gl-wall-calculated 1)
+        (up-compare-goal gl-wall-tc-pos-x >= 0)
+        (goal gl-wall-building-pending 1)
+        (goal gl-wall-deciding-building-position-for-end 0)
+        (goal gl-wall-building-tile-from-criterion-for-end 0)
+        =>
+        (up-get-rule-id gl-wall-building-tile-from-criterion-for-id)
+    )
+        (defrule
+            (goal gl-wall-calculated 1)
+            (up-compare-goal gl-wall-tc-pos-x >= 0)
+            (goal gl-wall-building-pending 1)
+            (goal gl-wall-deciding-building-position-for-end 0)
+            (goal gl-wall-building-tile-from-criterion-for-end 0)
+            =>
+            (up-lerp-tiles gl-tmp-x gl-tmp2-x g: gl-wall-building-tile-from-criterion)
+        )
+
+        (defrule
+            (goal gl-wall-calculated 1)
+            (up-compare-goal gl-wall-tc-pos-x >= 0)
+            (goal gl-wall-building-pending 1)
+            (goal gl-wall-deciding-building-position-for-end 0)
+            (goal gl-wall-building-tile-from-criterion-for-end 0)
+            =>
+            (up-modify-goal gl-tmp g:= gl-tmp-x)
+            (up-modify-goal gl-tmp g:- gl-tmp2-x)
+            (up-modify-goal gl-tmp2 g:= gl-tmp-y)
+            (up-modify-goal gl-tmp2 g:- gl-tmp2-y)
+        )
+        (defrule
+            (goal gl-wall-calculated 1)
+            (up-compare-goal gl-wall-tc-pos-x >= 0)
+            (goal gl-wall-building-pending 1)
+            (goal gl-wall-deciding-building-position-for-end 0)
+            (goal gl-wall-building-tile-from-criterion-for-end 0)
+
+            (up-compare-goal gl-tmp == 0)
+            (up-compare-goal gl-tmp2 == 0)
+            =>
+            (set-goal gl-wall-building-tile-from-criterion-for-end 1)
+        )
+
+        (defrule
+            (goal gl-wall-calculated 1)
+            (up-compare-goal gl-wall-tc-pos-x >= 0)
+            (goal gl-wall-building-pending 1)
+            (goal gl-wall-deciding-building-position-for-end 0)
+            (goal gl-wall-building-tile-from-criterion-for-end 0)
+
+            (up-point-explored gl-tmp-x == explored-yes)
+            (or
+                (up-get-point-contains gl-tmp-x gl-tmp c: building-class)
+                (up-get-point-contains gl-tmp-x gl-tmp c: tree-class)
+            )
+            =>
+            (up-modify-goal gl-wall-building-tile-from-criterion c:+ 1)
+            (up-jump-direct g: gl-wall-building-tile-from-criterion-for-id); continue
+        )
+
+        (defrule
+            (goal gl-wall-calculated 1)
+            (up-compare-goal gl-wall-tc-pos-x >= 0)
+            (goal gl-wall-building-pending 1)
+            (goal gl-wall-deciding-building-position-for-end 0)
+            (goal gl-wall-building-tile-from-criterion-for-end 0)
+            =>
+            (up-set-target-point gl-tmp-x)
+            (up-full-reset-search)
+            (up-filter-distance c: -1 g: gl-wall-building-range)
+            (up-find-local c: building-class c: 20)
+            (up-get-search-state gl-tmp-local-total)
+        )
+        (defrule
+            (goal gl-wall-calculated 1)
+            (up-compare-goal gl-wall-tc-pos-x >= 0)
+            (goal gl-wall-building-pending 1)
+            (goal gl-wall-deciding-building-position-for-end 0)
+            (goal gl-wall-building-tile-from-criterion-for-end 0)
+
+            (up-compare-goal gl-tmp-local-total > 0)
+            =>
+            (up-modify-goal gl-wall-building-tile-from-criterion c:+ 1)
+            (up-jump-direct g: gl-wall-building-tile-from-criterion-for-id); continue
+        )
+
+        (defrule
+            (goal gl-wall-calculated 1)
+            (up-compare-goal gl-wall-tc-pos-x >= 0)
+            (goal gl-wall-building-pending 1)
+            (goal gl-wall-deciding-building-position-for-end 0)
+            (goal gl-wall-building-tile-from-criterion-for-end 0)
+            =>
+            (up-set-target-point gl-tmp-x)
+            (up-full-reset-search)
+            (up-filter-status c: status-ready c: list-active); not chopped tree
+            (up-filter-distance c: -1 g: gl-wall-building-range)
+            (up-find-resource c: wood c: 50)
+            (up-filter-status c: status-resource c: list-active); including chopped tree
+            (up-find-resource c: wood c: 50)
+            (up-find-resource c: stone c: 50)
+            (up-find-resource c: gold c: 50)
+            (up-get-search-state gl-tmp-local-total)
+        )
+        (defrule
+            (goal gl-wall-calculated 1)
+            (up-compare-goal gl-wall-tc-pos-x >= 0)
+            (goal gl-wall-building-pending 1)
+            (goal gl-wall-deciding-building-position-for-end 0)
+            (goal gl-wall-building-tile-from-criterion-for-end 0)
+
+            (up-compare-goal gl-tmp-remote-total > 0)
+            =>
+            (up-modify-goal gl-wall-building-tile-from-criterion c:+ 1)
+            (up-jump-direct g: gl-wall-building-tile-from-criterion-for-id); continue
+        )
+
+        (defrule
+            (goal gl-wall-calculated 1)
+            (up-compare-goal gl-wall-tc-pos-x >= 0)
+            (goal gl-wall-building-pending 1)
+            (goal gl-wall-deciding-building-position-for-end 0)
+            (goal gl-wall-building-tile-from-criterion-for-end 0)
+            =>
+            (set-goal gl-wall-building-pending 0)
+            (set-goal gl-wall-building-tile-from-criterion-for-end 1)
+            (up-copy-point gl-wall-building-pos-x gl-tmp-x)
+            (up-send-flare gl-wall-building-pos-x)
+        )
+    (defrule
+        (goal gl-wall-calculated 1)
+        (up-compare-goal gl-wall-tc-pos-x >= 0)
+        (goal gl-wall-building-pending 1)
+        (goal gl-wall-deciding-building-position-for-end 0)
+        (goal gl-wall-building-tile-from-criterion-for-end 0)
+        =>
+        (up-jump-direct g: gl-wall-building-tile-from-criterion-for-id)
+    )
+
+    (defrule
+        (goal gl-wall-calculated 1)
+        (up-compare-goal gl-wall-tc-pos-x >= 0)
+        (goal gl-wall-building-pending 0)
+        (goal gl-wall-deciding-building-position-for-end 0)
+        =>
+        ; break
+        (set-goal gl-wall-deciding-building-position-for-end 1)
+    )
+
+    ; change the criterion to the next one in the order
+    (defrule
+        (goal gl-wall-calculated 1)
+        (up-compare-goal gl-wall-tc-pos-x >= 0)
+        (goal gl-wall-building-pending 1)
+        (goal gl-wall-deciding-building-position-for-end 0)
+        =>
+        (up-modify-goal gl-wall-building-criterion g:+ gl-wall-building-direction)
+        (set-goal gl-wall-building-tile-from-criterion 0)
+    )
+    (defrule
+        (goal gl-wall-calculated 1)
+        (up-compare-goal gl-wall-tc-pos-x >= 0)
+        (goal gl-wall-building-pending 1)
+        (goal gl-wall-deciding-building-position-for-end 0)
+
+        (up-compare-goal gl-wall-building-criterion > wall-north-west) ; wall-north-west is the last one in the order, so go to 0 (wall-north)
+        =>
+        (set-goal gl-wall-building-criterion wall-north)
+    )
+    (defrule
+        (goal gl-wall-calculated 1)
+        (up-compare-goal gl-wall-tc-pos-x >= 0)
+        (goal gl-wall-building-pending 1)
+        (goal gl-wall-deciding-building-position-for-end 0)
+
+        (up-compare-goal gl-wall-building-criterion < wall-north) ; wall-north the first one in the order, so go to the last (wall-north-west)
+        =>
+        (set-goal gl-wall-building-criterion wall-north-west)
+    )
+
+
+    (defrule ; check whether going around all places
+        (goal gl-wall-calculated 1)
+        (up-compare-goal gl-wall-tc-pos-x >= 0)
+        (goal gl-wall-building-pending 1)
+        (goal gl-wall-deciding-building-position-for-end 0)
+        =>
+        (up-modify-goal gl-tmp g:= gl-wall-building-criterion-before-changing)
+        (up-modify-goal gl-tmp g:- gl-wall-building-criterion)
+    )
+    (defrule
+        (goal gl-wall-calculated 1)
+        (up-compare-goal gl-wall-tc-pos-x >= 0)
+        (goal gl-wall-building-pending 1)
+        (goal gl-wall-deciding-building-position-for-end 0)
+
+        (goal gl-tmp 0)
+        =>
+        ; cannot have building position as a part of the wall in all places, so this trial is no longer available
+        (set-goal gl-wall-building-pending 0)
+        (set-goal gl-wall-building-unavailable 1)
+        (set-goal gl-wall-deciding-building-position-for-end 1)
+    )
+(defrule
+    (goal gl-wall-calculated 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+    (goal gl-wall-building-pending 1)
+    (goal gl-wall-deciding-building-position-for-end 0)
+    =>
+    (up-jump-direct g: gl-wall-deciding-building-position-for-id)
 )
