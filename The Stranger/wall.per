@@ -64,6 +64,12 @@
 (defconst gl-wall-gate-decided 466)
 (defconst gl-wall-gate-pos-x 467)
 (defconst gl-wall-gate-pos-y 468)
+(defconst gl-wall-gate-type0 469)
+(defconst gl-wall-gate-type1 470)
+(defconst gl-wall-gate-type2 471)
+(defconst gl-wall-gate-type3 472)
+(defconst gl-wall-gate-type-decided 473)
+(defconst gl-wall-building-lerp-left-distance 474)
 
 (defrule
     (true)
@@ -82,7 +88,14 @@
     (set-goal gl-wall-building-unavailable 0)
     (set-goal gl-wall-building-range 3)
     (set-goal gl-wall-gate-decided 0)
+    (set-goal gl-wall-gate-type-decided 0)
 
+    (set-strategic-number sn-placement-zone-size 0)
+    (disable-self)
+)
+(defrule ; to avoid `Rule too long` error
+    (true)
+    =>
     (set-goal gl-wall-north-has-tree 0)
     (set-goal gl-wall-north-east-has-tree 0)
     (set-goal gl-wall-east-has-tree 0)
@@ -770,10 +783,10 @@
     (up-copy-point gl-tmp-x gl-wall-right-corner-pos-x)
     (up-modify-goal gl-tmp-x c:/ 2)
     (up-modify-goal gl-tmp-y c:/ 2)
-    (up-send-flare gl-tmp-x)
+    ;(up-send-flare gl-tmp-x)
     (up-add-point gl-tmp-x gl-wall-tc-pos-x c: -1)
-    (up-chat-data-to-all "gl-tmp-x: %d" g: gl-tmp-x)
-    (up-chat-data-to-all "gl-tmp-y: %d" g: gl-tmp-y)
+    ;(up-chat-data-to-all "gl-tmp-x: %d" g: gl-tmp-x)
+    ;(up-chat-data-to-all "gl-tmp-y: %d" g: gl-tmp-y)
 )
 (defrule
     (goal gl-wall-start 1)
@@ -915,6 +928,8 @@
     (up-send-flare gl-wall-south-west-pos-x)
     (up-send-flare gl-wall-west-pos-x)
     (up-send-flare gl-wall-north-west-pos-x)
+
+    (up-send-flare gl-wall-building-pos-x)
 )
 
 
@@ -961,7 +976,184 @@
 ;)
 
 
+; build gate
+(defrule
+    (goal gl-wall-calculated 1)
+    (goal gl-wall-start-walling 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
 
+    (goal gl-wall-gate-decided 0)
+    (goal gl-wall-building-pending 0)
+    (up-compare-goal gl-wall-building-range < 5)
+    =>
+    (set-goal gl-wall-building-range 5)
+    (set-goal gl-wall-building-pending 1)
+)
+(defrule
+    (goal gl-wall-calculated 1)
+    (goal gl-wall-start-walling 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+
+    (goal gl-wall-gate-decided 0)
+    (goal gl-wall-building-pending 0)
+    (up-compare-goal gl-wall-building-range >= 5)
+    =>
+    (set-goal gl-wall-building-pending 1)
+    (up-copy-point gl-wall-gate-pos-x gl-wall-building-pos-x)
+    (set-goal gl-wall-gate-decided 1)
+)
+(defrule ; is ascending?
+    (goal gl-wall-calculated 1)
+    (goal gl-wall-start-walling 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+
+    (goal gl-wall-gate-decided 1)
+    (goal gl-wall-gate-type-decided 0)
+    =>
+    (up-copy-point gl-tmp-x gl-wall-gate-pos-x)
+    (up-modify-goal gl-tmp-x c:+ 1)
+)
+(defrule
+    (goal gl-wall-calculated 1)
+    (goal gl-wall-start-walling 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+
+    (goal gl-wall-gate-decided 1)
+    (goal gl-wall-gate-type-decided 0)
+
+    (up-point-explored gl-wall-gate-pos-x == explored-yes)
+    (up-point-contains gl-wall-gate-pos-x c: palisade-wall)
+    (up-point-explored gl-tmp-x == explored-yes)
+    (up-point-contains gl-tmp-x c: palisade-wall)
+    =>
+    (set-goal gl-wall-gate-type-decided 1)
+    (set-goal gl-wall-gate-type0 789)
+    (set-goal gl-wall-gate-type1 790)
+    (set-goal gl-wall-gate-type2 791)
+    (set-goal gl-wall-gate-type3 792)
+    ;(up-modify-goal gl-wall-gate-pos-y c:+ 2)
+    (chat-to-all "gate is ascending")
+)
+(defrule ; is descending?
+    (goal gl-wall-calculated 1)
+    (goal gl-wall-start-walling 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+
+    (goal gl-wall-gate-decided 1)
+    (goal gl-wall-gate-type-decided 0)
+    =>
+    (up-copy-point gl-tmp-x gl-wall-gate-pos-x)
+    (up-modify-goal gl-tmp-y c:+ 1)
+)
+(defrule
+    (goal gl-wall-calculated 1)
+    (goal gl-wall-start-walling 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+
+    (goal gl-wall-gate-decided 1)
+    (goal gl-wall-gate-type-decided 0)
+
+    (up-point-explored gl-wall-gate-pos-x == explored-yes)
+    (up-point-contains gl-wall-gate-pos-x c: palisade-wall)
+    (up-point-explored gl-tmp-x == explored-yes)
+    (up-point-contains gl-tmp-x c: palisade-wall)
+    =>
+    (set-goal gl-wall-gate-type-decided 1)
+    (set-goal gl-wall-gate-type0 793)
+    (set-goal gl-wall-gate-type1 794)
+    (set-goal gl-wall-gate-type2 795)
+    (set-goal gl-wall-gate-type3 796)
+    ;(up-modify-goal gl-wall-gate-pos-x c:- 2)
+    (chat-to-all "gate is descending")
+)
+(defrule ; is horizontal?
+    (goal gl-wall-calculated 1)
+    (goal gl-wall-start-walling 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+
+    (goal gl-wall-gate-decided 1)
+    (goal gl-wall-gate-type-decided 0)
+    =>
+    (up-copy-point gl-tmp-x gl-wall-gate-pos-x)
+    (up-modify-goal gl-tmp-x c:+ 1)
+    (up-modify-goal gl-tmp-y c:+ 1)
+)
+(defrule
+    (goal gl-wall-calculated 1)
+    (goal gl-wall-start-walling 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+
+    (goal gl-wall-gate-decided 1)
+    (goal gl-wall-gate-type-decided 0)
+
+    (up-point-explored gl-wall-gate-pos-x == explored-yes)
+    (up-point-contains gl-wall-gate-pos-x c: palisade-wall)
+    (up-point-explored gl-tmp-x == explored-yes)
+    (up-point-contains gl-tmp-x c: palisade-wall)
+    =>
+    (set-goal gl-wall-gate-type-decided 1)
+    (set-goal gl-wall-gate-type0 797)
+    (set-goal gl-wall-gate-type1 798)
+    (set-goal gl-wall-gate-type2 799)
+    (set-goal gl-wall-gate-type3 800)
+    (chat-to-all "gate is horizontal")
+)
+(defrule ; is vertical?
+    (goal gl-wall-calculated 1)
+    (goal gl-wall-start-walling 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+
+    (goal gl-wall-gate-decided 1)
+    (goal gl-wall-gate-type-decided 0)
+    =>
+    (up-copy-point gl-tmp-x gl-wall-gate-pos-x)
+    (up-modify-goal gl-tmp-x c:+ 1)
+    (up-modify-goal gl-tmp-y c:- 1)
+)
+(defrule
+    (goal gl-wall-calculated 1)
+    (goal gl-wall-start-walling 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+
+    (goal gl-wall-gate-decided 1)
+    (goal gl-wall-gate-type-decided 0)
+
+    (up-point-explored gl-wall-gate-pos-x == explored-yes)
+    (up-point-contains gl-wall-gate-pos-x c: palisade-wall)
+    (up-point-explored gl-tmp-x == explored-yes)
+    (up-point-contains gl-tmp-x c: palisade-wall)
+    =>
+    (set-goal gl-wall-gate-type-decided 1)
+    (set-goal gl-wall-gate-type0 801)
+    (set-goal gl-wall-gate-type1 802)
+    (set-goal gl-wall-gate-type2 803)
+    (set-goal gl-wall-gate-type3 804)
+    (chat-to-all "gate is vertical")
+)
+(defrule
+    (goal gl-wall-calculated 1)
+    (goal gl-wall-start-walling 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+
+    (goal gl-wall-gate-decided 1)
+    (goal gl-wall-gate-type-decided 1)
+
+    (up-object-type-count-total g: gl-wall-gate-type0 == 0)
+    (up-object-type-count-total g: gl-wall-gate-type1 == 0)
+    (up-object-type-count-total g: gl-wall-gate-type2 == 0)
+    (up-object-type-count-total g: gl-wall-gate-type3 == 0)
+    (up-can-build 0 g: gl-wall-gate-type3)
+    =>
+    (set-strategic-number sn-placement-zone-size 0)
+    (up-set-target-point gl-wall-gate-pos-x)
+    ;(up-build place-point 0 g: gl-wall-gate-type0)
+    (up-build-line gl-wall-gate-pos-x gl-wall-gate-pos-x g: gl-wall-gate-type3)
+    (up-send-flare gl-wall-gate-pos-x)
+    (chat-to-all "building gate!")
+)
+
+
+; build walls
 (defrule
     (goal gl-wall-calculated 1)
     (goal gl-wall-start-walling 1)
@@ -1081,32 +1273,32 @@
 ;    (up-send-flare gl-wall-north-west-pos-x)
 ;)
 
-(defrule
-    (goal gl-wall-calculated 1)
-    (up-compare-goal gl-wall-tc-pos-x >= 0)
-
-    (goal gl-wall-north-not-used 0)
-    (goal gl-wall-north-west-not-used 0)
-
-    (building-type-count-total 789 == 0)
-    (building-type-count-total 790 == 0)
-    (building-type-count-total 791 == 0)
-    (building-type-count-total 792 == 0)
-
-    (can-build 792)
-    =>
-    (set-strategic-number sn-placement-zone-size 0)
-    (up-copy-point gl-tmp-x gl-wall-north-pos-x)
-    (up-lerp-tiles gl-tmp-x gl-wall-north-west-pos-x c: 15)
-    (up-modify-goal gl-tmp-y c:- 2)
-    ;(up-modify-goal gl-tmp-x c:+ 1)
-    (up-set-target-point gl-tmp-x)
-    (up-send-flare gl-wall-north-pos-x)
-    (up-send-flare gl-wall-north-west-pos-x)
-    (up-send-flare gl-tmp-x)
-    (up-build place-point 0 c: 792)
-    ;(up-build place-point 0 c: house)
-)
+;(defrule
+;    (goal gl-wall-calculated 1)
+;    (up-compare-goal gl-wall-tc-pos-x >= 0)
+;
+;    (goal gl-wall-north-not-used 0)
+;    (goal gl-wall-north-west-not-used 0)
+;
+;    (building-type-count-total 789 == 0)
+;    (building-type-count-total 790 == 0)
+;    (building-type-count-total 791 == 0)
+;    (building-type-count-total 792 == 0)
+;
+;    (can-build 792)
+;    =>
+;    (set-strategic-number sn-placement-zone-size 0)
+;    (up-copy-point gl-tmp-x gl-wall-north-pos-x)
+;    (up-lerp-tiles gl-tmp-x gl-wall-north-west-pos-x c: 15)
+;    (up-modify-goal gl-tmp-y c:- 2)
+;    ;(up-modify-goal gl-tmp-x c:+ 1)
+;    (up-set-target-point gl-tmp-x)
+;    (up-send-flare gl-wall-north-pos-x)
+;    (up-send-flare gl-wall-north-west-pos-x)
+;    (up-send-flare gl-tmp-x)
+;    (up-build place-point 0 c: 792)
+;    ;(up-build place-point 0 c: house)
+;)
 
 
 ; set building position as a part of the wall
@@ -1321,6 +1513,14 @@
         (up-copy-point gl-tmp-x gl-wall-north-west-pos-x)
         (up-copy-point gl-tmp2-x gl-wall-west-pos-x)
     )
+    (defrule
+        (goal gl-wall-calculated 1)
+        (up-compare-goal gl-wall-tc-pos-x >= 0)
+        (goal gl-wall-building-pending 1)
+        (goal gl-wall-deciding-building-position-for-end 0)
+        =>
+        (up-get-point-distance gl-tmp-x gl-tmp2-x gl-wall-building-lerp-left-distance)
+    )
 
 
     (defrule
@@ -1340,6 +1540,17 @@
         =>
         (up-get-rule-id gl-wall-building-tile-from-criterion-for-id)
     )
+        (defrule ; preserve the distance
+            (goal gl-wall-calculated 1)
+            (up-compare-goal gl-wall-tc-pos-x >= 0)
+            (goal gl-wall-building-pending 1)
+            (goal gl-wall-deciding-building-position-for-end 0)
+            (goal gl-wall-building-tile-from-criterion-for-end 0)
+            =>
+            (up-get-point-distance gl-tmp-x gl-tmp2-x gl-tmp)
+            (up-modify-goal gl-wall-building-lerp-left-distance g:min gl-tmp)
+        )
+
         (defrule
             (goal gl-wall-calculated 1)
             (up-compare-goal gl-wall-tc-pos-x >= 0)
@@ -1348,8 +1559,32 @@
             (goal gl-wall-building-tile-from-criterion-for-end 0)
             =>
             (up-lerp-tiles gl-tmp-x gl-tmp2-x g: gl-wall-building-tile-from-criterion)
+            (up-send-flare gl-tmp-x)
         )
 
+        (defrule ; calculate the distance after lerp
+            (goal gl-wall-calculated 1)
+            (up-compare-goal gl-wall-tc-pos-x >= 0)
+            (goal gl-wall-building-pending 1)
+            (goal gl-wall-deciding-building-position-for-end 0)
+            (goal gl-wall-building-tile-from-criterion-for-end 0)
+            =>
+            (up-get-point-distance gl-tmp-x gl-tmp2-x gl-tmp)
+            (up-modify-goal gl-tmp g:- gl-wall-building-lerp-left-distance)
+            (up-chat-data-to-all "gl-wall-building-lerp-left-distance: %d" g: gl-wall-building-lerp-left-distance)
+        )
+        (defrule
+            (goal gl-wall-calculated 1)
+            (up-compare-goal gl-wall-tc-pos-x >= 0)
+            (goal gl-wall-building-pending 1)
+            (goal gl-wall-deciding-building-position-for-end 0)
+            (goal gl-wall-building-tile-from-criterion-for-end 0)
+
+            (up-compare-goal gl-tmp > 0) ; lerp over the end point, we need to stop
+            =>
+            (set-goal gl-wall-building-tile-from-criterion-for-end 1)
+            (chat-to-all "lerp reached the end point, stopping")
+        )
         (defrule
             (goal gl-wall-calculated 1)
             (up-compare-goal gl-wall-tc-pos-x >= 0)
@@ -1373,6 +1608,7 @@
             (up-compare-goal gl-tmp2 == 0)
             =>
             (set-goal gl-wall-building-tile-from-criterion-for-end 1)
+            (chat-to-all "same point found! lerp reached the end point, stopping")
         )
 
         (defrule
@@ -1446,6 +1682,7 @@
             (up-compare-goal gl-tmp-remote-total > 0)
             =>
             (up-modify-goal gl-wall-building-tile-from-criterion c:+ 1)
+            (up-chat-data-to-all "resources %d are found when placing wall" g: gl-tmp-remote-total)
             (up-jump-direct g: gl-wall-building-tile-from-criterion-for-id); continue
         )
 
