@@ -123,8 +123,9 @@
     (goal gl-wall-building-unavailable 0)
     (goal gl-wall-start-walling 0)
     =>
-    (up-set-target-point gl-wall-building-pos-x)
-    (up-build place-point 0 c: house)
+    (up-build-line gl-wall-building-pos-x gl-wall-building-pos-x c: house)
+    ;(up-set-target-point gl-wall-building-pos-x)
+    ;(up-build place-point 0 c: house)
     (set-goal gl-wall-building-pending 1)
     (up-jump-rule 1) ; skip normally building houses
 )

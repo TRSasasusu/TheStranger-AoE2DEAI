@@ -167,7 +167,7 @@
     =>
     (up-find-remote c: lumber-camp c: 5)
     (up-get-search-state gl-attack-target-local-total)
-    (chat-to-all "try attacking to lumber-camp")
+    ;(chat-to-all "try attacking to lumber-camp")
 )
 (defrule
     (up-compare-goal gl-attack-target-rnd > 0)
@@ -179,7 +179,7 @@
     )
     =>
     (set-goal gl-attack-target-rnd 6)
-    (chat-to-all "attacking to NOT lumber-camp")
+    ;(chat-to-all "attacking to NOT lumber-camp")
 )
 (defrule
     (up-compare-goal gl-attack-target-rnd >= 6)
@@ -191,7 +191,7 @@
     =>
     (up-find-remote c: mill c: 5)
     (up-get-search-state gl-attack-target-local-total)
-    (chat-to-all "try attacking to mill")
+    ;(chat-to-all "try attacking to mill")
 )
 (defrule
     (up-compare-goal gl-attack-target-rnd >= 6)
@@ -203,7 +203,7 @@
     )
     =>
     (set-goal gl-attack-target-rnd 8)
-    (chat-to-all "attacking to NOT mill")
+    ;(chat-to-all "attacking to NOT mill")
 )
 (defrule
     (up-compare-goal gl-attack-target-rnd >= 8)
@@ -226,7 +226,7 @@
     )
     =>
     (set-goal gl-attack-target-rnd 11)
-    (chat-to-all "attacking to NOT mining-camp")
+    ;(chat-to-all "attacking to NOT mining-camp")
 )
 (defrule
     (up-compare-goal gl-attack-target-rnd >= 11)
@@ -249,7 +249,7 @@
     )
     =>
     (set-goal gl-attack-target-rnd 22)
-    (chat-to-all "attacking to NOT town-center or deep")
+    ;(chat-to-all "attacking to NOT town-center or deep")
 )
 (defrule
     (up-compare-goal gl-attack-target-rnd > 0)
@@ -347,7 +347,7 @@
     (up-modify-goal gl-tmp c:- 1)
     (up-modify-goal gl-tmp g:* gl-attack-unit-local-total)
     (up-modify-goal gl-tmp c:z/ 100)
-    (up-chat-data-to-all "units with %d go!" g: gl-tmp)
+    ;(up-chat-data-to-all "units with %d go!" g: gl-tmp)
     (up-set-target-object search-local g: gl-tmp)
     (up-get-point position-object gl-tmp-x)
     (up-set-target-point gl-tmp-x)
@@ -397,7 +397,7 @@
     (up-modify-goal gl-attack-target-y g:+ gl-tmp)
     ;(up-target-point gl-attack-target-x action-move -1 -1)
     (up-target-point gl-attack-target-x action-attack-move -1 -1)
-    (chat-to-all "attack move!")
+    ;(chat-to-all "attack move!")
     ;(up-send-flare gl-attack-target-x)
     (up-full-reset-search)
 )
@@ -417,7 +417,7 @@
     )
     =>
     (up-target-point gl-attack-target-x action-move -1 -1)
-    (chat-to-all "only moving!")
+    ;(chat-to-all "only moving!")
     ;(up-send-flare gl-attack-target-x)
     (up-full-reset-search)
 )
