@@ -86,56 +86,6 @@
 ;    ;(up-chat-data-to-all "start attacking!")
 ;)
 
-; detect near villagers
-(defrule
-    (true)
-    =>
-    (set-goal gl-tmp-local-total 0)
-    (set-goal gl-tmp-remote-total 0)
-
-    (up-full-reset-search)
-    (up-find-remote c: villager-class c: 50)
-    (up-get-search-state gl-tmp-local-total)
-)
-(defrule
-    (up-compare-goal gl-tmp-remote-total > 0)
-    =>
-    (generate-random-number 100)
-    (up-get-fact random-number 0 gl-tmp)
-    (up-modify-goal gl-tmp c:/ gl-tmp-remote-total)
-    (up-modify-goal gl-tmp c:* 100)
-    (up-set-target-object search-remote g: gl-tmp)
-    (up-get-point position-object gl-tmp-x)
-    (up-set-target-point gl-tmp-x)
-
-    (up-filter-distance c: -1 c: 3)
-    (up-filter-include cmdid-military -1 -1 -1)
-    (up-find-local c: all-units-class c: 20)
-    (up-get-search-state gl-tmp-local-total)
-)
-(defrule
-    (up-compare-goal gl-tmp-local-total > 0)
-    =>
-    (generate-random-number 100)
-    (up-get-fact random-number 0 gl-tmp2)
-    (up-modify-goal gl-tmp2 c:/ gl-tmp-local-total)
-    (up-modify-goal gl-tmp2 c:* 100)
-    (up-set-target-object search-local g: gl-tmp2)
-    (up-get-point position-object gl-tmp2-x) ; gl-tmp-x preserves the position of the detected remote villager
-    (up-set-target-point gl-tmp2-x)
-)
-(defrule
-    (up-compare-goal gl-tmp-local-total > 0)
-    =>
-    (up-reset-search 1 1 0 0)
-    (up-reset-filters)
-    (up-filter-distance c: -1 c: 3)
-    (up-filter-include cmdid-military -1 -1 -1)
-    (up-find-local c: all-units-class c: 50)
-
-    (up-target-point gl-tmp-x action-attack-move -1 -1)
-    (chat-to-all "attack move to nearby villager!")
-)
 
 (defrule
     ;(or

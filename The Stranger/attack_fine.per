@@ -1,0 +1,208 @@
+(defconst gl-attack-fine-focus-player-backup 600)
+(defconst gl-attack-fine-attack-unit-for-id 601)
+(defconst gl-attack-fine-attack-unit-for-end 602)
+(defconst gl-attack-fine-attack-each-unit-for-id 603)
+(defconst gl-attack-fine-attack-each-unit-for-end 604)
+(defconst gl-attack-fine-target-unit-id 605)
+(defconst gl-attack-fine-skip 606)
+(defconst t-attack-fine-attack-timer 37)
+
+; initialization containing backup focus player
+(defrule
+    (true)
+    =>
+    (up-modify-goal gl-attack-fine-focus-player-backup s:= sn-focus-player-number)
+
+    (set-goal gl-attack-fine-skip 0)
+)
+(defrule
+    (players-building-count focus-player == 0)
+    =>
+    (set-goal gl-attack-fine-skip 1)
+)
+(defrule
+    (up-timer-status t-attack-fine-attack-timer == timer-running)
+    =>
+    (set-goal gl-attack-fine-skip 1)
+)
+
+(defrule
+    (true)
+    =>
+    (set-goal gl-attack-fine-attack-unit-for-end 0)
+
+    (set-strategic-number sn-focus-player-number 0)
+)
+(defrule
+    (goal gl-attack-fine-attack-unit-for-end 0)
+    =>
+    (up-get-rule-id gl-attack-fine-attack-unit-for-id)
+)
+    (defrule
+        (goal gl-attack-fine-attack-unit-for-end 0)
+
+        (goal gl-attack-fine-skip 1)
+        =>
+        (set-goal gl-attack-fine-attack-unit-for-end 1)
+    )
+
+    (defrule
+        (goal gl-attack-fine-attack-unit-for-end 0)
+        =>
+        (up-modify-sn sn-focus-player-number c:+ 1)
+    )
+    (defrule
+        (goal gl-attack-fine-attack-unit-for-end 0)
+
+        (up-compare-sn sn-focus-player-number > 8)
+        =>
+        (set-goal gl-attack-fine-attack-unit-for-end 1)
+    )
+    (defrule
+        (goal gl-attack-fine-attack-unit-for-end 0)
+
+        (not(and
+            (player-valid focus-player)
+            (players-stance focus-player enemy)
+        ))
+        =>
+        (up-jump-direct g: gl-attack-fine-attack-unit-for-id)
+    )
+
+    ; detect near units to attack
+    (defrule
+        (goal gl-attack-fine-attack-unit-for-end 0)
+        =>
+        (set-goal gl-tmp-local-total 0)
+        (set-goal gl-tmp-remote-total 0)
+
+        (up-full-reset-search)
+        ;;(up-filter-exclude -1 -1 -1 building-class)
+        ;;(up-filter-exclude -1 -1 -1 tower-class)
+        ;;(up-filter-exclude -1 -1 -1 wall-class)
+        ;(up-filter-include cmdid-military -1 -1 -1)
+        ;(up-find-remote c: all-units-class c: 50)
+        ;(up-reset-filters)
+        ;(up-filter-include cmdid-villager -1 -1 -1)
+        ;(up-find-remote c: all-units-class c: 50)
+        (up-find-remote c: villager-class c: 50)
+        (up-get-search-state gl-tmp-local-total)
+    )
+
+    (defrule
+        (goal gl-attack-fine-attack-unit-for-end 0)
+        =>
+        (set-goal gl-attack-fine-attack-each-unit-for-end 0)
+
+        (up-modify-goal gl-attack-fine-target-unit-id g:= gl-tmp-remote-total)
+        (up-modify-goal gl-attack-fine-target-unit-id c:- 1)
+    )
+    (defrule
+        (goal gl-attack-fine-attack-unit-for-end 0)
+        (goal gl-attack-fine-attack-each-unit-for-end 0)
+        =>
+        (up-get-rule-id gl-attack-fine-attack-each-unit-for-id)
+    )
+        (defrule
+            (goal gl-attack-fine-attack-unit-for-end 0)
+            (goal gl-attack-fine-attack-each-unit-for-end 0)
+
+            (up-compare-goal gl-attack-fine-target-unit-id < 0)
+            =>
+            (set-goal gl-attack-fine-attack-each-unit-for-end 1)
+        )
+
+        (defrule
+            (goal gl-attack-fine-attack-unit-for-end 0)
+            (goal gl-attack-fine-attack-each-unit-for-end 0)
+            =>
+            (up-set-target-object search-remote g: gl-attack-fine-target-unit-id)
+            (up-get-point position-object gl-tmp-x)
+            (up-set-target-point gl-tmp-x)
+
+            (up-reset-search 1 1 0 0)
+            (up-reset-filters)
+            (up-filter-distance c: -1 c: 3)
+            (up-filter-include cmdid-military -1 -1 -1)
+            (up-find-local c: all-units-class c: 50)
+            (up-get-search-state gl-tmp-local-total)
+        )
+        (defrule
+            (goal gl-attack-fine-attack-unit-for-end 0)
+            (goal gl-attack-fine-attack-each-unit-for-end 0)
+
+            (up-compare-goal gl-tmp-local-total > 0)
+            =>
+            ;(up-target-objects 1 action-patrol -1 -1)
+            (up-target-point gl-tmp-x action-attack-move -1 -1)
+            (up-send-flare gl-tmp-x)
+            (chat-to-all "attack move to nearby enemy unit!")
+            (set-goal gl-attack-fine-attack-each-unit-for-end 1)
+            (set-goal gl-attack-fine-attack-unit-for-end 1)
+
+            (enable-timer t-attack-fine-attack-timer 3)
+        )
+
+        (defrule
+            (goal gl-attack-fine-attack-unit-for-end 0)
+            (goal gl-attack-fine-attack-each-unit-for-end 0)
+            =>
+            (up-modify-goal gl-attack-fine-target-unit-id c:- 1)
+        )
+    (defrule
+        (goal gl-attack-fine-attack-unit-for-end 0)
+        (goal gl-attack-fine-attack-each-unit-for-end 0)
+        =>
+        (up-jump-direct g: gl-attack-fine-attack-each-unit-for-id)
+    )
+    ;(defrule
+    ;    (up-compare-goal gl-tmp-remote-total > 0)
+    ;    =>
+    ;    (generate-random-number 100)
+    ;    (up-get-fact random-number 0 gl-tmp)
+    ;    (up-modify-goal gl-tmp c:/ gl-tmp-remote-total)
+    ;    (up-modify-goal gl-tmp c:* 100)
+    ;    (up-set-target-object search-remote g: gl-tmp)
+    ;    (up-get-point position-object gl-tmp-x)
+    ;    (up-set-target-point gl-tmp-x)
+
+    ;    (up-filter-distance c: -1 c: 3)
+    ;    (up-filter-include cmdid-military -1 -1 -1)
+    ;    (up-find-local c: all-units-class c: 20)
+    ;    (up-get-search-state gl-tmp-local-total)
+    ;)
+    ;(defrule
+    ;    (up-compare-goal gl-tmp-local-total > 0)
+    ;    =>
+    ;    (generate-random-number 100)
+    ;    (up-get-fact random-number 0 gl-tmp2)
+    ;    (up-modify-goal gl-tmp2 c:/ gl-tmp-local-total)
+    ;    (up-modify-goal gl-tmp2 c:* 100)
+    ;    (up-set-target-object search-local g: gl-tmp2)
+    ;    (up-get-point position-object gl-tmp2-x) ; gl-tmp-x preserves the position of the detected remote villager
+    ;    (up-set-target-point gl-tmp2-x)
+    ;)
+    ;(defrule
+    ;    (up-compare-goal gl-tmp-local-total > 0)
+    ;    =>
+    ;    (up-reset-search 1 1 0 0)
+    ;    (up-reset-filters)
+    ;    (up-filter-distance c: -1 c: 3)
+    ;    (up-filter-include cmdid-military -1 -1 -1)
+    ;    (up-find-local c: all-units-class c: 50)
+
+    ;    (up-target-point gl-tmp-x action-attack-move -1 -1)
+    ;    (chat-to-all "attack move to nearby villager!")
+    ;)
+(defrule
+    (goal gl-attack-fine-attack-unit-for-end 0)
+    =>
+    (up-jump-direct g: gl-attack-fine-attack-unit-for-id)
+)
+
+; restore focus player
+(defrule
+    (true)
+    =>
+    (up-modify-sn sn-focus-player-number g:= gl-attack-fine-focus-player-backup)
+)
