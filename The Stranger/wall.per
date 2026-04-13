@@ -71,6 +71,8 @@
 (defconst gl-wall-gate-type-decided 473)
 (defconst gl-wall-building-lerp-left-distance 474)
 (defconst gl-wall-building-tile-from-criterion-for-skip 475)
+(defconst gl-wall-building-criterion-initial 476)
+(defconst gl-wall-gate-built 477)
 
 (defrule
     (true)
@@ -90,6 +92,7 @@
     (set-goal gl-wall-building-range 3)
     (set-goal gl-wall-gate-decided 0)
     (set-goal gl-wall-gate-type-decided 0)
+    (set-goal gl-wall-gate-built 0)
 
     (set-goal gl-wall-building-criterion wall-north) ; default used like in the center of the map in custom scenario
     (set-goal gl-wall-building-direction 1)
@@ -955,6 +958,7 @@
     =>
     (set-goal gl-wall-calculated 1)
     (set-goal gl-wall-building-pending 1)
+    (up-modify-goal gl-wall-building-criterion-initial g:= gl-wall-building-criterion)
     (chat-to-all "wall calculated")
     (up-chat-data-to-all "gl-wall-has-edge: %d" g: gl-wall-has-edge)
     (up-chat-data-to-all "gl-wall-building-criterion: %d" g: gl-wall-building-criterion)
@@ -999,11 +1003,12 @@
 
     (goal gl-wall-gate-decided 0)
     (goal gl-wall-building-pending 0)
-    (up-compare-goal gl-wall-building-range < 6)
+    (up-compare-goal gl-wall-building-range != 0)
     =>
-    (set-goal gl-wall-building-range 6)
+    (set-goal gl-wall-building-range 0)
     (set-goal gl-wall-building-pending 1)
-    (chat-to-all "building range set to 6 for gate")
+    (up-modify-goal gl-wall-building-criterion g:= gl-wall-building-criterion-initial)
+    (chat-to-all "building range set to 0 for gate")
 )
 (defrule
     (goal gl-wall-calculated 1)
@@ -1013,7 +1018,7 @@
     (goal gl-wall-gate-decided 0)
     (goal gl-wall-gate-type-decided 0)
     (goal gl-wall-building-pending 0)
-    (up-compare-goal gl-wall-building-range >= 6)
+    (up-compare-goal gl-wall-building-range == 0)
     =>
     (set-goal gl-wall-building-pending 1)
     (up-copy-point gl-wall-gate-pos-x gl-wall-building-pos-x)
@@ -1031,7 +1036,7 @@
     =>
     (up-full-reset-search)
     (up-set-target-point gl-wall-gate-pos-x)
-    (up-filter-distance c: -1 c: 2)
+    (up-filter-distance c: -1 c: 3)
     (up-find-local c: palisade-wall c: 10)
     (up-filter-status c: status-pending c: list-active) ; including only base
     (up-find-status-local c: palisade-wall c: 10)
@@ -1310,6 +1315,20 @@
     (set-goal gl-wall-gate-type3 804)
     (chat-to-all "gate is vertical")
 )
+(defrule ; failed to decide gate type
+    (goal gl-wall-calculated 1)
+    (goal gl-wall-start-walling 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+
+    (goal gl-wall-gate-decided 1)
+    (goal gl-wall-gate-type-decided 0)
+    =>
+    (set-goal gl-wall-gate-decided 0)
+    (set-goal gl-wall-gate-built 0)
+    (set-goal gl-wall-gate-type-decided 0)
+    (chat-to-all "gate type decision failed, recalculating gate position")
+    (up-chat-data-to-all "gl-wall-building-tile-from-criterion: %d" g: gl-wall-building-tile-from-criterion)
+)
 (defrule
     (goal gl-wall-calculated 1)
     (goal gl-wall-start-walling 1)
@@ -1329,9 +1348,30 @@
     ;(up-build place-point 0 g: gl-wall-gate-type0)
     (up-build-line gl-wall-gate-pos-x gl-wall-gate-pos-x g: gl-wall-gate-type3)
     (up-send-flare gl-wall-gate-pos-x)
+    (set-goal gl-wall-gate-built 1)
     (chat-to-all "building gate!")
 )
+(defrule
+    (goal gl-wall-calculated 1)
+    (goal gl-wall-start-walling 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
 
+    (goal gl-wall-gate-decided 1)
+    (goal gl-wall-gate-type-decided 1)
+
+    (up-object-type-count-total g: gl-wall-gate-type0 == 0)
+    (up-object-type-count-total g: gl-wall-gate-type1 == 0)
+    (up-object-type-count-total g: gl-wall-gate-type2 == 0)
+    (up-object-type-count-total g: gl-wall-gate-type3 == 0)
+    (goal gl-wall-gate-built 1)
+    =>
+    (set-goal gl-wall-gate-decided 0)
+    (set-goal gl-wall-gate-built 0)
+    (set-goal gl-wall-gate-type-decided 0)
+    ;(set-goal gl-wall-building-range 2)
+    (chat-to-all "gate built failed, recalculating gate position")
+    (up-chat-data-to-all "gl-wall-building-tile-from-criterion: %d" g: gl-wall-building-tile-from-criterion)
+)
 
 ; build walls
 (defrule
@@ -1947,6 +1987,7 @@
         (goal gl-wall-building-pending 1)
         (goal gl-wall-deciding-building-position-for-end 0)
         =>
+        (up-lerp-tiles gl-tmp-x gl-tmp2-x g: gl-wall-building-tile-from-criterion) ; apply previous result
         (up-get-point-distance gl-tmp-x gl-tmp2-x gl-wall-building-lerp-left-distance)
     )
 
@@ -1997,7 +2038,8 @@
             =>
             ;(up-lerp-tiles gl-tmp-x gl-tmp2-x g: gl-wall-building-tile-from-criterion)
             (up-lerp-tiles gl-tmp-x gl-tmp2-x c: 1)
-            ;(up-send-flare gl-tmp-x)
+            (up-modify-goal gl-wall-building-tile-from-criterion c:+ 1)
+            (up-send-flare gl-tmp-x)
         )
 
         (defrule ; calculate the distance after lerp
@@ -2061,8 +2103,10 @@
                 (up-get-point-contains gl-tmp-x gl-tmp c: building-class)
                 (up-get-point-contains gl-tmp-x gl-tmp c: tree-class)
             )
+            (up-compare-goal gl-wall-building-range > 0) ; to avoid setting gate
             =>
             ;(up-modify-goal gl-wall-building-tile-from-criterion c:+ 1)
+            (chat-to-all "has building or tree, skip")
             (up-jump-direct g: gl-wall-building-tile-from-criterion-for-id); continue
         )
 
@@ -2072,6 +2116,8 @@
             (goal gl-wall-building-pending 1)
             (goal gl-wall-deciding-building-position-for-end 0)
             (goal gl-wall-building-tile-from-criterion-for-end 0)
+
+            (up-compare-goal gl-wall-building-range > 0) ; to avoid setting gate
             =>
             (up-set-target-point gl-tmp-x)
             (up-full-reset-search)
@@ -2086,9 +2132,11 @@
             (goal gl-wall-deciding-building-position-for-end 0)
             (goal gl-wall-building-tile-from-criterion-for-end 0)
 
+            (up-compare-goal gl-wall-building-range > 0) ; to avoid setting gate
             (up-compare-goal gl-tmp-local-total > 0)
             =>
             ;(up-modify-goal gl-wall-building-tile-from-criterion c:+ 1)
+            (chat-to-all "has building around this point, skip")
             (up-jump-direct g: gl-wall-building-tile-from-criterion-for-id); continue
         )
 

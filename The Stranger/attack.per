@@ -308,6 +308,26 @@
 (defrule
     (up-compare-goal gl-attack-target-rnd > 0)
     (up-compare-goal gl-attack-target-rnd < 22)
+    =>
+    (up-set-target-object search-local c: 0)
+    (up-get-point position-object gl-tmp-x)
+    (up-set-target-point gl-tmp-x)
+    (up-reset-search 0 0 1 1)
+    (up-reset-filters)
+    (up-filter-distance c: -1 c: 3)
+    (up-find-remote c: villager-class c: 10)
+    (up-get-search-state gl-attacking-vil-local-total)
+)
+(defrule
+    (up-compare-goal gl-attack-target-rnd > 0)
+    (up-compare-goal gl-attack-target-rnd < 22)
+    (up-compare-goal gl-attacking-vil-remote-total > 0)
+    =>
+    (up-jump-rule 3) ; do not action to avoid stopping attacking to vils
+)
+(defrule
+    (up-compare-goal gl-attack-target-rnd > 0)
+    (up-compare-goal gl-attack-target-rnd < 22)
     (or
         (up-object-type-count g: gl-attacking-unit-type >= 2)
         (goal gl-attack-ignore-count-limit 1)
