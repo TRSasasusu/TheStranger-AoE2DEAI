@@ -1,0 +1,453 @@
+(defconst t-attack-new-timer 13)
+(defconst gl-attack-new-focus-player-backup 700)
+(defconst gl-attack-new-attacker-type-for-id 701)
+(defconst gl-attack-new-attacker-type-for-end 702)
+(defconst gl-attack-new-attacker-type 703)
+(defconst gl-attack-new-attacker-unit-for-id 704)
+(defconst gl-attack-new-attacker-unit-for-end 705)
+(defconst gl-attack-new-attacker-unit-id 706)
+(defconst gl-attack-new-player-for-id 707)
+(defconst gl-attack-new-player-for-end 708)
+(defconst gl-attack-new-attacker-to-unit-find-distance 709)
+(defconst gl-attack-new-attack-target-rnd 710)
+(defconst attack-new-point-lumber-camp 40) ; these total is 100
+(defconst attack-new-point-mill 10)
+(defconst attack-new-point-mining-camp 20)
+(defconst attack-new-point-tc 10)
+(defconst attack-new-point-some 20)
+(defconst gl-attack-new-attack-target-candidates 711)
+(defconst gl-attack-new-timer-counter 712) ; only in even, attack some point
+
+; copy from previous version of attack.per
+(defconst gl-enemy-tc-x 354)
+(defconst gl-enemy-tc-y 355)
+(defconst gl-position-self-x 362)
+(defconst gl-position-self-y 363)
+(defconst gl-deep-point-x 364)
+(defconst gl-deep-point-y 365)
+(defconst gl-self-to-enemy-dist 366)
+
+(defrule ; also initialization
+    (true)
+    =>
+    (set-goal gl-attack-new-attacker-type-for-end 0)
+
+    (up-modify-goal gl-attack-new-focus-player-backup s:= sn-focus-player-number)
+    (set-goal gl-attack-new-attacker-type -1)
+)
+(defrule
+    (up-timer-status t-attack-new-timer == timer-running)
+    =>
+    (set-goal gl-attack-new-attacker-type-for-end 1)
+)
+(defrule
+    (goal gl-attack-new-attacker-type-for-end 0)
+    =>
+    (enable-timer t-attack-new-timer 3)
+    (up-modify-goal gl-attack-new-timer-counter c:+ 1)
+    (up-modify-goal gl-attack-new-timer-counter c:mod 2)
+)
+(defrule
+    (goal gl-attack-new-attacker-type-for-end 0)
+    =>
+    (up-get-rule-id gl-attack-new-attacker-type-for-id)
+)
+    (defrule
+        (goal gl-attack-new-attacker-type-for-end 0)
+
+        (goal gl-attack-new-attacker-type archery-class)
+        =>
+        (set-goal gl-attack-new-attacker-type-for-end 1) ; for end
+    )
+    (defrule
+        (goal gl-attack-new-attacker-type-for-end 0)
+
+        (goal gl-attack-new-attacker-type cavalry-archer-class)
+        =>
+        (set-goal gl-attack-new-attacker-type archery-class)
+        (set-goal gl-attack-new-attacker-to-unit-find-distance 6)
+    )
+    (defrule
+        (goal gl-attack-new-attacker-type-for-end 0)
+
+        (goal gl-attack-new-attacker-type infantry-class)
+        =>
+        (set-goal gl-attack-new-attacker-type cavalry-archer-class)
+        (set-goal gl-attack-new-attacker-to-unit-find-distance 6)
+        (chat-to-all "switch to cavalry archer")
+    )
+    (defrule
+        (goal gl-attack-new-attacker-type-for-end 0)
+
+        (goal gl-attack-new-attacker-type scout-cavalry-class)
+        =>
+        (set-goal gl-attack-new-attacker-type infantry-class)
+        (set-goal gl-attack-new-attacker-to-unit-find-distance 3)
+    )
+    (defrule
+        (goal gl-attack-new-attacker-type-for-end 0)
+
+        (goal gl-attack-new-attacker-type -1)
+        =>
+        (set-goal gl-attack-new-attacker-type scout-cavalry-class)
+        (set-goal gl-attack-new-attacker-to-unit-find-distance 3)
+    )
+
+
+    (defrule
+        (goal gl-attack-new-attacker-type-for-end 0)
+
+        (goal gl-attack-new-attacker-type scout-cavalry-class)
+        (players-building-count focus-player == 0)
+        =>
+        (up-jump-direct g: gl-attack-new-attacker-type-for-id) ; sc must find enemy at first
+    )
+
+
+    ; iterate attacker units of this type to find enemy units near them
+    (defrule
+        (goal gl-attack-new-attacker-type-for-end 0)
+        =>
+        (set-goal gl-attack-new-attacker-unit-for-end 0)
+
+        (up-full-reset-search)
+        (up-find-local g: gl-attack-new-attacker-type c: 200)
+        (up-get-search-state gl-tmp-local-total)
+        (up-modify-goal gl-attack-new-attacker-unit-id g:= gl-tmp-local-total)
+    )
+    (defrule
+        (goal gl-attack-new-attacker-type-for-end 0)
+        (goal gl-attack-new-attacker-unit-for-end 0)
+        =>
+        (up-get-rule-id gl-attack-new-attacker-unit-for-id)
+    )
+        (defrule
+            (goal gl-attack-new-attacker-type-for-end 0)
+            (goal gl-attack-new-attacker-unit-for-end 0)
+            =>
+            (up-modify-goal gl-attack-new-attacker-unit-id c:- 1)
+        )
+        (defrule
+            (goal gl-attack-new-attacker-type-for-end 0)
+            (goal gl-attack-new-attacker-unit-for-end 0)
+
+            (up-compare-goal gl-attack-new-attacker-unit-id < 0)
+            =>
+            (set-goal gl-attack-new-attacker-unit-for-end 1)
+        )
+
+        (defrule
+            (goal gl-attack-new-attacker-type-for-end 0)
+            (goal gl-attack-new-attacker-unit-for-end 0)
+            =>
+            (up-set-target-object search-local g: gl-attack-new-attacker-unit-id)
+            (up-get-point position-object gl-tmp-x)
+            (up-set-target-point gl-tmp-x) ; set target point to this unit's position
+        )
+
+        ; find enemy units near this attacker
+        (defrule
+            (goal gl-attack-new-attacker-type-for-end 0)
+            (goal gl-attack-new-attacker-unit-for-end 0)
+            =>
+            (set-goal gl-attack-new-player-for-end 0)
+
+            (set-strategic-number sn-focus-player-number 0)
+        )
+        (defrule
+            (goal gl-attack-new-attacker-type-for-end 0)
+            (goal gl-attack-new-attacker-unit-for-end 0)
+            (goal gl-attack-new-player-for-end 0)
+            =>
+            (up-get-rule-id gl-attack-new-player-for-id)
+        )
+            (defrule
+                (goal gl-attack-new-attacker-type-for-end 0)
+                (goal gl-attack-new-attacker-unit-for-end 0)
+                (goal gl-attack-new-player-for-end 0)
+                =>
+                (up-modify-sn sn-focus-player-number c:+ 1)
+            )
+            (defrule
+                (goal gl-attack-new-attacker-type-for-end 0)
+                (goal gl-attack-new-attacker-unit-for-end 0)
+                (goal gl-attack-new-player-for-end 0)
+                (up-compare-sn sn-focus-player-number > 8)
+                =>
+                (set-goal gl-attack-new-player-for-end 1)
+            )
+            (defrule
+                (goal gl-attack-new-attacker-type-for-end 0)
+                (goal gl-attack-new-attacker-unit-for-end 0)
+                (goal gl-attack-new-player-for-end 0)
+                (not(and
+                    (player-valid focus-player)
+                    (players-stance focus-player enemy)
+                ))
+                =>
+                (up-jump-direct g: gl-attack-new-player-for-id)
+            )
+
+            (defrule
+                (goal gl-attack-new-attacker-type-for-end 0)
+                (goal gl-attack-new-attacker-unit-for-end 0)
+                (goal gl-attack-new-player-for-end 0)
+                =>
+                (up-reset-search 0 0 1 1)
+                (up-reset-filters)
+                (up-filter-distance c: -1 g: gl-attack-new-attacker-to-unit-find-distance)
+                (up-filter-include cmdid-military -1 -1 -1)
+                (up-find-remote c: all-units-class c: 50)
+                (up-reset-filters)
+                (up-filter-distance c: -1 g: gl-attack-new-attacker-to-unit-find-distance)
+                (up-find-remote c: villager-class c: 50)
+                (up-clean-search search-remote object-data-distance search-order-asc)
+                (up-get-search-state gl-tmp-local-total)
+            )
+            (defrule
+                (goal gl-attack-new-attacker-type-for-end 0)
+                (goal gl-attack-new-attacker-unit-for-end 0)
+                (goal gl-attack-new-player-for-end 0)
+
+                (up-compare-goal gl-tmp-remote-total > 0)
+                =>
+                (up-reset-filters)
+                (up-reset-search 1 1 0 0)
+                (up-filter-distance c: -1 c: 4)
+                (up-find-local g: gl-attack-new-attacker-type c: 200) ; grab attacker units
+
+                (up-set-target-object search-remote c: 0) ; set target to the nearest enemy unit
+                (up-get-point position-object gl-tmp-x)
+
+                (up-target-point gl-tmp-x action-attack-move -1 -1) ; attack move to this point
+                (set-goal gl-attack-new-attacker-type-for-end 1)
+            )
+        (defrule
+            (goal gl-attack-new-attacker-type-for-end 0)
+            (goal gl-attack-new-attacker-unit-for-end 0)
+            (goal gl-attack-new-player-for-end 0)
+            =>
+            (up-jump-direct g: gl-attack-new-player-for-id)
+        )
+
+
+    (defrule
+        (goal gl-attack-new-attacker-type-for-end 0)
+        (goal gl-attack-new-attacker-unit-for-end 0)
+        =>
+        (up-jump-direct g: gl-attack-new-attacker-unit-for-id)
+    )
+
+    ; random attacker goes to some points of the focus player
+    (defrule
+        (goal gl-attack-new-attacker-type-for-end 0)
+
+        (goal gl-attack-new-timer-counter 1)
+        =>
+        (up-jump-direct g: gl-attack-new-attacker-type-for-id) ; continue
+    )
+    (defrule ; per 6 seconds
+        (goal gl-attack-new-attacker-type-for-end 0)
+        =>
+        (up-get-search-state gl-tmp-local-total) ; it still has local results
+        (up-chat-data-to-all "attacker units total: %d" g: gl-tmp-local-total)
+
+        ; TODO: I need random version
+        (up-modify-sn sn-focus-player-number g:= gl-attack-new-focus-player-backup) ; restore focus player for some point attack
+    )
+    (defrule
+        (goal gl-attack-new-attacker-type-for-end 0)
+
+        (goal gl-tmp-local-total 0)
+        =>
+        (up-jump-direct g: gl-attack-new-attacker-type-for-id)
+    )
+    (defrule
+        (goal gl-attack-new-attacker-type-for-end 0)
+        =>
+        (generate-random-number 100)
+        (up-get-fact random-number 0 gl-tmp)
+        (up-modify-goal gl-tmp c:- 1)
+        (up-modify-goal gl-tmp g:* gl-tmp-local-total)
+        (up-modify-goal gl-tmp c:z/ 100)
+        (up-set-target-object search-local g: gl-tmp) ; randomly pick one of the attacker units
+        (up-get-point position-object gl-tmp-x)
+        (up-set-target-point gl-tmp-x) ; set target point to this unit's position for distance calculation
+
+        (up-full-reset-search)
+        (up-filter-distance c: -1 c: 5)
+        (up-find-local g: gl-attack-new-attacker-type c: 200) ; grab attacker units near this unit
+
+        (generate-random-number 100)
+        (up-get-fact random-number 0 gl-attack-new-attack-target-rnd)
+        (up-reset-filters)
+        (up-reset-search 0 0 1 1)
+    )
+
+    (defrule
+        (goal gl-attack-new-attacker-type-for-end 0)
+
+        (up-compare-goal gl-attack-new-attack-target-rnd > 0)
+        (up-compare-goal gl-attack-new-attack-target-rnd <= attack-new-point-lumber-camp)
+        =>
+        (up-find-remote c: lumber-camp c: 20)
+        (up-get-search-state gl-tmp-local-total)
+        (up-modify-goal gl-attack-new-attack-target-candidates g:= gl-tmp-remote-total)
+        (up-modify-goal gl-attack-new-attack-target-rnd c:- attack-new-point-lumber-camp)
+        (chat-to-all "try finding lumber camp")
+    )
+    (defrule
+        (goal gl-attack-new-attacker-type-for-end 0)
+
+        (up-compare-goal gl-attack-new-attack-target-rnd <= 0)
+        (goal gl-attack-new-attack-target-candidates 0)
+        =>
+        (set-goal gl-attack-new-attack-target-rnd 1) ; when cannot find lumber camp, next mill
+    )
+    (defrule
+        (goal gl-attack-new-attacker-type-for-end 0)
+
+        (up-compare-goal gl-attack-new-attack-target-rnd > 0)
+        (up-compare-goal gl-attack-new-attack-target-rnd <= attack-new-point-mill)
+        =>
+        (up-find-remote c: mill c: 20)
+        (up-get-search-state gl-tmp-local-total)
+        (up-modify-goal gl-attack-new-attack-target-candidates g:= gl-tmp-remote-total)
+        (up-modify-goal gl-attack-new-attack-target-rnd c:- attack-new-point-mill)
+    )
+    (defrule
+        (goal gl-attack-new-attacker-type-for-end 0)
+
+        (up-compare-goal gl-attack-new-attack-target-rnd <= 0)
+        (goal gl-attack-new-attack-target-candidates 0)
+        =>
+        (set-goal gl-attack-new-attack-target-rnd 1) ; when cannot find mill, next mining camp
+    )
+    (defrule
+        (goal gl-attack-new-attacker-type-for-end 0)
+
+        (up-compare-goal gl-attack-new-attack-target-rnd > 0)
+        (up-compare-goal gl-attack-new-attack-target-rnd <= attack-new-point-mining-camp)
+        =>
+        (up-find-remote c: mining-camp c: 20)
+        (up-get-search-state gl-tmp-local-total)
+        (up-modify-goal gl-attack-new-attack-target-candidates g:= gl-tmp-remote-total)
+        (up-modify-goal gl-attack-new-attack-target-rnd c:- attack-new-point-mining-camp)
+    )
+    (defrule
+        (goal gl-attack-new-attacker-type-for-end 0)
+
+        (up-compare-goal gl-attack-new-attack-target-rnd <= 0)
+        (goal gl-attack-new-attack-target-candidates 0)
+        =>
+        (set-goal gl-attack-new-attack-target-rnd 1) ; when cannot find mining camp, next town center
+    )
+    (defrule
+        (goal gl-attack-new-attacker-type-for-end 0)
+
+        (up-compare-goal gl-attack-new-attack-target-rnd > 0)
+        (up-compare-goal gl-attack-new-attack-target-rnd <= attack-new-point-tc)
+        =>
+        (up-find-remote c: town-center c: 20)
+        (up-get-search-state gl-tmp-local-total)
+        (up-modify-goal gl-attack-new-attack-target-candidates g:= gl-tmp-remote-total)
+        (up-modify-goal gl-attack-new-attack-target-rnd c:- attack-new-point-tc)
+        (chat-to-all "try finding town center")
+        (up-chat-data-to-all "town center candidates: %d" g: gl-tmp-remote-total)
+    )
+    (defrule
+        (goal gl-attack-new-attacker-type-for-end 0)
+
+        (up-compare-goal gl-attack-new-attack-target-rnd <= 0)
+        (goal gl-attack-new-attack-target-candidates 0)
+        =>
+        (set-goal gl-attack-new-attack-target-rnd 1) ; when cannot find town center, next random point
+    )
+    (defrule
+        (goal gl-attack-new-attacker-type-for-end 0)
+
+        (up-compare-goal gl-attack-new-attack-target-rnd <= 0)
+        =>
+        (generate-random-number 100)
+        (up-get-fact random-number 0 gl-tmp)
+        (up-modify-goal gl-tmp c:- 1)
+        (up-modify-goal gl-tmp g:* gl-attack-new-attack-target-candidates)
+        (up-modify-goal gl-tmp c:z/ 100)
+        (up-set-target-object search-remote g: gl-tmp) ; randomly pick one of the target camp
+        (up-get-point position-object gl-tmp-x)
+        (up-target-point gl-tmp-x action-move -1 -1) ; move to this point
+
+        (up-jump-direct g: gl-attack-new-attacker-type-for-id)
+    )
+
+    (defrule
+        (goal gl-attack-new-attacker-type-for-end 0)
+
+        (up-compare-goal gl-attack-new-attack-target-rnd > 0)
+        =>
+        (up-find-remote c: town-center c: 20)
+        (up-get-search-state gl-tmp-local-total)
+        (up-modify-goal gl-attack-new-attack-target-candidates g:= gl-tmp-remote-total)
+        (chat-to-all "try finding town center to go to random point")
+    )
+    (defrule
+        (goal gl-attack-new-attacker-type-for-end 0)
+
+        (up-compare-goal gl-attack-new-attack-target-rnd > 0)
+        (up-compare-goal gl-attack-new-attack-target-candidates > 0)
+        =>
+        (generate-random-number 100)
+        (up-get-fact random-number 0 gl-tmp)
+        (up-modify-goal gl-tmp c:- 1)
+        (up-modify-goal gl-tmp g:* gl-attack-new-attack-target-candidates)
+        (up-modify-goal gl-tmp c:z/ 100)
+        (up-set-target-object search-remote g: gl-tmp)
+        ;(up-set-target-object search-remote c: 0)
+        (up-get-point position-object gl-enemy-tc-x)
+        ;(up-full-reset-search)
+        ;(up-find-local c: militiaman-line c: 8)
+        (up-get-point position-self gl-position-self-x)
+        ;(up-send-flare gl-position-self-x)
+        (up-copy-point gl-deep-point-x gl-enemy-tc-x)
+        ;(up-send-flare gl-deep-point-x)
+        ;(up-add-point gl-deep-point-x gl-position-self-x c:- 1)
+        (up-modify-goal gl-deep-point-x g:- gl-position-self-x)
+        (up-modify-goal gl-deep-point-y g:- gl-position-self-y)
+        ;(up-send-flare gl-deep-point-x)
+        (up-get-point-distance gl-position-self-x gl-enemy-tc-x gl-self-to-enemy-dist)
+        (up-modify-goal gl-self-to-enemy-dist c:/ 2)
+        (up-modify-goal gl-deep-point-x g:/ gl-self-to-enemy-dist)
+        (up-modify-goal gl-deep-point-y g:/ gl-self-to-enemy-dist)
+        (up-modify-goal gl-deep-point-x c:* 10)
+        (up-modify-goal gl-deep-point-y c:* 10)
+        (up-add-point gl-deep-point-x gl-enemy-tc-x c: 1)
+        ;(up-send-flare gl-deep-point-x)
+        (generate-random-number 30)
+        (up-get-fact random-number 0 gl-tmp)
+        (up-modify-goal gl-tmp c:- 15)
+        (up-modify-goal gl-deep-point-x g:+ gl-tmp)
+        (generate-random-number 30)
+        (up-get-fact random-number 0 gl-tmp)
+        (up-modify-goal gl-tmp c:- 15)
+        (up-modify-goal gl-deep-point-y g:+ gl-tmp)
+        (up-target-point gl-deep-point-x action-move -1 -1) ; move to this point
+        ;(up-copy-point gl-attack-target-x gl-deep-point-x)
+        ;(up-target-point gl-deep-point-x action-default -1 stance-stand-ground)
+        ;(chat-to-all "try going to deep")
+        ;(up-send-flare gl-deep-point-x)
+    )
+
+
+(defrule
+    (goal gl-attack-new-attacker-type-for-end 0)
+    =>
+    (up-jump-direct g: gl-attack-new-attacker-type-for-id)
+)
+
+
+; restore focus player number
+(defrule
+    (true)
+    =>
+    (up-modify-sn sn-focus-player-number g:= gl-attack-new-focus-player-backup)
+)
