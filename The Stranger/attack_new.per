@@ -27,6 +27,13 @@
 (defconst gl-deep-point-y 365)
 (defconst gl-self-to-enemy-dist 366)
 
+(defrule
+    (true)
+    =>
+    (set-goal gl-attack-new-single-sc-attack 0)
+    (disable-self)
+)
+
 (defrule ; also initialization
     (true)
     =>
@@ -43,9 +50,9 @@
 (defrule
     (goal gl-attack-new-attacker-type-for-end 0)
     =>
-    (enable-timer t-attack-new-timer 3)
+    (enable-timer t-attack-new-timer 2)
     (up-modify-goal gl-attack-new-timer-counter c:+ 1)
-    (up-modify-goal gl-attack-new-timer-counter c:mod 2)
+    (up-modify-goal gl-attack-new-timer-counter c:mod 3)
 )
 (defrule
     (goal gl-attack-new-attacker-type-for-end 0)
@@ -98,7 +105,13 @@
         (goal gl-attack-new-attacker-type-for-end 0)
 
         (goal gl-attack-new-attacker-type scout-cavalry-class)
-        (players-building-count focus-player == 0)
+        (or
+            (players-building-count focus-player == 0)
+            (and
+                (unit-type-count-total scout-cavalry-class == 1)
+                (goal gl-attack-new-single-sc-attack 0)
+            )
+        )
         =>
         (up-jump-direct g: gl-attack-new-attacker-type-for-id) ; sc must find enemy at first
     )
@@ -238,15 +251,15 @@
         (up-jump-direct g: gl-attack-new-attacker-unit-for-id)
     )
 
-    ; random attacker goes to some points of the focus player
-    (defrule
-        (goal gl-attack-new-attacker-type-for-end 0)
+    ;; random attacker goes to some points of the focus player
+    ;(defrule
+    ;    (goal gl-attack-new-attacker-type-for-end 0)
 
-        (goal gl-attack-new-timer-counter 1)
-        =>
-        (up-jump-direct g: gl-attack-new-attacker-type-for-id) ; continue
-    )
-    (defrule ; per 6 seconds
+    ;    (goal gl-attack-new-timer-counter 1)
+    ;    =>
+    ;    (up-jump-direct g: gl-attack-new-attacker-type-for-id) ; continue
+    ;)
+    (defrule ;; per 6 seconds
         (goal gl-attack-new-attacker-type-for-end 0)
         =>
         (up-get-search-state gl-tmp-local-total) ; it still has local results
@@ -260,7 +273,7 @@
 
         (goal gl-tmp-local-total 0)
         =>
-        (up-jump-direct g: gl-attack-new-attacker-type-for-id)
+        (up-jump-direct g: gl-attack-new-attacker-type-for-id) ; continue when no attacker units
     )
     (defrule
         (goal gl-attack-new-attacker-type-for-end 0)
@@ -273,7 +286,19 @@
         (up-set-target-object search-local g: gl-tmp) ; randomly pick one of the attacker units
         (up-get-point position-object gl-tmp-x)
         (up-set-target-point gl-tmp-x) ; set target point to this unit's position for distance calculation
-
+    )
+    (defrule
+        (goal gl-attack-new-attacker-type-for-end 0)
+        (and
+            (up-compare-goal gl-attack-new-timer-counter != 0)
+            (up-object-data object-data-idling == 0)
+        )
+        =>
+        (up-jump-direct g: gl-attack-new-attacker-type-for-id) ; continue when attacker units are NOT idling and NOT just 6 seconds timer
+    )
+    (defrule
+        (goal gl-attack-new-attacker-type-for-end 0)
+        =>
         (up-full-reset-search)
         (up-filter-distance c: -1 c: 5)
         (up-find-local g: gl-attack-new-attacker-type c: 200) ; grab attacker units near this unit
