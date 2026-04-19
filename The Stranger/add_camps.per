@@ -1,15 +1,29 @@
-(defconst gl-resource-camps-local-total 190)
-(defconst gl-resource-camps-local-last 191)
-(defconst gl-resource-camps-remote-total 192)
-(defconst gl-resource-camps-remote-last 193)
-(defconst gl-resource-found-local-total 194)
-(defconst gl-resource-found-local-last 195)
-(defconst gl-resource-found-remote-total 196)
-(defconst gl-resource-found-remote-last 197)
+(defconst gl-add-camps-camp-id 190)
+(defconst gl-add-camps-camp-pos-x 191)
+(defconst gl-add-camps-camp-pos-y 192)
+(defconst gl-add-camps-lerp-pos-x 193)
+(defconst gl-add-camps-lerp-pos-y 194)
+(defconst gl-add-camps-lerp-counter 195)
+(defconst gl-add-camps-wall-found 196)
+(defconst gl-add-camps-need-camp 197)
+;(defconst gl-resource-camps-local-total 190)
+;(defconst gl-resource-camps-local-last 191)
+;(defconst gl-resource-camps-remote-total 192)
+;(defconst gl-resource-camps-remote-last 193)
+;(defconst gl-resource-found-local-total 194)
+;(defconst gl-resource-found-local-last 195)
+;(defconst gl-resource-found-remote-total 196)
+;(defconst gl-resource-found-remote-last 197)
 (defconst gl-resource-type 198)
 (defconst gl-resource-camps 199)
 (defconst gl-resource-percentage 200)
 (defconst gl-resource-status 201)
+(defconst gl-add-camps-resource-for-id 202)
+(defconst gl-add-camps-resource-for-end 203)
+(defconst gl-add-camps-camp-for-id 204)
+(defconst gl-add-camps-camp-for-end 205)
+(defconst gl-add-camps-find-wall-for-id 206)
+(defconst gl-add-camps-find-wall-for-end 207)
 ;(defconst gl-resource-lumber-camp-appear 202)
 ;(defconst gl-resource-mining-camp-appear 203)
 
@@ -54,97 +68,240 @@
 (defrule
     (true)
     =>
-    (set-goal gl-resource-type wood)
-    (set-goal gl-resource-camps lumber-camp)
-    (up-modify-goal gl-resource-percentage s:= sn-wood-gatherer-percentage)
-    (set-goal gl-resource-camps-local-total -1)
-    (set-goal gl-resource-status status-ready)
-    ;(chat-to-all "lumbercamp!")
+    (set-goal gl-add-camps-resource-for-end 0)
+    (set-goal gl-resource-type -1)
 )
 (defrule
-    (up-compare-goal gl-resource-percentage > 0)
+    (goal gl-add-camps-resource-for-end 0)
     =>
-    (up-full-reset-search)
-    (up-filter-status g: gl-resource-status c: list-active)
-    (up-find-resource g: gl-resource-type c: 30)
-    (up-get-search-state gl-resource-found-local-total)
+    (up-get-rule-id gl-add-camps-resource-for-id)
 )
-(defrule
-    (up-compare-goal gl-resource-percentage > 0)
-    (up-compare-goal gl-resource-found-remote-total == 0)
-    =>
-    (chat-to-all "no resource")
-    (up-jump-rule 5)
-)
-(defrule
-    ;(up-object-type-count-total g: gl-resource-camps > 0)
-    (up-compare-goal gl-resource-percentage > 0)
-    =>
-    (up-full-reset-search)
-    ;(up-filter-status c: status-ready c: list-active)
-    (up-find-local g: gl-resource-camps c: 20)
-    (up-filter-status c: status-pending c: list-active)
-    (up-find-status-local g: gl-resource-camps c: 20)
-    (up-get-search-state gl-resource-camps-local-total)
-)
-(defrule
-    ;(up-object-type-count-total g: gl-resource-camps > 0)
-    (up-compare-goal gl-resource-percentage > 0)
-    (up-compare-goal gl-resource-camps-local-total > 0)
-    =>
-    (up-modify-goal gl-resource-camps-local-total c:- 1)
-    (up-set-target-object search-local g: gl-resource-camps-local-total)
-    (up-get-point position-object gl-tmp-x)
-    (up-set-target-point gl-tmp-x)
-    ;(up-send-flare gl-tmp-x)
-    (up-reset-filters)
-    (up-reset-search 0 0 1 1)
-    (up-filter-status g: gl-resource-status c: list-active)
-    (up-filter-distance c: -1 c: 5)
-    (up-find-resource g: gl-resource-type c: 30)
-    (up-get-search-state gl-resource-found-local-total)
-    ;(up-chat-data-to-all "number of res: %d" g: gl-resource-found-remote-total)
-)
-(defrule
-    ;(up-object-type-count-total g: gl-resource-camps > 0)
-    (up-compare-goal gl-resource-percentage > 0)
-    (up-compare-goal gl-resource-found-remote-total > 0)
-    =>
-    (up-jump-rule 2)
-)
-(defrule
-    ;(up-object-type-count-total g: gl-resource-camps > 0)
-    (up-compare-goal gl-resource-percentage > 0)
-    (up-compare-goal gl-resource-camps-local-total > 0)
-    (up-compare-goal gl-resource-found-remote-total == 0)
-    =>
-    ;(do-nothing)
-    (up-jump-rule -3)
-)
-(defrule
-    ;(up-object-type-count-total g: gl-resource-camps > 0)
-    (up-compare-goal gl-resource-percentage > 0)
-    (goal gl-resource-camps-local-total 0)
-    (up-can-build 0 g: gl-resource-camps)
-    =>
-    (up-build place-normal 0 g: gl-resource-camps)
-)
+    (defrule
+        (goal gl-add-camps-resource-for-end 0)
+        (goal gl-resource-type stone)
+        =>
+        (set-goal gl-add-camps-resource-for-end 1)
+    )
+    (defrule
+        (goal gl-add-camps-resource-for-end 0)
+        (goal gl-resource-type gold)
+        =>
+        (set-goal gl-resource-type stone)
+        (up-modify-goal gl-resource-percentage s:= sn-stone-gatherer-percentage)
+    )
+    (defrule
+        (goal gl-add-camps-resource-for-end 0)
+        (goal gl-resource-type wood)
+        =>
+        (set-goal gl-resource-type gold)
+        (set-goal gl-resource-camps mining-camp)
+        (up-modify-goal gl-resource-percentage s:= sn-gold-gatherer-percentage)
+        (set-goal gl-resource-status status-resource)
+    )
+    (defrule
+        (goal gl-add-camps-resource-for-end 0)
+        (goal gl-resource-type -1)
+        =>
+        (set-goal gl-resource-type wood)
+        (set-goal gl-resource-camps lumber-camp)
+        (up-modify-goal gl-resource-percentage s:= sn-wood-gatherer-percentage)
+        (set-goal gl-resource-status status-ready)
+    )
+
+    (defrule
+        (goal gl-add-camps-resource-for-end 0)
+        (up-compare-goal gl-resource-percentage == 0)
+        =>
+        (up-jump-direct g: gl-add-camps-resource-for-id) ; continue
+    )
+
+    (defrule
+        (goal gl-add-camps-resource-for-end 0)
+        =>
+        (up-full-reset-search)
+        (up-filter-status g: gl-resource-status c: list-active)
+        (up-find-resource g: gl-resource-type c: 30)
+        (up-get-search-state gl-tmp-local-total)
+    )
+    (defrule
+        (goal gl-add-camps-resource-for-end 0)
+        (up-compare-goal gl-tmp-remote-total == 0)
+        =>
+        (chat-to-all "no resource")
+        (up-jump-direct g: gl-add-camps-resource-for-id) ; continue
+    )
+    (defrule
+        ;(up-object-type-count-total g: gl-resource-camps > 0)
+        (goal gl-add-camps-resource-for-end 0)
+        =>
+        (up-full-reset-search)
+        ;(up-filter-status c: status-ready c: list-active)
+        (up-find-local g: gl-resource-camps c: 20)
+        (up-filter-status c: status-pending c: list-active)
+        (up-find-status-local g: gl-resource-camps c: 20)
+        (up-get-search-state gl-tmp-local-total)
+        (up-modify-goal gl-add-camps-camp-id g:= gl-tmp-local-total)
+    )
+    (defrule
+        (goal gl-add-camps-resource-for-end 0)
+        =>
+        (set-goal gl-add-camps-camp-for-end 0)
+
+        (set-goal gl-add-camps-need-camp 1)
+    )
+    (defrule
+        (goal gl-add-camps-resource-for-end 0)
+        (goal gl-add-camps-camp-for-end 0)
+        =>
+        (up-get-rule-id gl-add-camps-camp-for-id)
+    )
+        (defrule
+            (goal gl-add-camps-resource-for-end 0)
+            (goal gl-add-camps-camp-for-end 0)
+            =>
+            (up-modify-goal gl-add-camps-camp-id c:- 1)
+        )
+        (defrule
+            (goal gl-add-camps-resource-for-end 0)
+            (goal gl-add-camps-camp-for-end 0)
+
+            (up-compare-goal gl-add-camps-camp-id < 0)
+            =>
+            (set-goal gl-add-camps-camp-for-end 1)
+        )
+
+        (defrule
+            (goal gl-add-camps-resource-for-end 0)
+            (goal gl-add-camps-camp-for-end 0)
+            =>
+            (up-set-target-object search-local g: gl-add-camps-camp-id)
+            (up-get-point position-object gl-add-camps-camp-pos-x)
+            (up-set-target-point gl-add-camps-camp-pos-x)
+            ;(up-send-flare gl-tmp-x)
+            (up-reset-filters)
+            (up-reset-search 0 0 1 1)
+            (up-filter-status g: gl-resource-status c: list-active)
+            (up-filter-distance c: -1 c: 5)
+            (up-find-resource g: gl-resource-type c: 30)
+            (up-clean-search search-remote object-data-distance search-order-asc)
+            (up-get-search-state gl-tmp-local-total)
+            ;(up-chat-data-to-all "number of res: %d" g: gl-resource-found-remote-total)
+        )
+        (defrule
+            ;(up-object-type-count-total g: gl-resource-camps > 0)
+            (goal gl-add-camps-resource-for-end 0)
+            (goal gl-add-camps-camp-for-end 0)
+
+            (up-compare-goal gl-tmp-remote-total == 0)
+            =>
+            (up-jump-direct g: gl-add-camps-camp-for-id) ; continue when no resource around the camp
+        )
+
+        (defrule
+            (goal gl-add-camps-resource-for-end 0)
+            (goal gl-add-camps-camp-for-end 0)
+            =>
+            (set-goal gl-add-camps-find-wall-for-end 0)
+
+            (up-set-target-object search-remote c: 0) ; set nearest resource as target
+            (up-get-point position-object gl-add-camps-lerp-pos-x)
+            (set-goal gl-add-camps-lerp-counter 10)
+            (set-goal gl-add-camps-wall-found 0)
+        )
+        (defrule
+            (goal gl-add-camps-resource-for-end 0)
+            (goal gl-add-camps-camp-for-end 0)
+            (goal gl-add-camps-find-wall-for-end 0)
+            =>
+            (up-get-rule-id gl-add-camps-find-wall-for-id)
+        )
+            (defrule
+                (goal gl-add-camps-resource-for-end 0)
+                (goal gl-add-camps-camp-for-end 0)
+                (goal gl-add-camps-find-wall-for-end 0)
+                =>
+                (up-copy-point gl-tmp-x gl-add-camps-lerp-pos-x)
+                (up-add-point gl-tmp-x gl-add-camps-camp-pos-x c: -1)
+            )
+            (defrule
+                (goal gl-add-camps-resource-for-end 0)
+                (goal gl-add-camps-camp-for-end 0)
+                (goal gl-add-camps-find-wall-for-end 0)
+
+                (goal gl-tmp-x 0)
+                (goal gl-tmp-y 0)
+                =>
+                (set-goal gl-add-camps-find-wall-for-end 1) ; break when the lerp ends
+            )
+            (defrule
+                (goal gl-add-camps-resource-for-end 0)
+                (goal gl-add-camps-camp-for-end 0)
+                (goal gl-add-camps-find-wall-for-end 0)
+
+                (up-modify-goal gl-add-camps-lerp-counter < 0)
+                =>
+                (set-goal gl-add-camps-find-wall-for-end 1) ; break when the counter ends to avoid infinite loop (should not happen)
+            )
+
+            (defrule
+                (goal gl-add-camps-resource-for-end 0)
+                (goal gl-add-camps-camp-for-end 0)
+                (goal gl-add-camps-find-wall-for-end 0)
+                =>
+                (up-lerp-tiles gl-add-camps-lerp-pos-x gl-add-camps-camp-pos-x c: 1)
+                (up-modify-goal gl-add-camps-lerp-counter c:- 1)
+            )
+            (defrule
+                (goal gl-add-camps-resource-for-end 0)
+                (goal gl-add-camps-camp-for-end 0)
+                (goal gl-add-camps-find-wall-for-end 0)
+
+                (up-point-contains gl-add-camps-lerp-pos-x c: palisade-wall)
+                =>
+                (set-goal gl-add-camps-wall-found 1)
+                (up-set-target-object search-local g: gl-add-camps-camp-id)
+                (up-target-objects 1 action-delete -1 -1) ; delete the camp to avoid confusing villagers
+                (chat-to-all "wall found near camp, so delete this camp")
+                (set-goal gl-add-camps-find-wall-for-end 1) ; break when the wall is found
+            )
+
+        (defrule
+            (goal gl-add-camps-resource-for-end 0)
+            (goal gl-add-camps-camp-for-end 0)
+            (goal gl-add-camps-find-wall-for-end 0)
+            =>
+            (up-jump-direct g: gl-add-camps-find-wall-for-id)
+        )
+
+        (defrule
+            (goal gl-add-camps-resource-for-end 0)
+            (goal gl-add-camps-camp-for-end 0)
+
+            (goal gl-add-camps-wall-found 0)
+            =>
+            (set-goal gl-add-camps-need-camp 0) ; good camp exists, no need to build
+            (set-goal gl-add-camps-camp-for-end 1)
+        )
+
+    (defrule
+        (goal gl-add-camps-resource-for-end 0)
+        (goal gl-add-camps-camp-for-end 0)
+        =>
+        (up-jump-direct g: gl-add-camps-camp-for-id) ; continue
+    )
+
+    (defrule
+        (goal gl-add-camps-resource-for-end 0)
+
+        (goal gl-add-camps-need-camp 1)
+        (up-can-build 0 g: gl-resource-camps)
+        =>
+        (up-build place-normal 0 g: gl-resource-camps)
+    )
+
 
 (defrule
-    (goal gl-resource-type wood)
+    (goal gl-add-camps-resource-for-end 0)
     =>
-    (set-goal gl-resource-type gold)
-    (set-goal gl-resource-camps mining-camp)
-    (set-goal gl-resource-camps-local-total -1)
-    (up-modify-goal gl-resource-percentage s:= sn-gold-gatherer-percentage)
-    (set-goal gl-resource-status status-resource)
-    (up-jump-rule -8)
-)
-(defrule
-    (goal gl-resource-type gold)
-    =>
-    (set-goal gl-resource-type stone)
-    (set-goal gl-resource-camps-local-total -1)
-    (up-modify-goal gl-resource-percentage s:= sn-stone-gatherer-percentage)
-    (up-jump-rule -9)
+    (up-jump-direct g: gl-add-camps-resource-for-id)
 )
