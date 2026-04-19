@@ -62,9 +62,17 @@
     (defrule
         (goal gl-attack-new-attacker-type-for-end 0)
 
-        (goal gl-attack-new-attacker-type archery-class)
+        (goal gl-attack-new-attacker-type mangonel-line)
         =>
         (set-goal gl-attack-new-attacker-type-for-end 1) ; for end
+    )
+    (defrule
+        (goal gl-attack-new-attacker-type-for-end 0)
+
+        (goal gl-attack-new-attacker-type archery-class)
+        =>
+        (set-goal gl-attack-new-attacker-type mangonel-line)
+        (set-goal gl-attack-new-attacker-to-unit-find-distance 6)
     )
     (defrule
         (goal gl-attack-new-attacker-type-for-end 0)
@@ -115,6 +123,8 @@
         =>
         (up-jump-direct g: gl-attack-new-attacker-type-for-id) ; sc must find enemy at first
     )
+
+
 
 
     ; iterate attacker units of this type to find enemy units near them
@@ -250,6 +260,158 @@
         =>
         (up-jump-direct g: gl-attack-new-attacker-unit-for-id)
     )
+
+
+
+    ; iterate siege units to find enemy buildings near them
+    (defrule
+        (goal gl-attack-new-attacker-type-for-end 0)
+        =>
+        (set-goal gl-attack-new-attacker-unit-for-end 0)
+    )
+    (defrule
+        (goal gl-attack-new-attacker-type-for-end 0)
+        (goal gl-attack-new-attacker-unit-for-end 0)
+
+        (not(goal gl-attack-new-attacker-type mangonel-line)) ; TODO: need other siege units HERE
+        =>
+        (set-goal gl-attack-new-attacker-unit-for-end 1)
+    )
+    (defrule
+        (goal gl-attack-new-attacker-type-for-end 0)
+        (goal gl-attack-new-attacker-unit-for-end 0)
+        =>
+        (up-full-reset-search)
+        (up-find-local g: gl-attack-new-attacker-type c: 200)
+        (up-get-search-state gl-tmp-local-total)
+        (up-modify-goal gl-attack-new-attacker-unit-id g:= gl-tmp-local-total)
+    )
+    (defrule
+        (goal gl-attack-new-attacker-type-for-end 0)
+        (goal gl-attack-new-attacker-unit-for-end 0)
+        =>
+        (up-get-rule-id gl-attack-new-attacker-unit-for-id)
+    )
+        (defrule
+            (goal gl-attack-new-attacker-type-for-end 0)
+            (goal gl-attack-new-attacker-unit-for-end 0)
+            =>
+            (up-modify-goal gl-attack-new-attacker-unit-id c:- 1)
+        )
+        (defrule
+            (goal gl-attack-new-attacker-type-for-end 0)
+            (goal gl-attack-new-attacker-unit-for-end 0)
+
+            (up-compare-goal gl-attack-new-attacker-unit-id < 0)
+            =>
+            (set-goal gl-attack-new-attacker-unit-for-end 1)
+        )
+
+        (defrule
+            (goal gl-attack-new-attacker-type-for-end 0)
+            (goal gl-attack-new-attacker-unit-for-end 0)
+            =>
+            (up-set-target-object search-local g: gl-attack-new-attacker-unit-id)
+            (up-get-point position-object gl-tmp-x)
+            (up-set-target-point gl-tmp-x) ; set target point to this unit's position
+        )
+
+        ; find enemy units near this attacker
+        (defrule
+            (goal gl-attack-new-attacker-type-for-end 0)
+            (goal gl-attack-new-attacker-unit-for-end 0)
+            =>
+            (set-goal gl-attack-new-player-for-end 0)
+
+            (set-strategic-number sn-focus-player-number 0)
+        )
+        (defrule
+            (goal gl-attack-new-attacker-type-for-end 0)
+            (goal gl-attack-new-attacker-unit-for-end 0)
+            (goal gl-attack-new-player-for-end 0)
+            =>
+            (up-get-rule-id gl-attack-new-player-for-id)
+        )
+            (defrule
+                (goal gl-attack-new-attacker-type-for-end 0)
+                (goal gl-attack-new-attacker-unit-for-end 0)
+                (goal gl-attack-new-player-for-end 0)
+                =>
+                (up-modify-sn sn-focus-player-number c:+ 1)
+            )
+            (defrule
+                (goal gl-attack-new-attacker-type-for-end 0)
+                (goal gl-attack-new-attacker-unit-for-end 0)
+                (goal gl-attack-new-player-for-end 0)
+                (up-compare-sn sn-focus-player-number > 8)
+                =>
+                (set-goal gl-attack-new-player-for-end 1)
+            )
+            (defrule
+                (goal gl-attack-new-attacker-type-for-end 0)
+                (goal gl-attack-new-attacker-unit-for-end 0)
+                (goal gl-attack-new-player-for-end 0)
+                (not(and
+                    (player-valid focus-player)
+                    (players-stance focus-player enemy)
+                ))
+                =>
+                (up-jump-direct g: gl-attack-new-player-for-id)
+            )
+
+            (defrule
+                (goal gl-attack-new-attacker-type-for-end 0)
+                (goal gl-attack-new-attacker-unit-for-end 0)
+                (goal gl-attack-new-player-for-end 0)
+                =>
+                (up-reset-search 0 0 1 1)
+                (up-reset-filters)
+                (up-find-remote c: town-center c: 50)
+                (up-find-remote c: watch-tower c: 50)
+            )
+        (defrule
+            (goal gl-attack-new-attacker-type-for-end 0)
+            (goal gl-attack-new-attacker-unit-for-end 0)
+            (goal gl-attack-new-player-for-end 0)
+            =>
+            (up-jump-direct g: gl-attack-new-player-for-id)
+        )
+
+        (defrule
+            (goal gl-attack-new-attacker-type-for-end 0)
+            (goal gl-attack-new-attacker-unit-for-end 0)
+            =>
+            (up-clean-search search-remote object-data-distance search-order-asc) ; sort by distance. this contains all target buildings of all enemy players
+            (up-get-search-state gl-tmp-local-total)
+        )
+        (defrule
+            (goal gl-attack-new-attacker-type-for-end 0)
+            (goal gl-attack-new-attacker-unit-for-end 0)
+
+            (up-compare-goal gl-tmp-remote-total > 0)
+            =>
+            (up-reset-filters)
+            (up-reset-search 1 1 0 0)
+            (up-filter-distance c: -1 c: 4)
+            (up-find-local g: gl-attack-new-attacker-type c: 200) ; grab attacker units
+
+            (up-set-target-object search-remote c: 0) ; set target to the nearest enemy unit
+
+            (up-target-objects 1 action-default -1 -1) ; attack this object
+            (set-goal gl-attack-new-attacker-type-for-end 1)
+        )
+
+    (defrule
+        (goal gl-attack-new-attacker-type-for-end 0)
+        (goal gl-attack-new-attacker-unit-for-end 0)
+        =>
+        (up-jump-direct g: gl-attack-new-attacker-unit-for-id)
+    )
+
+
+
+
+
 
     ;; random attacker goes to some points of the focus player
     ;(defrule
