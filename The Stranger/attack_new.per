@@ -62,9 +62,17 @@
     (defrule
         (goal gl-attack-new-attacker-type-for-end 0)
 
-        (goal gl-attack-new-attacker-type cavalry-class)
+        (goal gl-attack-new-attacker-type scorpion-line)
         =>
         (set-goal gl-attack-new-attacker-type-for-end 1) ; for end
+    )
+    (defrule
+        (goal gl-attack-new-attacker-type-for-end 0)
+
+        (goal gl-attack-new-attacker-type cavalry-class)
+        =>
+        (set-goal gl-attack-new-attacker-type scorpion-line)
+        (set-goal gl-attack-new-attacker-to-unit-find-distance 7)
     )
     (defrule
         (goal gl-attack-new-attacker-type-for-end 0)

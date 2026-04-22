@@ -236,7 +236,7 @@
 (defconst gl-my-flank-enemy 80)
 (defconst gl-my-pocket-enemy 81)
 (defrule
-    (true)
+    (game-time < 90)
     =>
     (up-find-player enemy find-closest gl-my-flank-enemy)
     (up-find-next-player enemy find-closest gl-my-flank-enemy)
@@ -246,7 +246,6 @@
     ;(up-chat-data-to-all "next closest: %d" g: gl-next-closest-enemy)
     (up-modify-sn sn-focus-player-number g:= gl-my-flank-enemy)
     ;(up-chat-data-to-all "set focus player: %d" g: gl-closest-enemy)
-    (disable-self)
 )
 (defrule
     (true)

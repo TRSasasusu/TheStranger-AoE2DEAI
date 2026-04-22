@@ -2090,6 +2090,18 @@
             (set-goal gl-wall-building-tile-from-criterion-for-end 1)
             (chat-to-all "same point found! lerp reached the end point, stopping")
         )
+        (defrule
+            (goal gl-wall-calculated 1)
+            (up-compare-goal gl-wall-tc-pos-x >= 0)
+            (goal gl-wall-building-pending 1)
+            (goal gl-wall-deciding-building-position-for-end 0)
+            (goal gl-wall-building-tile-from-criterion-for-end 0)
+
+            (up-compare-goal gl-wall-building-tile-from-criterion > 100) ; what causes this? just in case, stop it to avoid infinite loop
+            =>
+            (set-goal gl-wall-building-tile-from-criterion-for-end 1)
+            (chat-to-all "too many iterations, stopping")
+        )
 
         (defrule
             (goal gl-wall-calculated 1)
@@ -2169,7 +2181,7 @@
 
             (up-compare-goal gl-tmp-remote-total > 0)
             =>
-            (up-modify-goal gl-wall-building-tile-from-criterion c:+ 1)
+            ;(up-modify-goal gl-wall-building-tile-from-criterion c:+ 1)
             ;(up-chat-data-to-all "resources %d are found when placing wall" g: gl-tmp-remote-total)
             (up-jump-direct g: gl-wall-building-tile-from-criterion-for-id); continue
         )
