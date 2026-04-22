@@ -50,6 +50,44 @@
     (research ri-double-bit-axe)
 )
 
+; build barrack in wall
+(defrule
+    (or
+        (goal gl-researching-feudal 1)
+        (current-age >= feudal-age)
+    )
+    (can-build barracks)
+    (building-type-count-total barracks == 0)
+
+    (goal gl-wall-calculated 1)
+    (goal gl-wall-building-pending 0)
+    (goal gl-wall-building-unavailable 0)
+    (goal gl-wall-start-walling 0)
+    (up-compare-goal gl-wall-building-range < 4)
+    =>
+    (set-goal gl-wall-building-pending 1)
+    (set-goal gl-wall-building-range 5)
+    (up-jump-rule 2)
+)
+(defrule
+    (or
+        (goal gl-researching-feudal 1)
+        (current-age >= feudal-age)
+    )
+    (can-build barracks)
+    (building-type-count-total barracks == 0)
+
+    (goal gl-wall-calculated 1)
+    (goal gl-wall-building-pending 0)
+    (goal gl-wall-building-unavailable 0)
+    (goal gl-wall-start-walling 0)
+    (up-compare-goal gl-wall-building-range >= 5)
+    =>
+    (up-set-target-point gl-wall-building-pos-x)
+    (up-build place-point 0 c: barracks)
+    (set-goal gl-wall-building-pending 1)
+    (up-jump-rule 1)
+)
 (defrule
     (or
         (goal gl-researching-feudal 1)
@@ -59,17 +97,84 @@
     (building-type-count-total barracks == 0)
     =>
     (build barracks)
+    (chat-to-all "building barracks normally!?")
 )
 
+; build archery-range in wall
+(defrule
+    (current-age == feudal-age)
+    (can-build archery-range)
+    (building-type-count-total archery-range < 2)
+
+    (goal gl-wall-calculated 1)
+    (goal gl-wall-building-pending 0)
+    (goal gl-wall-building-unavailable 0)
+    (goal gl-wall-start-walling 0)
+    (up-compare-goal gl-wall-building-range < 4)
+    =>
+    (set-goal gl-wall-building-pending 1)
+    (set-goal gl-wall-building-range 5)
+    (up-jump-rule 2)
+)
+(defrule
+    (current-age == feudal-age)
+    (can-build archery-range)
+    (building-type-count-total archery-range < 2)
+
+    (goal gl-wall-calculated 1)
+    (goal gl-wall-building-pending 0)
+    (goal gl-wall-building-unavailable 0)
+    (goal gl-wall-start-walling 0)
+    (up-compare-goal gl-wall-building-range >= 5)
+    =>
+    (up-set-target-point gl-wall-building-pos-x)
+    (up-build place-point 0 c: archery-range)
+    (set-goal gl-wall-building-pending 1)
+    (up-jump-rule 1)
+)
 (defrule
     (current-age == feudal-age)
     (can-build archery-range)
     (building-type-count-total archery-range < 2)
     =>
-    (up-assign-builders c: archery-range c: 2)
     (build archery-range)
+    (chat-to-all "building archery range normally!?")
 )
 
+; build blacksmith in wall
+(defrule
+    (current-age >= feudal-age)
+    (can-build blacksmith)
+    (building-type-count-total archery-range >= 2)
+    (building-type-count-total blacksmith == 0)
+
+    (goal gl-wall-calculated 1)
+    (goal gl-wall-building-pending 0)
+    (goal gl-wall-building-unavailable 0)
+    (goal gl-wall-start-walling 0)
+    (up-compare-goal gl-wall-building-range < 4)
+    =>
+    (set-goal gl-wall-building-pending 1)
+    (set-goal gl-wall-building-range 5)
+    (up-jump-rule 2)
+)
+(defrule
+    (current-age >= feudal-age)
+    (can-build blacksmith)
+    (building-type-count-total archery-range >= 2)
+    (building-type-count-total blacksmith == 0)
+
+    (goal gl-wall-calculated 1)
+    (goal gl-wall-building-pending 0)
+    (goal gl-wall-building-unavailable 0)
+    (goal gl-wall-start-walling 0)
+    (up-compare-goal gl-wall-building-range >= 5)
+    =>
+    (up-set-target-point gl-wall-building-pos-x)
+    (up-build place-point 0 c: blacksmith)
+    (set-goal gl-wall-building-pending 1)
+    (up-jump-rule 1)
+)
 (defrule
     (current-age >= feudal-age)
     (can-build blacksmith)
@@ -77,6 +182,7 @@
     (building-type-count-total blacksmith == 0)
     =>
     (build blacksmith)
+    (chat-to-all "building blacksmith normally!?")
 )
 
 (defrule

@@ -125,26 +125,82 @@
     (defrule
         (goal gl-attack-new-attacker-type-for-end 0)
 
-        (goal gl-attack-new-attacker-type infantry-class)
+        (goal gl-attack-new-attacker-type elite-eagle-warrior)
         =>
         (set-goal gl-attack-new-attacker-type cavalry-archer-class)
         (set-goal gl-attack-new-attacker-to-unit-find-distance 6)
-        (chat-to-all "switch to cavalry archer")
+        ;(chat-to-all "switch to cavalry archer")
     )
     (defrule
         (goal gl-attack-new-attacker-type-for-end 0)
 
-        (goal gl-attack-new-attacker-type scout-cavalry-class)
+        (goal gl-attack-new-attacker-type heavy-eagle-warrior)
         =>
-        (set-goal gl-attack-new-attacker-type infantry-class)
+        (set-goal gl-attack-new-attacker-type elite-eagle-warrior)
+        (set-goal gl-attack-new-attacker-to-unit-find-distance 6)
+    )
+    (defrule
+        (goal gl-attack-new-attacker-type-for-end 0)
+
+        (goal gl-attack-new-attacker-type eagle-warrior)
+        =>
+        (set-goal gl-attack-new-attacker-type heavy-eagle-warrior)
+        (set-goal gl-attack-new-attacker-to-unit-find-distance 4)
+    )
+    (defrule
+        (goal gl-attack-new-attacker-type-for-end 0)
+
+        (goal gl-attack-new-attacker-type huskarl-set)
+        =>
+        (set-goal gl-attack-new-attacker-type eagle-warrior)
         (set-goal gl-attack-new-attacker-to-unit-find-distance 3)
+    )
+    (defrule
+        (goal gl-attack-new-attacker-type-for-end 0)
+
+        (goal gl-attack-new-attacker-type spearman-set)
+        =>
+        (set-goal gl-attack-new-attacker-type huskarl-set)
+        (set-goal gl-attack-new-attacker-to-unit-find-distance 6)
+    )
+    (defrule
+        (goal gl-attack-new-attacker-type-for-end 0)
+
+        (goal gl-attack-new-attacker-type militiaman-line)
+        =>
+        (set-goal gl-attack-new-attacker-type spearman-set)
+        (set-goal gl-attack-new-attacker-to-unit-find-distance 3)
+    )
+    (defrule
+        (goal gl-attack-new-attacker-type-for-end 0)
+
+        (goal gl-attack-new-attacker-type hussar)
+        =>
+        (set-goal gl-attack-new-attacker-type militiaman-line)
+        (set-goal gl-attack-new-attacker-to-unit-find-distance 3)
+    )
+    (defrule
+        (goal gl-attack-new-attacker-type-for-end 0)
+
+        (goal gl-attack-new-attacker-type light-cavalry)
+        =>
+        (set-goal gl-attack-new-attacker-type hussar)
+        (set-goal gl-attack-new-attacker-to-unit-find-distance 7)
+    )
+    (defrule
+        (goal gl-attack-new-attacker-type-for-end 0)
+
+        (goal gl-attack-new-attacker-type scout-cavalry)
+        =>
+        (set-goal gl-attack-new-attacker-type light-cavalry)
+        (set-goal gl-attack-new-attacker-to-unit-find-distance 5)
     )
     (defrule
         (goal gl-attack-new-attacker-type-for-end 0)
 
         (goal gl-attack-new-attacker-type -1)
         =>
-        (set-goal gl-attack-new-attacker-type scout-cavalry-class)
+        (set-goal gl-attack-new-attacker-type scout-cavalry)
         (set-goal gl-attack-new-attacker-to-unit-find-distance 3)
     )
 
@@ -152,17 +208,64 @@
     (defrule
         (goal gl-attack-new-attacker-type-for-end 0)
 
-        (goal gl-attack-new-attacker-type scout-cavalry-class)
+        (goal gl-attack-new-attacker-type scout-cavalry)
         (or
             (players-building-count focus-player == 0)
             (and
-                (unit-type-count-total scout-cavalry-class == 1)
+                (unit-type-count-total scout-cavalry == 1)
+                (goal gl-attack-new-single-sc-attack 0)
+            )
+        )
+        =>
+        (up-full-reset-search)
+        (up-filter-include -1 actionid-attack -1 -1)
+        (up-find-local c: scout-cavalry c: 1)
+        (up-get-search-state gl-tmp-local-total)
+    )
+    (defrule
+        (goal gl-attack-new-attacker-type-for-end 0)
+
+        (goal gl-attack-new-attacker-type scout-cavalry)
+        (or
+            (players-building-count focus-player == 0)
+            (and
+                (unit-type-count-total scout-cavalry == 1)
+                (goal gl-attack-new-single-sc-attack 0)
+            )
+        )
+        (up-compare-goal gl-tmp-local-total > 0)
+        =>
+        (up-reset-unit c: scout-cavalry) ; sc should find enemy!!!
+    )
+    (defrule
+        (goal gl-attack-new-attacker-type-for-end 0)
+
+        (goal gl-attack-new-attacker-type scout-cavalry)
+        (or
+            (players-building-count focus-player == 0)
+            (and
+                (unit-type-count-total scout-cavalry == 1)
                 (goal gl-attack-new-single-sc-attack 0)
             )
         )
         =>
         (up-jump-direct g: gl-attack-new-attacker-type-for-id) ; sc must find enemy at first
     )
+    (defrule
+        (goal gl-attack-new-attacker-type-for-end 0)
+
+        (goal gl-attack-new-attacker-type eagle-warrior) ; this is eagle scout actually
+        (or
+            (players-building-count focus-player == 0)
+            (and
+                (unit-type-count-total eagle-warrior == 1)
+                (goal gl-attack-new-single-sc-attack 0)
+            )
+        )
+        =>
+        (up-jump-direct g: gl-attack-new-attacker-type-for-id) ; eagle scout must find enemy at first
+    )
+    ; TODO: gurjaras camel and champis
 
 
 
@@ -488,7 +591,7 @@
         (goal gl-attack-new-attacker-type-for-end 0)
         =>
         (up-get-search-state gl-tmp-local-total) ; it still has local results
-        (up-chat-data-to-all "attacker units total: %d" g: gl-tmp-local-total)
+        ;(up-chat-data-to-all "attacker units total: %d" g: gl-tmp-local-total)
 
         ; TODO: I need random version
         (up-modify-sn sn-focus-player-number g:= gl-attack-new-focus-player-backup) ; restore focus player for some point attack
@@ -544,7 +647,7 @@
         (up-get-search-state gl-tmp-local-total)
         (up-modify-goal gl-attack-new-attack-target-candidates g:= gl-tmp-remote-total)
         (up-modify-goal gl-attack-new-attack-target-rnd c:- attack-new-point-lumber-camp)
-        (chat-to-all "try finding lumber camp")
+        ;(chat-to-all "try finding lumber camp")
     )
     (defrule
         (goal gl-attack-new-attacker-type-for-end 0)
@@ -602,8 +705,8 @@
         (up-get-search-state gl-tmp-local-total)
         (up-modify-goal gl-attack-new-attack-target-candidates g:= gl-tmp-remote-total)
         (up-modify-goal gl-attack-new-attack-target-rnd c:- attack-new-point-tc)
-        (chat-to-all "try finding town center")
-        (up-chat-data-to-all "town center candidates: %d" g: gl-tmp-remote-total)
+        ;(chat-to-all "try finding town center")
+        ;(up-chat-data-to-all "town center candidates: %d" g: gl-tmp-remote-total)
     )
     (defrule
         (goal gl-attack-new-attacker-type-for-end 0)
@@ -638,7 +741,7 @@
         (up-find-remote c: town-center c: 20)
         (up-get-search-state gl-tmp-local-total)
         (up-modify-goal gl-attack-new-attack-target-candidates g:= gl-tmp-remote-total)
-        (chat-to-all "try finding town center to go to random point")
+        ;(chat-to-all "try finding town center to go to random point")
     )
     (defrule
         (goal gl-attack-new-attacker-type-for-end 0)

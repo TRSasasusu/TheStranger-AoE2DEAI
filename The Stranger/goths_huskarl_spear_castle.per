@@ -87,6 +87,13 @@
 )
 
 (defrule
+    (can-build castle)
+    (goal build-castle-defensive-first-complete 1)
+    =>
+    (build castle)
+)
+
+(defrule
     (can-research ri-anarchy)
     =>
     (research ri-anarchy)
