@@ -62,9 +62,49 @@
     (defrule
         (goal gl-attack-new-attacker-type-for-end 0)
 
-        (goal gl-attack-new-attacker-type mangonel-line)
+        (goal gl-attack-new-attacker-type cavalry-class)
         =>
         (set-goal gl-attack-new-attacker-type-for-end 1) ; for end
+    )
+    (defrule
+        (goal gl-attack-new-attacker-type-for-end 0)
+
+        (goal gl-attack-new-attacker-type trebuchet)
+        =>
+        (set-goal gl-attack-new-attacker-type cavalry-class)
+        (set-goal gl-attack-new-attacker-to-unit-find-distance 4)
+    )
+    (defrule
+        (goal gl-attack-new-attacker-type-for-end 0)
+
+        (goal gl-attack-new-attacker-type battering-ram-line)
+        =>
+        (set-goal gl-attack-new-attacker-type trebuchet)
+        (set-goal gl-attack-new-attacker-to-unit-find-distance 0)
+    )
+    (defrule
+        (goal gl-attack-new-attacker-type-for-end 0)
+
+        (goal gl-attack-new-attacker-type rocket-cart-line)
+        =>
+        (set-goal gl-attack-new-attacker-type battering-ram-line)
+        (set-goal gl-attack-new-attacker-to-unit-find-distance 0)
+    )
+    (defrule
+        (goal gl-attack-new-attacker-type-for-end 0)
+
+        (goal gl-attack-new-attacker-type mangonel-line)
+        =>
+        (set-goal gl-attack-new-attacker-type rocket-cart-line)
+        (set-goal gl-attack-new-attacker-to-unit-find-distance 6)
+    )
+    (defrule
+        (goal gl-attack-new-attacker-type-for-end 0)
+
+        (goal gl-attack-new-attacker-type mangonel-line)
+        =>
+        (set-goal gl-attack-new-attacker-type rocket-cart-line)
+        (set-goal gl-attack-new-attacker-to-unit-find-distance 6)
     )
     (defrule
         (goal gl-attack-new-attacker-type-for-end 0)
@@ -274,6 +314,10 @@
         (goal gl-attack-new-attacker-unit-for-end 0)
 
         (not(goal gl-attack-new-attacker-type mangonel-line)) ; TODO: need other siege units HERE
+        (not(goal gl-attack-new-attacker-type bombard-cannon-line))
+        (not(goal gl-attack-new-attacker-type trebuchet))
+        (not(goal gl-attack-new-attacker-type battering-ram-line))
+        (not(goal gl-attack-new-attacker-type rocket-cart-line))
         =>
         (set-goal gl-attack-new-attacker-unit-for-end 1)
     )
@@ -368,6 +412,25 @@
                 (up-reset-filters)
                 (up-find-remote c: town-center c: 50)
                 (up-find-remote c: watch-tower c: 50)
+            )
+            ; only for ram, bombard cannon and trebuchet
+            (defrule
+                (goal gl-attack-new-attacker-type-for-end 0)
+                (goal gl-attack-new-attacker-unit-for-end 0)
+                (goal gl-attack-new-player-for-end 0)
+
+                (or
+                    (goal gl-attack-new-attacker-type bombard-cannon-line)
+                    (or
+                        (goal gl-attack-new-attacker-type trebuchet)
+                        (goal gl-attack-new-attacker-type battering-ram-line)
+                    )
+                )
+                =>
+                (up-find-remote c: castle c: 50)
+                (up-find-remote c: guard-tower c: 50)
+                (up-find-remote c: keep c: 50)
+                (up-find-remote c: bombard-tower c: 50)
             )
         (defrule
             (goal gl-attack-new-attacker-type-for-end 0)
