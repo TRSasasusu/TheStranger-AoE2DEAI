@@ -17,6 +17,7 @@
 (defconst attack-new-point-some 20)
 (defconst gl-attack-new-attack-target-candidates 711)
 (defconst gl-attack-new-timer-counter 712) ; only in even, attack some point
+(defconst gl-attack-new-only-grab-near-my-tc 713)
 
 ; copy from previous version of attack.per
 (defconst gl-enemy-tc-x 354)
@@ -44,6 +45,11 @@
 )
 (defrule
     (up-timer-status t-attack-new-timer == timer-running)
+    =>
+    (set-goal gl-attack-new-attacker-type-for-end 1)
+)
+(defrule
+    (goal gl-attack-stop 1)
     =>
     (set-goal gl-attack-new-attacker-type-for-end 1)
 )
@@ -210,6 +216,12 @@
         =>
         (set-goal gl-attack-new-attacker-type scout-cavalry)
         (set-goal gl-attack-new-attacker-to-unit-find-distance 3)
+    )
+
+    (defrule
+        (goal gl-attack-new-attacker-type-for-end 0)
+        =>
+        (set-goal gl-attack-new-only-grab-near-my-tc 0)
     )
 
 
@@ -394,7 +406,9 @@
                 (up-get-point position-object gl-tmp-x)
 
                 (up-target-point gl-tmp-x action-attack-move -1 -1) ; attack move to this point
-                (set-goal gl-attack-new-attacker-type-for-end 1)
+                ;(set-goal gl-attack-new-attacker-type-for-end 1)
+                (set-goal gl-attack-new-attacker-unit-for-end 1)
+                (set-goal gl-attack-new-only-grab-near-my-tc 1) ; only grab units near my tc to avoid hindering these already attacking units
             )
         (defrule
             (goal gl-attack-new-attacker-type-for-end 0)
@@ -437,6 +451,21 @@
         (goal gl-attack-new-attacker-unit-for-end 0)
         =>
         (up-full-reset-search)
+    )
+    ;(defrule
+    ;    (goal gl-attack-new-attacker-type-for-end 0)
+    ;    (goal gl-attack-new-attacker-unit-for-end 0)
+
+    ;    (goal gl-attack-new-only-grab-near-my-tc 1) ; only when attacking enemy units at that time
+    ;    =>
+    ;    (up-get-point position-self gl-tmp-x)
+    ;    (up-set-target-point gl-tmp-x)
+    ;    (up-filter-distance c: -1 c: 40) ; TODO: 40 is really good?
+    ;)
+    (defrule
+        (goal gl-attack-new-attacker-type-for-end 0)
+        (goal gl-attack-new-attacker-unit-for-end 0)
+        =>
         (up-find-local g: gl-attack-new-attacker-type c: 200)
         (up-get-search-state gl-tmp-local-total)
         (up-modify-goal gl-attack-new-attacker-unit-id g:= gl-tmp-local-total)
@@ -572,7 +601,8 @@
             (up-set-target-object search-remote c: 0) ; set target to the nearest enemy unit
 
             (up-target-objects 1 action-default -1 -1) ; attack this object
-            (set-goal gl-attack-new-attacker-type-for-end 1)
+            (set-goal gl-attack-new-attacker-unit-for-end 1)
+            (set-goal gl-attack-new-only-grab-near-my-tc 1) ; only grab units near my tc to avoid hindering these already attacking units
         )
 
     (defrule
@@ -595,7 +625,27 @@
     ;    =>
     ;    (up-jump-direct g: gl-attack-new-attacker-type-for-id) ; continue
     ;)
-    (defrule ;; per 6 seconds
+    (defrule
+        (goal gl-attack-new-attacker-type-for-end 0)
+        =>
+        (up-full-reset-search)
+    )
+    (defrule
+        (goal gl-attack-new-attacker-type-for-end 0)
+
+        (goal gl-attack-new-only-grab-near-my-tc 1) ; only when attacking enemy units at that time
+        =>
+        (up-get-point position-self gl-tmp-x)
+        (up-set-target-point gl-tmp-x)
+        (up-filter-distance c: -1 c: 40) ; TODO: 40 is really good?
+        (chat-to-all "only grab near my tc")
+    )
+    (defrule
+        (goal gl-attack-new-attacker-type-for-end 0)
+        =>
+        (up-find-local g: gl-attack-new-attacker-type c: 200)
+    )
+    (defrule
         (goal gl-attack-new-attacker-type-for-end 0)
         =>
         (up-get-search-state gl-tmp-local-total) ; it still has local results
@@ -625,10 +675,9 @@
     )
     (defrule
         (goal gl-attack-new-attacker-type-for-end 0)
-        (and
-            (up-compare-goal gl-attack-new-timer-counter != 0)
-            (up-object-data object-data-idling == 0)
-        )
+        (up-compare-goal gl-attack-new-timer-counter != 0)
+        (up-object-data object-data-idling == 0)
+        (goal gl-attack-new-only-grab-near-my-tc 0)
         =>
         (up-jump-direct g: gl-attack-new-attacker-type-for-id) ; continue when attacker units are NOT idling and NOT just 6 seconds timer
     )

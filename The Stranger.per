@@ -54,6 +54,7 @@
 (defconst gl-wall-building-pending 455)
 (defconst gl-wall-building-unavailable 464)
 (defconst gl-wall-building-range 465)
+(defconst gl-wall-allow 479)
 (defconst gl-attack-new-single-sc-attack 713)
 
 #load-if-defined MONGOL-CIV
@@ -157,7 +158,10 @@
 (defrule
     (or
         (goal gl-researching-feudal 1)
-        (current-age == feudal-age)
+        (or
+            (current-age == feudal-age)
+            (game-time > 540)
+        )
     )
     =>
     (enable-timer t-scout-timer 80)
@@ -167,7 +171,10 @@
 (defrule
     (or
         (goal gl-researching-feudal 1)
-        (current-age == feudal-age)
+        (or
+            (current-age == feudal-age)
+            (game-time > 540)
+        )
     )
     (up-timer-status t-scout-timer != timer-running)
     =>
@@ -178,7 +185,10 @@
 (defrule
     (or
         (goal gl-researching-feudal 1)
-        (current-age == feudal-age)
+        (or
+            (current-age == feudal-age)
+            (game-time > 540)
+        )
     )
     (up-timer-status t-scout-timer != timer-running)
     =>
@@ -189,7 +199,10 @@
 (defrule
     (or
         (goal gl-researching-feudal 1)
-        (current-age == feudal-age)
+        (or
+            (current-age == feudal-age)
+            (game-time > 540)
+        )
     )
     (up-timer-status t-scout-timer != timer-running)
     =>
@@ -200,7 +213,10 @@
 (defrule
     (or
         (goal gl-researching-feudal 1)
-        (current-age == feudal-age)
+        (or
+            (current-age == feudal-age)
+            (game-time > 540)
+        )
     )
     (up-timer-status t-scout-timer != timer-running)
     =>
@@ -211,7 +227,10 @@
 (defrule
     (or
         (goal gl-researching-feudal 1)
-        (current-age == feudal-age)
+        (or
+            (current-age == feudal-age)
+            (game-time > 540)
+        )
     )
     (up-timer-status t-scout-timer != timer-running)
     =>
@@ -222,7 +241,10 @@
 (defrule
     (or
         (goal gl-researching-feudal 1)
-        (current-age == feudal-age)
+        (or
+            (current-age == feudal-age)
+            (game-time > 540)
+        )
     )
     (up-timer-status t-scout-timer != timer-running)
     =>
@@ -235,18 +257,18 @@
 (defconst gl-next-closest-enemy 21)
 (defconst gl-my-flank-enemy 80)
 (defconst gl-my-pocket-enemy 81)
-(defrule
-    (game-time < 90)
-    =>
-    (up-find-player enemy find-closest gl-my-flank-enemy)
-    (up-find-next-player enemy find-closest gl-my-flank-enemy)
-    (up-modify-goal gl-my-pocket-enemy g:= gl-my-flank-enemy)
-    (up-find-player enemy find-closest gl-my-flank-enemy)
-    ;(up-chat-data-to-all "closest: %d" g: gl-closest-enemy)
-    ;(up-chat-data-to-all "next closest: %d" g: gl-next-closest-enemy)
-    (up-modify-sn sn-focus-player-number g:= gl-my-flank-enemy)
-    ;(up-chat-data-to-all "set focus player: %d" g: gl-closest-enemy)
-)
+;(defrule
+;    (game-time < 90)
+;    =>
+;    (up-find-player enemy find-closest gl-my-flank-enemy)
+;    (up-find-next-player enemy find-closest gl-my-flank-enemy)
+;    (up-modify-goal gl-my-pocket-enemy g:= gl-my-flank-enemy)
+;    (up-find-player enemy find-closest gl-my-flank-enemy)
+;    ;(up-chat-data-to-all "closest: %d" g: gl-closest-enemy)
+;    ;(up-chat-data-to-all "next closest: %d" g: gl-next-closest-enemy)
+;    (up-modify-sn sn-focus-player-number g:= gl-my-flank-enemy)
+;    ;(up-chat-data-to-all "set focus player: %d" g: gl-closest-enemy)
+;)
 (defrule
     (true)
     =>
@@ -259,6 +281,8 @@
     (up-modify-sn sn-focus-player-number g:= gl-closest-enemy)
     ;(up-chat-data-to-all "set focus player: %d" g: gl-closest-enemy)
 )
+
+(load "The Stranger/set_flank_pocket_enemy")
 
 
 ;(load "The Stranger/manatarms_w_tr")

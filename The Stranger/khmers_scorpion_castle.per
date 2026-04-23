@@ -24,16 +24,20 @@
     (can-build siege-workshop)
     (building-type-count-total siege-workshop == 0)
     =>
-    (build siege-workshop)
+    (up-get-point position-self gl-tmp-x)
+    (up-set-target-point gl-tmp-x)
+    (up-build place-point 0 c: siege-workshop)
 )
 
 (defrule
     (current-age >= castle-age)
-    (wood-amount > 400)
+    (wood-amount > 300)
     (can-build siege-workshop)
     (building-type-count-total siege-workshop <= 1)
     =>
-    (build siege-workshop)
+    (up-get-point position-self gl-tmp-x)
+    (up-set-target-point gl-tmp-x)
+    (up-build place-point 0 c: siege-workshop)
 )
 
 (defrule
@@ -130,4 +134,11 @@
     =>
     (set-goal gl-attack-stop 0)
     (set-goal gl-attack-only-attack-move-whole 1)
+)
+
+(defrule
+    (current-age >= castle-age)
+    (military-population > 15)
+    =>
+    (set-goal gl-wall-allow 1)
 )

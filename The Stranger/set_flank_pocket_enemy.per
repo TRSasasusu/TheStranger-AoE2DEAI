@@ -1,0 +1,120 @@
+(defconst gl-set-flank-pocket-enemy-player-for-id 290)
+(defconst gl-set-flank-pocket-enemy-player-for-end 291)
+(defconst gl-set-flank-pocket-enemy-player-enemy1 292)
+(defconst gl-set-flank-pocket-enemy-player-enemy2 293)
+(defconst gl-set-flank-pocket-enemy-player-enemy3 294)
+(defconst gl-set-flank-pocket-enemy-player-enemy4 295)
+(defconst gl-set-flank-pocket-enemy-focus-player-bak 296)
+
+(defrule
+    (true)
+    =>
+    (set-goal gl-set-flank-pocket-enemy-player-for-end 0)
+
+    (up-modify-goal gl-set-flank-pocket-enemy-focus-player-bak s:= sn-focus-player-number)
+    (set-strategic-number sn-focus-player-number 0)
+    (set-goal gl-set-flank-pocket-enemy-player-enemy1 0)
+    (set-goal gl-set-flank-pocket-enemy-player-enemy2 0)
+    (set-goal gl-set-flank-pocket-enemy-player-enemy3 0)
+    (set-goal gl-set-flank-pocket-enemy-player-enemy4 0)
+    (disable-self)
+)
+(defrule
+    (goal gl-set-flank-pocket-enemy-player-for-end 0)
+    =>
+    (up-get-rule-id gl-set-flank-pocket-enemy-player-for-id)
+)
+    (defrule
+        (goal gl-set-flank-pocket-enemy-player-for-end 0)
+        =>
+        (up-modify-sn sn-focus-player-number c:+ 1)
+    )
+    (defrule
+        (goal gl-set-flank-pocket-enemy-player-for-end 0)
+
+        (up-compare-sn sn-focus-player-number > 8)
+        =>
+        (set-goal gl-set-flank-pocket-enemy-player-for-end 1) ; break
+    )
+
+    (defrule
+        (goal gl-set-flank-pocket-enemy-player-for-end 0)
+
+        (not(and
+            (player-valid focus-player)
+            (players-stance focus-player enemy)
+        ))
+        =>
+        (up-jump-direct g: gl-set-flank-pocket-enemy-player-for-id) ; continue
+    )
+
+    (defrule
+        (goal gl-set-flank-pocket-enemy-player-for-end 0)
+
+        (goal gl-set-flank-pocket-enemy-player-enemy1 0)
+        =>
+        (up-modify-goal gl-set-flank-pocket-enemy-player-enemy1 s:= sn-focus-player-number)
+        (up-jump-direct g: gl-set-flank-pocket-enemy-player-for-id) ; continue
+    )
+    (defrule
+        (goal gl-set-flank-pocket-enemy-player-for-end 0)
+
+        (goal gl-set-flank-pocket-enemy-player-enemy2 0)
+        =>
+        (up-modify-goal gl-set-flank-pocket-enemy-player-enemy2 s:= sn-focus-player-number)
+        (up-jump-direct g: gl-set-flank-pocket-enemy-player-for-id) ; continue
+    )
+    (defrule
+        (goal gl-set-flank-pocket-enemy-player-for-end 0)
+
+        (goal gl-set-flank-pocket-enemy-player-enemy3 0)
+        =>
+        (up-modify-goal gl-set-flank-pocket-enemy-player-enemy3 s:= sn-focus-player-number)
+        (up-jump-direct g: gl-set-flank-pocket-enemy-player-for-id) ; continue
+    )
+    (defrule
+        (goal gl-set-flank-pocket-enemy-player-for-end 0)
+
+        (goal gl-set-flank-pocket-enemy-player-enemy4 0)
+        =>
+        (up-modify-goal gl-set-flank-pocket-enemy-player-enemy4 s:= sn-focus-player-number)
+        (up-jump-direct g: gl-set-flank-pocket-enemy-player-for-id) ; continue
+    )
+(defrule
+    (goal gl-set-flank-pocket-enemy-player-for-end 0)
+    =>
+    (up-jump-direct g: gl-set-flank-pocket-enemy-player-for-id)
+)
+
+
+(defrule
+    (up-compare-goal gl-set-flank-pocket-enemy-player-enemy1 > 0)
+    =>
+    (up-modify-goal gl-tmp g:= gl-set-flank-pocket-enemy-player-enemy1)
+    (up-modify-goal gl-tmp g:- gl-set-flank-pocket-enemy-focus-player-bak)
+    (disable-self)
+)
+(defrule
+    (up-compare-goal gl-set-flank-pocket-enemy-player-enemy1 > 0)
+    (goal gl-tmp 0)
+    =>
+    (up-modify-goal gl-my-flank-enemy g:= gl-set-flank-pocket-enemy-player-enemy1)
+    (up-modify-goal gl-my-pocket-enemy g:= gl-set-flank-pocket-enemy-player-enemy2)
+    (disable-self)
+)
+
+(defrule
+    (up-compare-goal gl-set-flank-pocket-enemy-player-enemy4 > 0)
+    =>
+    (up-modify-goal gl-tmp g:= gl-set-flank-pocket-enemy-player-enemy4)
+    (up-modify-goal gl-tmp g:- gl-set-flank-pocket-enemy-focus-player-bak)
+    (disable-self)
+)
+(defrule
+    (up-compare-goal gl-set-flank-pocket-enemy-player-enemy4 > 0)
+    (goal gl-tmp 0)
+    =>
+    (up-modify-goal gl-my-flank-enemy g:= gl-set-flank-pocket-enemy-player-enemy4)
+    (up-modify-goal gl-my-pocket-enemy g:= gl-set-flank-pocket-enemy-player-enemy3)
+    (disable-self)
+)
