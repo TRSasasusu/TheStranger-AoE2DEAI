@@ -53,6 +53,9 @@
 )
 
 (defrule
+    (current-age == feudal-age)
+    (not(goal gl-researching-castle 1))
+    (food-amount <= 200)
     (building-type-count-total mining-camp >= 1)
     (building-type-count-total barracks >= 1)
     =>
@@ -60,20 +63,19 @@
     (set-strategic-number sn-wood-gatherer-percentage 25)
     (set-strategic-number sn-gold-gatherer-percentage 15)
     (set-strategic-number sn-stone-gatherer-percentage 0)
-    (disable-self)
 )
 
 (defrule
     (current-age == feudal-age)
+    (not(goal gl-researching-castle 1))
     (food-amount > 200)
     (building-type-count-total barracks >= 1)
     (building-type-count-total mining-camp >= 1)
     =>
-    (set-strategic-number sn-food-gatherer-percentage 50)
-    (set-strategic-number sn-wood-gatherer-percentage 40)
+    (set-strategic-number sn-food-gatherer-percentage 45)
+    (set-strategic-number sn-wood-gatherer-percentage 45)
     (set-strategic-number sn-gold-gatherer-percentage 10)
     (set-strategic-number sn-stone-gatherer-percentage 0)
-    (disable-self)
 )
 
 

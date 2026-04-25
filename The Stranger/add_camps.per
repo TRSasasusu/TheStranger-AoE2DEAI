@@ -231,7 +231,7 @@
                 (goal gl-tmp-x 0)
                 (goal gl-tmp-y 0)
                 =>
-                (chat-to-all "camp and resource are in the same position, so skip wall check")
+                ;(chat-to-all "camp and resource are in the same position, so skip wall check")
                 (set-goal gl-add-camps-find-wall-for-end 1) ; break when the lerp ends
             )
             (defrule
@@ -239,8 +239,9 @@
                 (goal gl-add-camps-camp-for-end 0)
                 (goal gl-add-camps-find-wall-for-end 0)
 
-                (up-modify-goal gl-add-camps-lerp-counter < 0)
+                (up-compare-goal gl-add-camps-lerp-counter < 0)
                 =>
+                ;(chat-to-all "counter for lerp ended, so break")
                 (set-goal gl-add-camps-find-wall-for-end 1) ; break when the counter ends to avoid infinite loop (should not happen)
             )
 
@@ -250,6 +251,7 @@
                 (goal gl-add-camps-find-wall-for-end 0)
                 =>
                 (up-lerp-tiles gl-add-camps-lerp-pos-x gl-add-camps-camp-pos-x c: 1)
+                ;(up-send-flare gl-add-camps-lerp-pos-x)
                 (up-modify-goal gl-add-camps-lerp-counter c:- 1)
             )
             (defrule

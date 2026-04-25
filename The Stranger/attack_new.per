@@ -203,7 +203,7 @@
     (defrule
         (goal gl-attack-new-attacker-type-for-end 0)
 
-        (goal gl-attack-new-attacker-type huskarl-set)
+        (goal gl-attack-new-attacker-type elite-huskarl-barracks)
         =>
         (set-goal gl-attack-new-attacker-type eagle-warrior)
         (set-goal gl-attack-new-attacker-to-unit-find-distance 3)
@@ -211,9 +211,25 @@
     (defrule
         (goal gl-attack-new-attacker-type-for-end 0)
 
-        (goal gl-attack-new-attacker-type spearman-set)
+        (goal gl-attack-new-attacker-type huskarl-barracks)
         =>
-        (set-goal gl-attack-new-attacker-type huskarl-set)
+        (set-goal gl-attack-new-attacker-type elite-huskarl-barracks)
+        (set-goal gl-attack-new-attacker-to-unit-find-distance 6)
+    )
+    (defrule
+        (goal gl-attack-new-attacker-type-for-end 0)
+
+        (goal gl-attack-new-attacker-type huskarl-line)
+        =>
+        (set-goal gl-attack-new-attacker-type huskarl-barracks)
+        (set-goal gl-attack-new-attacker-to-unit-find-distance 6)
+    )
+    (defrule
+        (goal gl-attack-new-attacker-type-for-end 0)
+
+        (goal gl-attack-new-attacker-type spearman-line)
+        =>
+        (set-goal gl-attack-new-attacker-type huskarl-line)
         (set-goal gl-attack-new-attacker-to-unit-find-distance 6)
     )
     (defrule
@@ -221,7 +237,7 @@
 
         (goal gl-attack-new-attacker-type militiaman-line)
         =>
-        (set-goal gl-attack-new-attacker-type spearman-set)
+        (set-goal gl-attack-new-attacker-type spearman-line)
         (set-goal gl-attack-new-attacker-to-unit-find-distance 3)
     )
     (defrule
