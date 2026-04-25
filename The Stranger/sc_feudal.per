@@ -244,12 +244,12 @@
     ;(up-chat-data-to-all "im targeting %d" g: gl-next-closest-enemy)
 )
 
-(defrule
-    (true)
-    =>
-    (up-modify-goal gl-tmp s:= sn-focus-player-number)
-    (up-modify-sn sn-focus-player-number g:= gl-next-closest-enemy)
-)
+;(defrule
+;    (true)
+;    =>
+;    (up-modify-goal gl-tmp s:= sn-focus-player-number)
+;    (up-modify-sn sn-focus-player-number g:= gl-next-closest-enemy)
+;)
 ;(defrule
 ;    (players-current-age focus-player >= castle-age)
 ;    (players-current-age-time focus-player >= 120)
@@ -270,8 +270,8 @@
     =>
     (train scout-cavalry-line)
 )
-(defrule
-    (true)
-    =>
-    (up-modify-sn sn-focus-player-number g:= gl-tmp)
-)
+;(defrule
+;    (true)
+;    =>
+;    (up-modify-sn sn-focus-player-number g:= gl-tmp)
+;)

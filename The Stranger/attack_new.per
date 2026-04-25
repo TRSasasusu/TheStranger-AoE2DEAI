@@ -18,6 +18,8 @@
 (defconst gl-attack-new-attack-target-candidates 711)
 (defconst gl-attack-new-timer-counter 712) ; only in even, attack some point
 (defconst gl-attack-new-only-grab-near-my-tc 713)
+(defconst gl-attack-new-random-focus-player 714)
+(defconst gl-attack-random-id 715)
 
 ; copy from previous version of attack.per
 (defconst gl-enemy-tc-x 354)
@@ -41,6 +43,7 @@
     (set-goal gl-attack-new-attacker-type-for-end 0)
 
     (up-modify-goal gl-attack-new-focus-player-backup s:= sn-focus-player-number)
+    (up-modify-goal gl-attack-new-random-focus-player s:= sn-focus-player-number)
     (set-goal gl-attack-new-attacker-type -1)
 )
 (defrule
@@ -60,6 +63,42 @@
     (up-modify-goal gl-attack-new-timer-counter c:+ 1)
     (up-modify-goal gl-attack-new-timer-counter c:mod 3)
 )
+
+(defrule
+    (goal gl-attack-new-attacker-type-for-end 0)
+
+    (goal gl-attack-random 1)
+    =>
+    (set-goal gl-tmp2 50)
+)
+(defrule
+    (goal gl-attack-new-attacker-type-for-end 0)
+
+    (goal gl-attack-random 1)
+    (up-compare-goal gl-tmp2 > 0)
+    =>
+    (up-get-rule-id gl-attack-random-id)
+    (up-modify-goal gl-tmp2 c:- 1)
+    (generate-random-number 8)
+    (up-get-fact random-number 0 gl-tmp)
+    (up-modify-sn sn-focus-player-number g:= gl-tmp)
+    (up-modify-goal gl-attack-new-random-focus-player s:= sn-focus-player-number)
+    ;(up-chat-data-to-all "focus player: %d" s: sn-focus-player-number)
+)
+(defrule
+    (goal gl-attack-new-attacker-type-for-end 0)
+
+    (goal gl-attack-random 1)
+    (not(and
+        (player-valid focus-player)
+        (players-stance focus-player enemy)
+    ))
+    (up-compare-goal gl-tmp2 > 0)
+    =>
+    ;(chat-to-all "is invalid, pick another one")
+    (up-jump-direct g: gl-attack-random-id)
+)
+
 (defrule
     (goal gl-attack-new-attacker-type-for-end 0)
     =>
@@ -651,8 +690,7 @@
         (up-get-search-state gl-tmp-local-total) ; it still has local results
         ;(up-chat-data-to-all "attacker units total: %d" g: gl-tmp-local-total)
 
-        ; TODO: I need random version
-        (up-modify-sn sn-focus-player-number g:= gl-attack-new-focus-player-backup) ; restore focus player for some point attack
+        (up-modify-sn sn-focus-player-number g:= gl-attack-new-random-focus-player) ; restore focus player for some point attack
     )
     (defrule
         (goal gl-attack-new-attacker-type-for-end 0)
