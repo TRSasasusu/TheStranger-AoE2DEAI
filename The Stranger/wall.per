@@ -1341,10 +1341,12 @@
     (goal gl-wall-gate-decided 1)
     (goal gl-wall-gate-type-decided 1)
 
-    (up-object-type-count-total g: gl-wall-gate-type0 == 0)
-    (up-object-type-count-total g: gl-wall-gate-type1 == 0)
-    (up-object-type-count-total g: gl-wall-gate-type2 == 0)
-    (up-object-type-count-total g: gl-wall-gate-type3 == 0)
+    ;(up-object-type-count-total g: gl-wall-gate-type0 == 0)
+    ;(up-object-type-count-total g: gl-wall-gate-type1 == 0)
+    ;(up-object-type-count-total g: gl-wall-gate-type2 == 0)
+    ;(up-object-type-count-total g: gl-wall-gate-type3 == 0)
+    (up-compare-goal gl-wall-gate-num < 3) ; we need 3 gates
+
     (up-can-build 0 g: gl-wall-gate-type3)
     =>
     (set-strategic-number sn-placement-zone-size 0)
@@ -1354,6 +1356,7 @@
     (up-send-flare gl-wall-gate-pos-x)
     (set-goal gl-wall-gate-built 1)
     (chat-to-all "building gate!")
+    (up-chat-data-to-all "gl-wall-gate-num: %d" g: gl-wall-gate-num)
 )
 (defrule
     (goal gl-wall-calculated 1)
@@ -1363,10 +1366,79 @@
     (goal gl-wall-gate-decided 1)
     (goal gl-wall-gate-type-decided 1)
 
-    (up-object-type-count-total g: gl-wall-gate-type0 == 0)
-    (up-object-type-count-total g: gl-wall-gate-type1 == 0)
-    (up-object-type-count-total g: gl-wall-gate-type2 == 0)
-    (up-object-type-count-total g: gl-wall-gate-type3 == 0)
+    (goal gl-wall-gate-built 1)
+    =>
+    ;(up-modify-goal gl-tmp2 g:= gl-wall-gate-num)
+    ;(up-modify-goal gl-tmp2 c:= 3)
+
+    (up-modify-goal gl-tmp2 c:= 0)
+    (up-get-fact building-type-count-total 789 gl-tmp)
+    (up-modify-goal gl-tmp2 g:max gl-tmp)
+    (up-get-fact building-type-count-total 790 gl-tmp)
+    (up-modify-goal gl-tmp2 g:max gl-tmp)
+    (up-get-fact building-type-count-total 791 gl-tmp)
+    (up-modify-goal gl-tmp2 g:max gl-tmp)
+    (up-get-fact building-type-count-total 792 gl-tmp)
+    (up-modify-goal gl-tmp2 g:max gl-tmp)
+    (up-modify-goal gl-wall-gate-num g:= gl-tmp2)
+
+    (up-modify-goal gl-tmp2 c:= 0)
+    (up-get-fact building-type-count-total 793 gl-tmp)
+    (up-modify-goal gl-tmp2 g:max gl-tmp)
+    (up-get-fact building-type-count-total 794 gl-tmp)
+    (up-modify-goal gl-tmp2 g:max gl-tmp)
+    (up-get-fact building-type-count-total 795 gl-tmp)
+    (up-modify-goal gl-tmp2 g:max gl-tmp)
+    (up-get-fact building-type-count-total 796 gl-tmp)
+    (up-modify-goal gl-tmp2 g:max gl-tmp)
+    (up-modify-goal gl-wall-gate-num g:+ gl-tmp2)
+)
+(defrule
+    (goal gl-wall-calculated 1)
+    (goal gl-wall-start-walling 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+
+    (goal gl-wall-gate-decided 1)
+    (goal gl-wall-gate-type-decided 1)
+
+    (goal gl-wall-gate-built 1)
+    =>
+    (up-modify-goal gl-tmp2 c:= 0)
+    (up-get-fact building-type-count-total 797 gl-tmp)
+    (up-modify-goal gl-tmp2 g:max gl-tmp)
+    (up-get-fact building-type-count-total 798 gl-tmp)
+    (up-modify-goal gl-tmp2 g:max gl-tmp)
+    (up-get-fact building-type-count-total 799 gl-tmp)
+    (up-modify-goal gl-tmp2 g:max gl-tmp)
+    (up-get-fact building-type-count-total 800 gl-tmp)
+    (up-modify-goal gl-tmp2 g:max gl-tmp)
+    (up-modify-goal gl-wall-gate-num g:+ gl-tmp2)
+
+    (up-modify-goal gl-tmp2 c:= 0)
+    (up-get-fact building-type-count-total 801 gl-tmp)
+    (up-modify-goal gl-tmp2 g:max gl-tmp)
+    (up-get-fact building-type-count-total 802 gl-tmp)
+    (up-modify-goal gl-tmp2 g:max gl-tmp)
+    (up-get-fact building-type-count-total 803 gl-tmp)
+    (up-modify-goal gl-tmp2 g:max gl-tmp)
+    (up-get-fact building-type-count-total 804 gl-tmp)
+    (up-modify-goal gl-tmp2 g:max gl-tmp)
+    (up-modify-goal gl-wall-gate-num g:+ gl-tmp2)
+    (up-chat-data-to-all "recomputed gl-wall-gate-num: %d" g: gl-wall-gate-num)
+)
+(defrule
+    (goal gl-wall-calculated 1)
+    (goal gl-wall-start-walling 1)
+    (up-compare-goal gl-wall-tc-pos-x >= 0)
+
+    (goal gl-wall-gate-decided 1)
+    (goal gl-wall-gate-type-decided 1)
+
+    ;(up-object-type-count-total g: gl-wall-gate-type0 == 0)
+    ;(up-object-type-count-total g: gl-wall-gate-type1 == 0)
+    ;(up-object-type-count-total g: gl-wall-gate-type2 == 0)
+    ;(up-object-type-count-total g: gl-wall-gate-type3 == 0)
+    (up-compare-goal gl-wall-gate-num < 3)
     (goal gl-wall-gate-built 1)
     =>
     (set-goal gl-wall-gate-decided 0)
@@ -1376,33 +1448,24 @@
     (chat-to-all "gate built failed, recalculating gate position")
     (up-chat-data-to-all "gl-wall-building-tile-from-criterion: %d" g: gl-wall-building-tile-from-criterion)
 )
-(defrule
-    (goal gl-wall-calculated 1)
-    (goal gl-wall-start-walling 1)
-    (up-compare-goal gl-wall-tc-pos-x >= 0)
-
-    (goal gl-wall-gate-decided 1)
-    (goal gl-wall-gate-type-decided 1)
-
-    (or
-        (up-object-type-count g: gl-wall-gate-type0 == 1)
-        (or
-            (up-object-type-count g: gl-wall-gate-type1 == 1)
-            (or
-                (up-object-type-count g: gl-wall-gate-type2 == 1)
-                (up-object-type-count g: gl-wall-gate-type3 == 1)
-            )
-        )
-    )
-    (goal gl-wall-gate-built 1)
-    (up-compare-goal gl-wall-gate-num < 3) ; we need 3 gates
-    =>
-    (up-modify-goal gl-wall-gate-num c:+ 1)
-
-    (set-goal gl-wall-gate-decided 0)
-    (set-goal gl-wall-gate-built 0)
-    (set-goal gl-wall-gate-type-decided 0)
-)
+;(defrule
+;    (goal gl-wall-calculated 1)
+;    (goal gl-wall-start-walling 1)
+;    (up-compare-goal gl-wall-tc-pos-x >= 0)
+;
+;    (goal gl-wall-gate-decided 1)
+;    (goal gl-wall-gate-type-decided 1)
+;
+;    (goal gl-wall-gate-built 1)
+;    (up-compare-goal gl-wall-gate-num < 3) ; we need 3 gates
+;    =>
+;    (up-modify-goal gl-wall-gate-num c:+ 1)
+;
+;    (set-goal gl-wall-gate-decided 0)
+;    (set-goal gl-wall-gate-built 0)
+;    (set-goal gl-wall-gate-type-decided 0)
+;    (chat-to-all "need more gates, recalculating gate position")
+;)
 
 ; build walls
 (defrule

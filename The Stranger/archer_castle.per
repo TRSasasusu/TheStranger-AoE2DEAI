@@ -134,12 +134,15 @@
 )
 
 (defrule
+    (current-age == castle-age)
     (can-build castle)
     (goal build-castle-defensive-first-complete 1)
     =>
     (build castle)
+    (chat-to-all "normally building castle!?")
 )
 (defrule
+    (current-age == castle-age)
     (can-build castle)
     =>
     (up-assign-builders c: castle c: 10)

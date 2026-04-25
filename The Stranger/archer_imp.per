@@ -179,10 +179,19 @@
 ;)
 
 (defrule
+    (current-age == imperial-age)
+    (can-build castle)
+    (goal build-castle-defensive-first-complete 1)
+    =>
+    (build castle)
+    (chat-to-all "normally building castle!?")
+)
+(defrule
+    (current-age == imperial-age)
     (can-build castle)
     =>
     (up-assign-builders c: castle c: 10)
-    (build castle)
+    (set-goal build-castle-defensive-first 1)
 )
 
 (defrule

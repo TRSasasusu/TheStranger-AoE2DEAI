@@ -407,7 +407,7 @@
 
                 (up-target-point gl-tmp-x action-attack-move -1 -1) ; attack move to this point
                 ;(set-goal gl-attack-new-attacker-type-for-end 1)
-                (set-goal gl-attack-new-attacker-unit-for-end 1)
+                ;(set-goal gl-attack-new-attacker-unit-for-end 1)
                 (set-goal gl-attack-new-only-grab-near-my-tc 1) ; only grab units near my tc to avoid hindering these already attacking units
             )
         (defrule
@@ -601,7 +601,7 @@
             (up-set-target-object search-remote c: 0) ; set target to the nearest enemy unit
 
             (up-target-objects 1 action-default -1 -1) ; attack this object
-            (set-goal gl-attack-new-attacker-unit-for-end 1)
+            ;(set-goal gl-attack-new-attacker-unit-for-end 1)
             (set-goal gl-attack-new-only-grab-near-my-tc 1) ; only grab units near my tc to avoid hindering these already attacking units
         )
 
@@ -638,7 +638,7 @@
         (up-get-point position-self gl-tmp-x)
         (up-set-target-point gl-tmp-x)
         (up-filter-distance c: -1 c: 40) ; TODO: 40 is really good?
-        (chat-to-all "only grab near my tc")
+        ;(chat-to-all "only grab near my tc")
     )
     (defrule
         (goal gl-attack-new-attacker-type-for-end 0)

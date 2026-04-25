@@ -181,7 +181,7 @@
             (up-reset-filters)
             (up-reset-search 0 0 1 1)
             (up-filter-status g: gl-resource-status c: list-active)
-            (up-filter-distance c: -1 c: 5)
+            (up-filter-distance c: -1 c: 10)
             (up-find-resource g: gl-resource-type c: 30)
             (up-clean-search search-remote object-data-distance search-order-asc)
             (up-get-search-state gl-tmp-local-total)
@@ -205,7 +205,7 @@
 
             (up-set-target-object search-remote c: 0) ; set nearest resource as target
             (up-get-point position-object gl-add-camps-lerp-pos-x)
-            (set-goal gl-add-camps-lerp-counter 10)
+            (set-goal gl-add-camps-lerp-counter 20)
             (set-goal gl-add-camps-wall-found 0)
         )
         (defrule
@@ -231,6 +231,7 @@
                 (goal gl-tmp-x 0)
                 (goal gl-tmp-y 0)
                 =>
+                (chat-to-all "camp and resource are in the same position, so skip wall check")
                 (set-goal gl-add-camps-find-wall-for-end 1) ; break when the lerp ends
             )
             (defrule
