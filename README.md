@@ -10,7 +10,7 @@ Currently, it's in the alpha version.
 
 * [x] Typical civilizations in Arabia (both 1vs1 and 4vs4): flank civs use archers, and pocket civs use scout cavalry and cavaliers.
 * [ ] Unique strategies for each civilization in Arabia. Goths, Persians (flank), and Khmer are supported.
-* [ ] Walling
+* [x] Walling
 * [ ] Nomad
 * [ ] Arena
 * [ ] 10x shared civs
