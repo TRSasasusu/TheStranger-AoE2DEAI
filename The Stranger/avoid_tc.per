@@ -48,7 +48,7 @@
 (defrule
     (true)
     =>
-    (up-set-attack-stance archer-line c: stance-aggressive)
+    (up-set-attack-stance archery-class c: stance-aggressive)
     (up-set-attack-stance cavalry-archer-line c: stance-aggressive)
     (up-set-attack-stance skirmisher-line c: stance-aggressive)
     (up-set-attack-stance militiaman-line c: stance-aggressive)
@@ -60,6 +60,7 @@
     (up-set-attack-stance bombard-cannon-line c: stance-aggressive)
     (up-set-attack-stance steppe-lancer-line c: stance-aggressive)
     (up-set-attack-stance scorpion-line c: stance-aggressive)
+    (up-set-attack-stance cavalry-class c: stance-aggressive)
 )
 
 ; for player
@@ -101,7 +102,7 @@
     (goal gl-avoiding-player-for-end 0)
     =>
     (up-get-rule-id gl-avoiding-unit-type-reset-id)
-    (set-goal gl-avoiding-unit-type archer-line)
+    (set-goal gl-avoiding-unit-type archery-class)
     (set-goal gl-avoiding-start-distance 11)
     (set-goal gl-avoiding-additional-distance 0)
 )
@@ -236,7 +237,7 @@
 )
 (defrule
     (goal gl-avoiding-player-for-end 0)
-    (goal gl-avoiding-unit-type archer-line)
+    (goal gl-avoiding-unit-type archery-class)
     =>
     (set-goal gl-avoiding-unit-type cavalry-archer-line)
     (up-jump-direct g: gl-avoiding-tc-search-reset-id)

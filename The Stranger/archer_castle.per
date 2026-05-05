@@ -125,12 +125,24 @@
     (civilian-population > 45)
     (research-completed ri-bodkin-arrow)
     (research-completed ri-crossbow)
+    (building-type-count-total castle == 0)
+    =>
+    (set-strategic-number sn-food-gatherer-percentage 20)
+    (set-strategic-number sn-wood-gatherer-percentage 25)
+    (set-strategic-number sn-gold-gatherer-percentage 40)
+    (set-strategic-number sn-stone-gatherer-percentage 15)
+)
+(defrule
+    (current-age >= castle-age)
+    (civilian-population > 45)
+    (research-completed ri-bodkin-arrow)
+    (research-completed ri-crossbow)
+    (building-type-count-total castle > 0)
     =>
     (set-strategic-number sn-food-gatherer-percentage 25)
     (set-strategic-number sn-wood-gatherer-percentage 25)
     (set-strategic-number sn-gold-gatherer-percentage 45)
     (set-strategic-number sn-stone-gatherer-percentage 5)
-    (disable-self)
 )
 
 (defrule
@@ -200,5 +212,74 @@
     (current-age == castle-age)
     (up-compare-goal gl-tmp-remote-total > 0)
     =>
-    (up-modify-sn sn-focus-player-number g:= gl-next-closest-enemy)
+    ;(up-modify-sn sn-focus-player-number g:= gl-next-closest-enemy)
+    (up-modify-sn sn-focus-player-number g:= gl-my-pocket-enemy)
 )
+
+; TODO: mayan and vietnamese should have different rule on their unique files, but currently I just put it here for simplicity
+#load-if-defined MAYAN-CIV
+(defrule
+    (current-age == castle-age)
+    (unit-type-count plumed-archer-line > 5)
+    =>
+    (enable-timer t-tactics-timer 180)
+    (disable-self)
+)
+(defrule
+    (current-age == castle-age)
+    (up-timer-status t-tactics-timer != timer-running)
+    (goal gl-attack-random 1)
+    =>
+    (enable-timer t-tactics-timer 180)
+    (set-goal gl-attack-random 0)
+)
+(defrule
+    (current-age == castle-age)
+    (up-timer-status t-tactics-timer != timer-running)
+    (goal gl-attack-random 0)
+    (unit-type-count plumed-archer-line > 5)
+    =>
+    (enable-timer t-tactics-timer 300)
+    (set-goal gl-attack-random 1)
+)
+
+(defrule
+    (building-type-count-total castle > 0)
+    (can-train plumed-archer-line)
+    =>
+    (train plumed-archer-line)
+)
+#end-if
+#load-if-defined VIETNAMESE-CIV
+(defrule
+    (current-age == castle-age)
+    (unit-type-count rattan-archer-line > 5)
+    =>
+    (enable-timer t-tactics-timer 180)
+    (disable-self)
+)
+(defrule
+    (current-age == castle-age)
+    (up-timer-status t-tactics-timer != timer-running)
+    (goal gl-attack-random 1)
+    =>
+    (enable-timer t-tactics-timer 180)
+    (set-goal gl-attack-random 0)
+)
+(defrule
+    (current-age == castle-age)
+    (up-timer-status t-tactics-timer != timer-running)
+    (goal gl-attack-random 0)
+    (unit-type-count rattan-archer-line > 5)
+    =>
+    (enable-timer t-tactics-timer 300)
+    (set-goal gl-attack-random 1)
+)
+
+(defrule
+    (building-type-count-total castle > 0)
+    (can-train rattan-archer-line)
+    =>
+    (train rattan-archer-line)
+)
+#end-if

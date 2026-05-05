@@ -122,10 +122,18 @@
     (defrule
         (goal gl-attack-new-attacker-type-for-end 0)
 
-        (goal gl-attack-new-attacker-type trebuchet)
+        (goal gl-attack-new-attacker-type bombard-cannon-line)
         =>
         (set-goal gl-attack-new-attacker-type cavalry-class)
         (set-goal gl-attack-new-attacker-to-unit-find-distance 4)
+    )
+    (defrule
+        (goal gl-attack-new-attacker-type-for-end 0)
+
+        (goal gl-attack-new-attacker-type trebuchet)
+        =>
+        (set-goal gl-attack-new-attacker-type bombard-cannon-line)
+        (set-goal gl-attack-new-attacker-to-unit-find-distance 7)
     )
     (defrule
         (goal gl-attack-new-attacker-type-for-end 0)
