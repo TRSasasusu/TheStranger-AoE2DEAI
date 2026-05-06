@@ -472,6 +472,13 @@
                 ;(set-goal gl-attack-new-attacker-type-for-end 1)
                 ;(set-goal gl-attack-new-attacker-unit-for-end 1)
                 (set-goal gl-attack-new-only-grab-near-my-tc 1) ; only grab units near my tc to avoid hindering these already attacking units
+
+                (set-goal gl-attack-new-player-for-end 1) ; only attack one player at a time to avoid confusion
+
+                ; restore local search state for next attacker unit
+                (up-full-reset-search)
+                (up-find-local g: gl-attack-new-attacker-type c: 200)
+                (up-get-search-state gl-tmp-local-total)
             )
         (defrule
             (goal gl-attack-new-attacker-type-for-end 0)
@@ -561,6 +568,9 @@
             (up-set-target-object search-local g: gl-attack-new-attacker-unit-id)
             (up-get-point position-object gl-tmp-x)
             (up-set-target-point gl-tmp-x) ; set target point to this unit's position
+
+            (up-reset-search 0 0 1 1) ; reset remote search to find buildings near this unit
+            (up-reset-filters)
         )
 
         ; find enemy units near this attacker
@@ -611,8 +621,8 @@
                 (goal gl-attack-new-attacker-unit-for-end 0)
                 (goal gl-attack-new-player-for-end 0)
                 =>
-                (up-reset-search 0 0 1 1)
-                (up-reset-filters)
+                ;(up-reset-search 0 0 1 1)
+                ;(up-reset-filters)
                 (up-find-remote c: town-center c: 50)
                 (up-find-remote c: watch-tower c: 50)
             )
@@ -666,6 +676,11 @@
             (up-target-objects 1 action-default -1 -1) ; attack this object
             ;(set-goal gl-attack-new-attacker-unit-for-end 1)
             (set-goal gl-attack-new-only-grab-near-my-tc 1) ; only grab units near my tc to avoid hindering these already attacking units
+
+            ; restore local search state for next attacker unit
+            (up-full-reset-search)
+            (up-find-local g: gl-attack-new-attacker-type c: 200)
+            (up-get-search-state gl-tmp-local-total)
         )
 
     (defrule

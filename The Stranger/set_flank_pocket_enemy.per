@@ -9,15 +9,25 @@
 (defrule
     (true)
     =>
-    (set-goal gl-set-flank-pocket-enemy-player-for-end 0)
-
-    (up-modify-goal gl-set-flank-pocket-enemy-focus-player-bak s:= sn-focus-player-number)
-    (set-strategic-number sn-focus-player-number 0)
     (set-goal gl-set-flank-pocket-enemy-player-enemy1 0)
     (set-goal gl-set-flank-pocket-enemy-player-enemy2 0)
     (set-goal gl-set-flank-pocket-enemy-player-enemy3 0)
     (set-goal gl-set-flank-pocket-enemy-player-enemy4 0)
     (disable-self)
+)
+
+(defrule
+    (goal gl-set-flank-pocket-enemy-player-enemy1 0)
+    =>
+    (set-goal gl-set-flank-pocket-enemy-player-for-end 0)
+
+    (up-modify-goal gl-set-flank-pocket-enemy-focus-player-bak s:= sn-focus-player-number)
+    (set-strategic-number sn-focus-player-number 0)
+)
+(defrule
+    (game-time < 600)
+    =>
+    (set-goal gl-set-flank-pocket-enemy-player-for-end 1)
 )
 (defrule
     (goal gl-set-flank-pocket-enemy-player-for-end 0)

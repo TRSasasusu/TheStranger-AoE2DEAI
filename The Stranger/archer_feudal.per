@@ -270,3 +270,10 @@
     (up-find-local c: archery-range c: 2)
     (up-target-point gl-tmp-x action-gather -1 -1)
 )
+
+(defrule
+    (current-age == feudal-age)
+    (players-building-type-count focus-player watch-tower >= 2)
+    =>
+    (up-modify-sn sn-focus-player-number g:= gl-my-pocket-enemy)
+)
