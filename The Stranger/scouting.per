@@ -1,0 +1,213 @@
+#load-if-defined UP-POCKET-POSITION
+(defrule
+    (or
+        (goal gl-researching-feudal 1)
+        (or
+            (current-age == feudal-age)
+            (game-time > 540)
+        )
+    )
+    =>
+    (enable-timer t-scout-timer 80)
+    (up-send-scout group-type-land-explore scout-mirror)
+    (disable-self)
+)
+(defrule
+    (or
+        (goal gl-researching-feudal 1)
+        (or
+            (current-age == feudal-age)
+            (game-time > 540)
+        )
+    )
+    (up-timer-status t-scout-timer != timer-running)
+    =>
+    (enable-timer t-scout-timer 40)
+    (up-send-scout group-type-land-explore scout-opposite)
+    (disable-self)
+)
+(defrule
+    (or
+        (goal gl-researching-feudal 1)
+        (or
+            (current-age == feudal-age)
+            (game-time > 540)
+        )
+    )
+    (up-timer-status t-scout-timer != timer-running)
+    =>
+    (enable-timer t-scout-timer 40)
+    (up-send-scout group-type-land-explore scout-enemy)
+    (disable-self)
+)
+;(defrule
+;    (or
+;        (goal gl-researching-feudal 1)
+;        (or
+;            (current-age == feudal-age)
+;            (game-time > 540)
+;        )
+;    )
+;    (up-timer-status t-scout-timer != timer-running)
+;    =>
+;    (enable-timer t-scout-timer 30)
+;    (up-send-scout group-type-land-explore scout-flank)
+;    (disable-self)
+;)
+(defrule
+    (or
+        (goal gl-researching-feudal 1)
+        (or
+            (current-age == feudal-age)
+            (game-time > 540)
+        )
+    )
+    (up-timer-status t-scout-timer != timer-running)
+    =>
+    (enable-timer t-scout-timer 60)
+    (up-send-scout group-type-land-explore scout-opposite)
+    (disable-self)
+)
+(defrule
+    (or
+        (goal gl-researching-feudal 1)
+        (or
+            (current-age == feudal-age)
+            (game-time > 540)
+        )
+    )
+    (up-timer-status t-scout-timer != timer-running)
+    =>
+    (enable-timer t-scout-timer 60)
+    (up-send-scout group-type-land-explore scout-mirror)
+    (disable-self)
+)
+(defrule
+    (or
+        (goal gl-researching-feudal 1)
+        (or
+            (current-age == feudal-age)
+            (game-time > 540)
+        )
+    )
+    (up-timer-status t-scout-timer != timer-running)
+    =>
+    (enable-timer t-scout-timer 60)
+    (up-send-scout group-type-land-explore scout-enemy)
+    (disable-self)
+)
+(defrule
+    (or
+        (goal gl-researching-feudal 1)
+        (or
+            (current-age == feudal-age)
+            (game-time > 540)
+        )
+    )
+    (up-timer-status t-scout-timer != timer-running)
+    =>
+    (enable-timer t-scout-timer 60)
+    (up-send-scout group-type-land-explore scout-mirror)
+    (disable-self)
+)
+
+#else
+
+(defrule
+    (or
+        (goal gl-researching-feudal 1)
+        (or
+            (current-age == feudal-age)
+            (game-time > 540)
+        )
+    )
+    =>
+    (enable-timer t-scout-timer 80)
+    (up-send-scout group-type-land-explore scout-flank)
+    (disable-self)
+)
+(defrule
+    (or
+        (goal gl-researching-feudal 1)
+        (or
+            (current-age == feudal-age)
+            (game-time > 540)
+        )
+    )
+    (up-timer-status t-scout-timer != timer-running)
+    =>
+    (enable-timer t-scout-timer 40)
+    (up-send-scout group-type-land-explore scout-opposite)
+    (disable-self)
+)
+(defrule
+    (or
+        (goal gl-researching-feudal 1)
+        (or
+            (current-age == feudal-age)
+            (game-time > 540)
+        )
+    )
+    (up-timer-status t-scout-timer != timer-running)
+    =>
+    (enable-timer t-scout-timer 40)
+    (up-send-scout group-type-land-explore scout-enemy)
+    (disable-self)
+)
+(defrule
+    (or
+        (goal gl-researching-feudal 1)
+        (or
+            (current-age == feudal-age)
+            (game-time > 540)
+        )
+    )
+    (up-timer-status t-scout-timer != timer-running)
+    =>
+    (enable-timer t-scout-timer 80)
+    (up-send-scout group-type-land-explore scout-flank)
+    (disable-self)
+)
+(defrule
+    (or
+        (goal gl-researching-feudal 1)
+        (or
+            (current-age == feudal-age)
+            (game-time > 540)
+        )
+    )
+    (up-timer-status t-scout-timer != timer-running)
+    =>
+    (enable-timer t-scout-timer 60)
+    (up-send-scout group-type-land-explore scout-opposite)
+    (disable-self)
+)
+(defrule
+    (or
+        (goal gl-researching-feudal 1)
+        (or
+            (current-age == feudal-age)
+            (game-time > 540)
+        )
+    )
+    (up-timer-status t-scout-timer != timer-running)
+    =>
+    (enable-timer t-scout-timer 60)
+    (up-send-scout group-type-land-explore scout-enemy)
+    (disable-self)
+)
+(defrule
+    (or
+        (goal gl-researching-feudal 1)
+        (or
+            (current-age == feudal-age)
+            (game-time > 540)
+        )
+    )
+    (up-timer-status t-scout-timer != timer-running)
+    =>
+    (enable-timer t-scout-timer 60)
+    (up-send-scout group-type-land-explore scout-flank)
+    (disable-self)
+)
+#end-if
