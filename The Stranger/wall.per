@@ -87,6 +87,7 @@
     (set-goal gl-wall-distance-to-tree 10)
     (set-goal gl-wall-distance-to-edge 30)
     (set-goal gl-wall-allow 1)
+    (set-goal gl-wall-disabled 0)
 
     (set-goal gl-wall-building-tile-from-criterion 0)
     (set-goal gl-wall-building-pending 0)
@@ -131,12 +132,14 @@
 )
 
 (defrule
+    (goal gl-wall-disabled 0)
     (game-time > 220)
     =>
     (set-goal gl-wall-start 1)
     (disable-self)
 )
 (defrule
+    (goal gl-wall-disabled 0)
     (game-time > 400)
     =>
     (set-goal gl-wall-start 1)
@@ -147,6 +150,7 @@
     (disable-self)
 )
 (defrule
+    (goal gl-wall-disabled 0)
     (game-time > 800)
     =>
     (set-goal gl-wall-start 1)
@@ -157,6 +161,7 @@
     (disable-self)
 )
 (defrule
+    (goal gl-wall-disabled 0)
     (game-time > 840)
     (goal gl-wall-allow 1)
     =>
