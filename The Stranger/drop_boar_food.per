@@ -7,39 +7,7 @@
     (food-amount < 50)
     (housing-headroom > 0)
     =>
-    (up-full-reset-search)
-    (up-find-local c: town-center c: 2)
-    (up-get-search-state gl-tmp-local-total)
-)
-(defrule
-    (up-timer-status t-drop-boar-food-timer != timer-running)
-    (current-age == dark-age)
-    (goal gl-researching-feudal 0)
-    (food-amount < 50)
-    (housing-headroom > 0)
-
-    (up-compare-goal gl-tmp-local-total >= 1)
-    =>
-    (up-set-target-object search-local c: 0) ; set town center as target
-)
-(defrule
-    (up-timer-status t-drop-boar-food-timer != timer-running)
-    (current-age == dark-age)
-    (goal gl-researching-feudal 0)
-    (food-amount < 50)
-    (housing-headroom > 0)
-
-    (up-compare-goal gl-tmp-local-total >= 1)
-    (up-object-data object-data-progress-type == 0)
-    =>
-    (up-full-reset-search)
-    (up-get-point position-object gl-tmp-x)
-    (up-set-target-point gl-tmp-x)
-    (up-filter-distance c: -1 c: 6)
-    (up-find-local c: villager-class c: 20)
-    (up-target-objects 1 action-garrison -1 -1)
-
+    (up-drop-resources food c: 1)
+    (up-drop-resources hunting c: 1)
     (enable-timer t-drop-boar-food-timer 5)
-
-    (chat-to-all "drop food not to stop making vils!")
 )
